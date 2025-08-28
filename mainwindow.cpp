@@ -15,6 +15,15 @@
 #include <QPdfWriter>
 #include <QPainter>
 #include <QPageSize>
+#include <QGraphicsView>
+#include <QGraphicsScene>
+#include <QGraphicsEllipseItem>
+#include <QGraphicsRectItem>
+#include <QGraphicsTextItem>
+#include <QPen>
+#include <QBrush>
+#include <QVBoxLayout>
+#include <QHeaderView>
 
 
 bool MainWindow::validateClientForm() {
@@ -98,6 +107,39 @@ MainWindow::MainWindow(QWidget *parent)
     loadClientsTable();
     loadClientsCombo();
     loadOrdersTable();
+
+    // setup charts containers
+    if (!clientChartView) {
+        auto chartView = new QGraphicsView(new QGraphicsScene());
+        auto container = this->findChild<QWidget*>("clientChartContainer");
+        if (container) {
+            auto lay = new QVBoxLayout(container);
+            lay->setContentsMargins(0,0,0,0);
+            lay->addWidget(chartView);
+        }
+        clientChartView = chartView;
+    }
+    if (!orderChartView) {
+        auto chartView = new QGraphicsView(new QGraphicsScene());
+        auto container = this->findChild<QWidget*>("orderChartContainer");
+        if (container) {
+            auto lay = new QVBoxLayout(container);
+            lay->setContentsMargins(0,0,0,0);
+            lay->addWidget(chartView);
+        }
+        orderChartView = chartView;
+    }
+
+    // wire filters
+    connect(ui->leSearchClient, &QLineEdit::textChanged, this, &MainWindow::applyClientFilters);
+    connect(ui->cbStatutFilter, &QComboBox::currentTextChanged, this, &MainWindow::applyClientFilters);
+    connect(ui->cbClientSort, &QComboBox::currentTextChanged, this, &MainWindow::applyClientFilters);
+    connect(ui->leSearchOrder, &QLineEdit::textChanged, this, &MainWindow::applyOrderFilters);
+    connect(ui->cbEtatFilter, &QComboBox::currentTextChanged, this, &MainWindow::applyOrderFilters);
+    connect(ui->cbOrderSort, &QComboBox::currentTextChanged, this, &MainWindow::applyOrderFilters);
+
+    updateClientChart();
+    updateOrderChart();
 }
 
 MainWindow::~MainWindow() { delete ui; }
@@ -234,6 +276,7 @@ void MainWindow::loadClientsTable() {
     ui->tblClients->setColumnCount(8);
     QStringList headers = {"ID","Nom","Prenom","Tel","Email","Adr","Statut","Cree"};
     ui->tblClients->setHorizontalHeaderLabels(headers);
+    ui->tblClients->horizontalHeader()->setStretchLastSection(true);
     for (int i=0;i<v.size();++i) {
         const auto &c = v[i];
         ui->tblClients->setItem(i,0,new QTableWidgetItem(QString::number(c.id)));
@@ -245,6 +288,8 @@ void MainWindow::loadClientsTable() {
         ui->tblClients->setItem(i,6,new QTableWidgetItem(c.statut));
         ui->tblClients->setItem(i,7,new QTableWidgetItem(c.created.toString("yyyy-MM-dd")));
     }
+    applyClientFilters();
+    updateClientChart();
 }
 
 void MainWindow::loadOrdersTable() {
@@ -255,6 +300,7 @@ void MainWindow::loadOrdersTable() {
     ui->tblOrders->setColumnCount(6);
     QStringList headers = {"ID","Client","Date","Etat","Montant","Adr"};
     ui->tblOrders->setHorizontalHeaderLabels(headers);
+    ui->tblOrders->horizontalHeader()->setStretchLastSection(true);
     for (int i=0;i<v.size();++i) {
         const auto &o = v[i];
         ui->tblOrders->setItem(i,0,new QTableWidgetItem(QString::number(o.id)));
@@ -264,6 +310,8 @@ void MainWindow::loadOrdersTable() {
         ui->tblOrders->setItem(i,4,new QTableWidgetItem(QString::number(o.montant, 'f', 3)));
         ui->tblOrders->setItem(i,5,new QTableWidgetItem(o.adrLiv));
     }
+    applyOrderFilters();
+    updateOrderChart();
 }
 void MainWindow::exportOrderPdf() {
     auto items = ui->tblOrders->selectedItems();
@@ -329,4 +377,127 @@ void MainWindow::loadClientsCombo() {
     for (const auto& c: v) {
         ui->cbClient->addItem(QString("%1 %2").arg(c.nom, c.prenom), c.id);
     }
+}
+
+void MainWindow::applyClientFilters() {
+    QString text = ui->leSearchClient ? ui->leSearchClient->text().trimmed() : QString();
+    QString statut = ui->cbStatutFilter ? ui->cbStatutFilter->currentText() : QString("Tous");
+    QString sortKey = ui->cbClientSort ? ui->cbClientSort->currentText() : QString();
+
+    // show all rows first
+    for (int r=0; r<ui->tblClients->rowCount(); ++r) ui->tblClients->setRowHidden(r, false);
+
+    for (int r=0; r<ui->tblClients->rowCount(); ++r) {
+        bool match = true;
+        if (!text.isEmpty()) {
+            QString rowText = ui->tblClients->item(r,1)->text() + " " + ui->tblClients->item(r,2)->text() + " " + ui->tblClients->item(r,4)->text();
+            match &= rowText.contains(text, Qt::CaseInsensitive);
+        }
+        if (statut != "Tous") {
+            match &= ui->tblClients->item(r,6)->text() == statut;
+        }
+        if (!match) ui->tblClients->setRowHidden(r, true);
+    }
+
+    // sorting: simple in-place sort by column
+    if (sortKey == "Nom") ui->tblClients->sortItems(1);
+    else if (sortKey == "Prénom") ui->tblClients->sortItems(2);
+    else if (sortKey == "Créé") ui->tblClients->sortItems(7);
+}
+
+void MainWindow::applyOrderFilters() {
+    QString text = ui->leSearchOrder ? ui->leSearchOrder->text().trimmed() : QString();
+    QString etat = ui->cbEtatFilter ? ui->cbEtatFilter->currentText() : QString("Tous");
+    QString sortKey = ui->cbOrderSort ? ui->cbOrderSort->currentText() : QString();
+
+    for (int r=0; r<ui->tblOrders->rowCount(); ++r) ui->tblOrders->setRowHidden(r, false);
+
+    for (int r=0; r<ui->tblOrders->rowCount(); ++r) {
+        bool match = true;
+        if (!text.isEmpty()) {
+            QString rowText = ui->tblOrders->item(r,3)->text() + " " + ui->tblOrders->item(r,5)->text();
+            match &= rowText.contains(text, Qt::CaseInsensitive);
+        }
+        if (etat != "Tous") {
+            match &= ui->tblOrders->item(r,3)->text() == etat;
+        }
+        if (!match) ui->tblOrders->setRowHidden(r, true);
+    }
+
+    if (sortKey == "Date") ui->tblOrders->sortItems(2);
+    else if (sortKey == "Montant") ui->tblOrders->sortItems(4);
+    else if (sortKey == "État") ui->tblOrders->sortItems(3);
+}
+
+void MainWindow::updateClientChart() {
+    if (!clientChartView) return;
+    auto view = static_cast<QGraphicsView*>(clientChartView);
+    QGraphicsScene* scene = view->scene();
+    scene->clear();
+
+    QMap<QString,int> counts; counts["ACTIVE"]=0; counts["INACTIVE"]=0;
+    for (int r=0; r<ui->tblClients->rowCount(); ++r) {
+        if (ui->tblClients->isRowHidden(r)) continue;
+        counts[ ui->tblClients->item(r,6)->text() ]++;
+    }
+    int total = 0; for (auto v : counts) total += v;
+    if (total == 0) { scene->addText("Aucune donnée"); return; }
+
+    QRectF pieRect(10, 10, 220, 220);
+    int startAngle16 = 0;
+    QList<QColor> colors { QColor("#4caf50"), QColor("#f44336"), QColor("#2196f3"), QColor("#ff9800") };
+    int colorIdx = 0;
+    int legendY = 10;
+    for (auto it = counts.begin(); it != counts.end(); ++it) {
+        if (it.value() == 0) continue;
+        int span16 = int(5760.0 * (double(it.value()) / double(total)) + 0.5);
+        QColor color = colors[colorIdx++ % colors.size()];
+        auto slice = scene->addEllipse(pieRect, QPen(Qt::NoPen), QBrush(color));
+        slice->setStartAngle(startAngle16);
+        slice->setSpanAngle(span16);
+        // legend
+        auto rect = scene->addRect(250, legendY, 12, 12, QPen(Qt::black), QBrush(color));
+        Q_UNUSED(rect);
+        scene->addText(QString("%1 (%2)").arg(it.key()).arg(it.value()))->setPos(270, legendY-2);
+        legendY += 18;
+        startAngle16 += span16;
+    }
+    scene->addText("Clients par statut (filtrés)")->setPos(10, 240);
+}
+
+void MainWindow::updateOrderChart() {
+    if (!orderChartView) return;
+    auto view = static_cast<QGraphicsView*>(orderChartView);
+    QGraphicsScene* scene = view->scene();
+    scene->clear();
+
+    QMap<QString,double> sums; sums["EN_ATTENTE"]=0; sums["EN_COURS"]=0; sums["LIVREE"]=0; sums["ANNULEE"]=0;
+    for (int r=0; r<ui->tblOrders->rowCount(); ++r) {
+        if (ui->tblOrders->isRowHidden(r)) continue;
+        QString e = ui->tblOrders->item(r,3)->text();
+        double m = ui->tblOrders->item(r,4)->text().toDouble();
+        sums[e] += m;
+    }
+    QStringList cats; cats << "EN_ATTENTE" << "EN_COURS" << "LIVREE" << "ANNULEE";
+    double maxVal = 0; for (const auto& c : cats) maxVal = std::max(maxVal, sums.value(c,0));
+    if (maxVal <= 0) { scene->addText("Aucune donnée"); return; }
+
+    int left = 40, top = 20, width = 360, height = 220;
+    scene->addRect(left, top, width, height, QPen(Qt::black));
+    int barWidth = 50; int gap = 30; int x = left + 20;
+    QList<QColor> colors { QColor("#3f51b5"), QColor("#009688"), QColor("#ff5722"), QColor("#9c27b0") };
+    int idx = 0;
+    for (const auto& c : cats) {
+        double val = sums.value(c,0);
+        int barH = int((val / maxVal) * (height - 20));
+        int y = top + height - barH;
+        QColor color = colors[idx++ % colors.size()];
+        scene->addRect(x, y, barWidth, barH, QPen(Qt::black), QBrush(color));
+        auto txt = scene->addText(c);
+        txt->setPos(x, top + height + 5);
+        auto valTxt = scene->addText(QString::number(val, 'f', 2));
+        valTxt->setPos(x, y - 18);
+        x += barWidth + gap;
+    }
+    scene->addText("Somme des commandes par état (filtrées)")->setPos(left, top + height + 40);
 }

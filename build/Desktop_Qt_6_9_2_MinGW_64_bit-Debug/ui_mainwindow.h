@@ -36,41 +36,52 @@ public:
     QWidget *tabClients;
     QVBoxLayout *vlc;
     QFormLayout *formClient;
-    QLabel *label;
+    QLabel *lblNom;
     QLineEdit *leNom;
-    QLabel *label1;
+    QLabel *lblPrenom;
     QLineEdit *lePrenom;
-    QLabel *label2;
+    QLabel *lblTel;
     QLineEdit *leTel;
-    QLabel *label3;
+    QLabel *lblEmail;
     QLineEdit *leEmail;
-    QLabel *label4;
+    QLabel *lblAdr;
     QLineEdit *leAdr;
-    QLabel *label5;
+    QLabel *lblStatut;
     QComboBox *cbStatut;
+    QHBoxLayout *filterRowClient;
+    QLineEdit *leSearchClient;
+    QComboBox *cbStatutFilter;
+    QComboBox *cbClientSort;
     QHBoxLayout *btnRowClient;
     QPushButton *btnAddClient;
     QPushButton *btnUpdClient;
     QPushButton *btnDelClient;
     QPushButton *btnRefClient;
     QTableWidget *tblClients;
+    QWidget *clientChartContainer;
     QWidget *tabOrders;
     QVBoxLayout *vlo;
     QFormLayout *formOrder;
-    QLabel *label6;
+    QLabel *lblClient;
     QComboBox *cbClient;
-    QLabel *label7;
+    QLabel *lblEtat;
     QComboBox *cbEtat;
-    QLabel *label8;
+    QLabel *lblMontant;
     QDoubleSpinBox *dsMontant;
-    QLabel *label9;
+    QLabel *lblAdrLiv;
     QLineEdit *leAdrLiv;
+    QHBoxLayout *filterRowOrder;
+    QLineEdit *leSearchOrder;
+    QComboBox *cbEtatFilter;
+    QComboBox *cbOrderSort;
     QHBoxLayout *btnRowOrder;
     QPushButton *btnAddOrd;
     QPushButton *btnUpdOrd;
     QPushButton *btnDelOrd;
     QPushButton *btnRefOrd;
+    QPushButton *btnPdfOrd;
     QTableWidget *tblOrders;
+    QWidget *orderChartContainer;
 
     void setupUi(QMainWindow *MainWindow)
     {
@@ -89,60 +100,60 @@ public:
         vlc->setObjectName("vlc");
         formClient = new QFormLayout();
         formClient->setObjectName("formClient");
-        label = new QLabel(tabClients);
-        label->setObjectName("label");
+        lblNom = new QLabel(tabClients);
+        lblNom->setObjectName("lblNom");
 
-        formClient->setWidget(0, QFormLayout::ItemRole::LabelRole, label);
+        formClient->setWidget(0, QFormLayout::ItemRole::LabelRole, lblNom);
 
         leNom = new QLineEdit(tabClients);
         leNom->setObjectName("leNom");
 
         formClient->setWidget(0, QFormLayout::ItemRole::FieldRole, leNom);
 
-        label1 = new QLabel(tabClients);
-        label1->setObjectName("label1");
+        lblPrenom = new QLabel(tabClients);
+        lblPrenom->setObjectName("lblPrenom");
 
-        formClient->setWidget(1, QFormLayout::ItemRole::LabelRole, label1);
+        formClient->setWidget(1, QFormLayout::ItemRole::LabelRole, lblPrenom);
 
         lePrenom = new QLineEdit(tabClients);
         lePrenom->setObjectName("lePrenom");
 
         formClient->setWidget(1, QFormLayout::ItemRole::FieldRole, lePrenom);
 
-        label2 = new QLabel(tabClients);
-        label2->setObjectName("label2");
+        lblTel = new QLabel(tabClients);
+        lblTel->setObjectName("lblTel");
 
-        formClient->setWidget(2, QFormLayout::ItemRole::LabelRole, label2);
+        formClient->setWidget(2, QFormLayout::ItemRole::LabelRole, lblTel);
 
         leTel = new QLineEdit(tabClients);
         leTel->setObjectName("leTel");
 
         formClient->setWidget(2, QFormLayout::ItemRole::FieldRole, leTel);
 
-        label3 = new QLabel(tabClients);
-        label3->setObjectName("label3");
+        lblEmail = new QLabel(tabClients);
+        lblEmail->setObjectName("lblEmail");
 
-        formClient->setWidget(3, QFormLayout::ItemRole::LabelRole, label3);
+        formClient->setWidget(3, QFormLayout::ItemRole::LabelRole, lblEmail);
 
         leEmail = new QLineEdit(tabClients);
         leEmail->setObjectName("leEmail");
 
         formClient->setWidget(3, QFormLayout::ItemRole::FieldRole, leEmail);
 
-        label4 = new QLabel(tabClients);
-        label4->setObjectName("label4");
+        lblAdr = new QLabel(tabClients);
+        lblAdr->setObjectName("lblAdr");
 
-        formClient->setWidget(4, QFormLayout::ItemRole::LabelRole, label4);
+        formClient->setWidget(4, QFormLayout::ItemRole::LabelRole, lblAdr);
 
         leAdr = new QLineEdit(tabClients);
         leAdr->setObjectName("leAdr");
 
         formClient->setWidget(4, QFormLayout::ItemRole::FieldRole, leAdr);
 
-        label5 = new QLabel(tabClients);
-        label5->setObjectName("label5");
+        lblStatut = new QLabel(tabClients);
+        lblStatut->setObjectName("lblStatut");
 
-        formClient->setWidget(5, QFormLayout::ItemRole::LabelRole, label5);
+        formClient->setWidget(5, QFormLayout::ItemRole::LabelRole, lblStatut);
 
         cbStatut = new QComboBox(tabClients);
         cbStatut->addItem(QString());
@@ -153,6 +164,32 @@ public:
 
 
         vlc->addLayout(formClient);
+
+        filterRowClient = new QHBoxLayout();
+        filterRowClient->setObjectName("filterRowClient");
+        leSearchClient = new QLineEdit(tabClients);
+        leSearchClient->setObjectName("leSearchClient");
+
+        filterRowClient->addWidget(leSearchClient);
+
+        cbStatutFilter = new QComboBox(tabClients);
+        cbStatutFilter->addItem(QString());
+        cbStatutFilter->addItem(QString());
+        cbStatutFilter->addItem(QString());
+        cbStatutFilter->setObjectName("cbStatutFilter");
+
+        filterRowClient->addWidget(cbStatutFilter);
+
+        cbClientSort = new QComboBox(tabClients);
+        cbClientSort->addItem(QString());
+        cbClientSort->addItem(QString());
+        cbClientSort->addItem(QString());
+        cbClientSort->setObjectName("cbClientSort");
+
+        filterRowClient->addWidget(cbClientSort);
+
+
+        vlc->addLayout(filterRowClient);
 
         btnRowClient = new QHBoxLayout();
         btnRowClient->setObjectName("btnRowClient");
@@ -186,6 +223,11 @@ public:
 
         vlc->addWidget(tblClients);
 
+        clientChartContainer = new QWidget(tabClients);
+        clientChartContainer->setObjectName("clientChartContainer");
+
+        vlc->addWidget(clientChartContainer);
+
         tabWidget->addTab(tabClients, QString());
         tabOrders = new QWidget();
         tabOrders->setObjectName("tabOrders");
@@ -193,20 +235,20 @@ public:
         vlo->setObjectName("vlo");
         formOrder = new QFormLayout();
         formOrder->setObjectName("formOrder");
-        label6 = new QLabel(tabOrders);
-        label6->setObjectName("label6");
+        lblClient = new QLabel(tabOrders);
+        lblClient->setObjectName("lblClient");
 
-        formOrder->setWidget(0, QFormLayout::ItemRole::LabelRole, label6);
+        formOrder->setWidget(0, QFormLayout::ItemRole::LabelRole, lblClient);
 
         cbClient = new QComboBox(tabOrders);
         cbClient->setObjectName("cbClient");
 
         formOrder->setWidget(0, QFormLayout::ItemRole::FieldRole, cbClient);
 
-        label7 = new QLabel(tabOrders);
-        label7->setObjectName("label7");
+        lblEtat = new QLabel(tabOrders);
+        lblEtat->setObjectName("lblEtat");
 
-        formOrder->setWidget(1, QFormLayout::ItemRole::LabelRole, label7);
+        formOrder->setWidget(1, QFormLayout::ItemRole::LabelRole, lblEtat);
 
         cbEtat = new QComboBox(tabOrders);
         cbEtat->addItem(QString());
@@ -217,10 +259,10 @@ public:
 
         formOrder->setWidget(1, QFormLayout::ItemRole::FieldRole, cbEtat);
 
-        label8 = new QLabel(tabOrders);
-        label8->setObjectName("label8");
+        lblMontant = new QLabel(tabOrders);
+        lblMontant->setObjectName("lblMontant");
 
-        formOrder->setWidget(2, QFormLayout::ItemRole::LabelRole, label8);
+        formOrder->setWidget(2, QFormLayout::ItemRole::LabelRole, lblMontant);
 
         dsMontant = new QDoubleSpinBox(tabOrders);
         dsMontant->setObjectName("dsMontant");
@@ -228,10 +270,10 @@ public:
 
         formOrder->setWidget(2, QFormLayout::ItemRole::FieldRole, dsMontant);
 
-        label9 = new QLabel(tabOrders);
-        label9->setObjectName("label9");
+        lblAdrLiv = new QLabel(tabOrders);
+        lblAdrLiv->setObjectName("lblAdrLiv");
 
-        formOrder->setWidget(3, QFormLayout::ItemRole::LabelRole, label9);
+        formOrder->setWidget(3, QFormLayout::ItemRole::LabelRole, lblAdrLiv);
 
         leAdrLiv = new QLineEdit(tabOrders);
         leAdrLiv->setObjectName("leAdrLiv");
@@ -240,6 +282,34 @@ public:
 
 
         vlo->addLayout(formOrder);
+
+        filterRowOrder = new QHBoxLayout();
+        filterRowOrder->setObjectName("filterRowOrder");
+        leSearchOrder = new QLineEdit(tabOrders);
+        leSearchOrder->setObjectName("leSearchOrder");
+
+        filterRowOrder->addWidget(leSearchOrder);
+
+        cbEtatFilter = new QComboBox(tabOrders);
+        cbEtatFilter->addItem(QString());
+        cbEtatFilter->addItem(QString());
+        cbEtatFilter->addItem(QString());
+        cbEtatFilter->addItem(QString());
+        cbEtatFilter->addItem(QString());
+        cbEtatFilter->setObjectName("cbEtatFilter");
+
+        filterRowOrder->addWidget(cbEtatFilter);
+
+        cbOrderSort = new QComboBox(tabOrders);
+        cbOrderSort->addItem(QString());
+        cbOrderSort->addItem(QString());
+        cbOrderSort->addItem(QString());
+        cbOrderSort->setObjectName("cbOrderSort");
+
+        filterRowOrder->addWidget(cbOrderSort);
+
+
+        vlo->addLayout(filterRowOrder);
 
         btnRowOrder = new QHBoxLayout();
         btnRowOrder->setObjectName("btnRowOrder");
@@ -263,6 +333,11 @@ public:
 
         btnRowOrder->addWidget(btnRefOrd);
 
+        btnPdfOrd = new QPushButton(tabOrders);
+        btnPdfOrd->setObjectName("btnPdfOrd");
+
+        btnRowOrder->addWidget(btnPdfOrd);
+
 
         vlo->addLayout(btnRowOrder);
 
@@ -273,6 +348,11 @@ public:
 
         vlo->addWidget(tblOrders);
 
+        orderChartContainer = new QWidget(tabOrders);
+        orderChartContainer->setObjectName("orderChartContainer");
+
+        vlo->addWidget(orderChartContainer);
+
         tabWidget->addTab(tabOrders, QString());
 
         verticalLayout->addWidget(tabWidget);
@@ -281,7 +361,7 @@ public:
 
         retranslateUi(MainWindow);
 
-        tabWidget->setCurrentIndex(0);
+        tabWidget->setCurrentIndex(1);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -290,33 +370,54 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "projet_logi", nullptr));
-        label->setText(QCoreApplication::translate("MainWindow", "Nom", nullptr));
-        label1->setText(QCoreApplication::translate("MainWindow", "Prenom", nullptr));
-        label2->setText(QCoreApplication::translate("MainWindow", "Tel", nullptr));
-        label3->setText(QCoreApplication::translate("MainWindow", "Email", nullptr));
-        label4->setText(QCoreApplication::translate("MainWindow", "Adr", nullptr));
-        label5->setText(QCoreApplication::translate("MainWindow", "Statut", nullptr));
+        lblNom->setText(QCoreApplication::translate("MainWindow", "Nom", nullptr));
+        lblPrenom->setText(QCoreApplication::translate("MainWindow", "Prenom", nullptr));
+        lblTel->setText(QCoreApplication::translate("MainWindow", "Tel", nullptr));
+        lblEmail->setText(QCoreApplication::translate("MainWindow", "Email", nullptr));
+        lblAdr->setText(QCoreApplication::translate("MainWindow", "Adr", nullptr));
+        lblStatut->setText(QCoreApplication::translate("MainWindow", "Statut", nullptr));
         cbStatut->setItemText(0, QCoreApplication::translate("MainWindow", "ACTIVE", nullptr));
         cbStatut->setItemText(1, QCoreApplication::translate("MainWindow", "INACTIVE", nullptr));
+
+        leSearchClient->setPlaceholderText(QCoreApplication::translate("MainWindow", "Rechercher (nom, pr\303\251nom, email)", nullptr));
+        cbStatutFilter->setItemText(0, QCoreApplication::translate("MainWindow", "Tous", nullptr));
+        cbStatutFilter->setItemText(1, QCoreApplication::translate("MainWindow", "ACTIVE", nullptr));
+        cbStatutFilter->setItemText(2, QCoreApplication::translate("MainWindow", "INACTIVE", nullptr));
+
+        cbClientSort->setItemText(0, QCoreApplication::translate("MainWindow", "Nom", nullptr));
+        cbClientSort->setItemText(1, QCoreApplication::translate("MainWindow", "Pr\303\251nom", nullptr));
+        cbClientSort->setItemText(2, QCoreApplication::translate("MainWindow", "Cr\303\251\303\251", nullptr));
 
         btnAddClient->setText(QCoreApplication::translate("MainWindow", "Ajouter", nullptr));
         btnUpdClient->setText(QCoreApplication::translate("MainWindow", "Modifier", nullptr));
         btnDelClient->setText(QCoreApplication::translate("MainWindow", "Supprimer", nullptr));
         btnRefClient->setText(QCoreApplication::translate("MainWindow", "Rafra\303\256chir", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tabClients), QCoreApplication::translate("MainWindow", "Clients", nullptr));
-        label6->setText(QCoreApplication::translate("MainWindow", "Client", nullptr));
-        label7->setText(QCoreApplication::translate("MainWindow", "Etat", nullptr));
+        lblClient->setText(QCoreApplication::translate("MainWindow", "Client", nullptr));
+        lblEtat->setText(QCoreApplication::translate("MainWindow", "Etat", nullptr));
         cbEtat->setItemText(0, QCoreApplication::translate("MainWindow", "EN_ATTENTE", nullptr));
         cbEtat->setItemText(1, QCoreApplication::translate("MainWindow", "EN_COURS", nullptr));
         cbEtat->setItemText(2, QCoreApplication::translate("MainWindow", "LIVREE", nullptr));
         cbEtat->setItemText(3, QCoreApplication::translate("MainWindow", "ANNULEE", nullptr));
 
-        label8->setText(QCoreApplication::translate("MainWindow", "Montant", nullptr));
-        label9->setText(QCoreApplication::translate("MainWindow", "Adr Liv.", nullptr));
+        lblMontant->setText(QCoreApplication::translate("MainWindow", "Montant", nullptr));
+        lblAdrLiv->setText(QCoreApplication::translate("MainWindow", "Adr Liv.", nullptr));
+        leSearchOrder->setPlaceholderText(QCoreApplication::translate("MainWindow", "Rechercher (\303\251tat, adr)", nullptr));
+        cbEtatFilter->setItemText(0, QCoreApplication::translate("MainWindow", "Tous", nullptr));
+        cbEtatFilter->setItemText(1, QCoreApplication::translate("MainWindow", "EN_ATTENTE", nullptr));
+        cbEtatFilter->setItemText(2, QCoreApplication::translate("MainWindow", "EN_COURS", nullptr));
+        cbEtatFilter->setItemText(3, QCoreApplication::translate("MainWindow", "LIVREE", nullptr));
+        cbEtatFilter->setItemText(4, QCoreApplication::translate("MainWindow", "ANNULEE", nullptr));
+
+        cbOrderSort->setItemText(0, QCoreApplication::translate("MainWindow", "Date", nullptr));
+        cbOrderSort->setItemText(1, QCoreApplication::translate("MainWindow", "Montant", nullptr));
+        cbOrderSort->setItemText(2, QCoreApplication::translate("MainWindow", "\303\211tat", nullptr));
+
         btnAddOrd->setText(QCoreApplication::translate("MainWindow", "Ajouter", nullptr));
         btnUpdOrd->setText(QCoreApplication::translate("MainWindow", "Modifier", nullptr));
         btnDelOrd->setText(QCoreApplication::translate("MainWindow", "Supprimer", nullptr));
         btnRefOrd->setText(QCoreApplication::translate("MainWindow", "Rafra\303\256chir", nullptr));
+        btnPdfOrd->setText(QCoreApplication::translate("MainWindow", "Exporter PDF", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tabOrders), QCoreApplication::translate("MainWindow", "Commandes", nullptr));
     } // retranslateUi
 

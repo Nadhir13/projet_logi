@@ -28,7 +28,7 @@
         <item>
          <layout class="QFormLayout" name="formClient">
           <item row="0" column="0">
-           <widget class="QLabel" name="label">
+           <widget class="QLabel" name="lblNom">
             <property name="text">
              <string>Nom</string>
             </property>
@@ -38,7 +38,7 @@
            <widget class="QLineEdit" name="leNom"/>
           </item>
           <item row="1" column="0">
-           <widget class="QLabel" name="label">
+           <widget class="QLabel" name="lblPrenom">
             <property name="text">
              <string>Prenom</string>
             </property>
@@ -48,7 +48,7 @@
            <widget class="QLineEdit" name="lePrenom"/>
           </item>
           <item row="2" column="0">
-           <widget class="QLabel" name="label">
+           <widget class="QLabel" name="lblTel">
             <property name="text">
              <string>Tel</string>
             </property>
@@ -58,7 +58,7 @@
            <widget class="QLineEdit" name="leTel"/>
           </item>
           <item row="3" column="0">
-           <widget class="QLabel" name="label">
+           <widget class="QLabel" name="lblEmail">
             <property name="text">
              <string>Email</string>
             </property>
@@ -68,7 +68,7 @@
            <widget class="QLineEdit" name="leEmail"/>
           </item>
           <item row="4" column="0">
-           <widget class="QLabel" name="label">
+           <widget class="QLabel" name="lblAdr">
             <property name="text">
              <string>Adr</string>
             </property>
@@ -78,7 +78,7 @@
            <widget class="QLineEdit" name="leAdr"/>
           </item>
           <item row="5" column="0">
-           <widget class="QLabel" name="label">
+           <widget class="QLabel" name="lblStatut">
             <property name="text">
              <string>Statut</string>
             </property>
@@ -96,6 +96,31 @@
               <string>INACTIVE</string>
              </property>
             </item>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="filterRowClient">
+          <item>
+           <widget class="QLineEdit" name="leSearchClient">
+            <property name="placeholderText">
+             <string>Rechercher (nom, prénom, email)</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="cbStatutFilter">
+            <item><property name="text"><string>Tous</string></property></item>
+            <item><property name="text"><string>ACTIVE</string></property></item>
+            <item><property name="text"><string>INACTIVE</string></property></item>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="cbClientSort">
+            <item><property name="text"><string>Nom</string></property></item>
+            <item><property name="text"><string>Prénom</string></property></item>
+            <item><property name="text"><string>Créé</string></property></item>
            </widget>
           </item>
          </layout>
@@ -142,6 +167,9 @@
           </property>
          </widget>
         </item>
+        <item>
+         <widget class="QWidget" name="clientChartContainer"/>
+        </item>
        </layout>
       </widget>
       <widget class="QWidget" name="tabOrders">
@@ -152,7 +180,7 @@
         <item>
          <layout class="QFormLayout" name="formOrder">
           <item row="0" column="0">
-           <widget class="QLabel" name="label">
+           <widget class="QLabel" name="lblClient">
             <property name="text">
              <string>Client</string>
             </property>
@@ -162,7 +190,7 @@
            <widget class="QComboBox" name="cbClient"/>
           </item>
           <item row="1" column="0">
-           <widget class="QLabel" name="label">
+           <widget class="QLabel" name="lblEtat">
             <property name="text">
              <string>Etat</string>
             </property>
@@ -193,7 +221,7 @@
            </widget>
           </item>
           <item row="2" column="0">
-           <widget class="QLabel" name="label">
+           <widget class="QLabel" name="lblMontant">
             <property name="text">
              <string>Montant</string>
             </property>
@@ -207,7 +235,7 @@
            </widget>
           </item>
           <item row="3" column="0">
-           <widget class="QLabel" name="label">
+           <widget class="QLabel" name="lblAdrLiv">
             <property name="text">
              <string>Adr Liv.</string>
             </property>
@@ -215,6 +243,33 @@
           </item>
           <item row="3" column="1">
            <widget class="QLineEdit" name="leAdrLiv"/>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="filterRowOrder">
+          <item>
+           <widget class="QLineEdit" name="leSearchOrder">
+            <property name="placeholderText">
+             <string>Rechercher (état, adr)</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="cbEtatFilter">
+            <item><property name="text"><string>Tous</string></property></item>
+            <item><property name="text"><string>EN_ATTENTE</string></property></item>
+            <item><property name="text"><string>EN_COURS</string></property></item>
+            <item><property name="text"><string>LIVREE</string></property></item>
+            <item><property name="text"><string>ANNULEE</string></property></item>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="cbOrderSort">
+            <item><property name="text"><string>Date</string></property></item>
+            <item><property name="text"><string>Montant</string></property></item>
+            <item><property name="text"><string>État</string></property></item>
+           </widget>
           </item>
          </layout>
         </item>
@@ -266,6 +321,9 @@
            <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
           </property>
          </widget>
+        </item>
+        <item>
+         <widget class="QWidget" name="orderChartContainer"/>
         </item>
        </layout>
       </widget>
