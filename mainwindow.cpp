@@ -11,6 +11,11 @@
 #include "clientdao.h"
 #include "orderdao.h"
 
+#include <QFileDialog>
+#include <QPdfWriter>
+#include <QPainter>
+#include <QPageSize>
+
 
 bool MainWindow::validateClientForm() {
     if (ui->leNom->text().isEmpty()) {
@@ -45,6 +50,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->btnUpdOrd, &QPushButton::clicked, this, &MainWindow::updOrder);
     connect(ui->btnDelOrd, &QPushButton::clicked, this, &MainWindow::delOrder);
     connect(ui->btnRefOrd, &QPushButton::clicked, this, &MainWindow::refOrder);
+    connect(ui->btnPdfOrd, &QPushButton::clicked, this, &MainWindow::exportOrderPdf);
 
     // Connect selection changes
     connect(ui->tblClients, &QTableWidget::itemSelectionChanged, this, [this]() {
@@ -258,6 +264,62 @@ void MainWindow::loadOrdersTable() {
         ui->tblOrders->setItem(i,4,new QTableWidgetItem(QString::number(o.montant, 'f', 3)));
         ui->tblOrders->setItem(i,5,new QTableWidgetItem(o.adrLiv));
     }
+}
+void MainWindow::exportOrderPdf() {
+    auto items = ui->tblOrders->selectedItems();
+    if (items.isEmpty()) {
+        QMessageBox::warning(this, "PDF", "Veuillez sélectionner une commande.");
+        return;
+    }
+    int row = items.first()->row();
+    int id = ui->tblOrders->item(row, 0)->text().toInt();
+
+    OrderDao dao;
+    auto orderOpt = dao.byId(id);
+    if (!orderOpt.has_value()) {
+        QMessageBox::warning(this, "PDF", "Commande introuvable.");
+        return;
+    }
+    Order o = orderOpt.value();
+
+    QString defaultName = QString("commande_%1.pdf").arg(o.id);
+    QString filePath = QFileDialog::getSaveFileName(this, "Enregistrer le PDF", defaultName, "PDF Files (*.pdf)");
+    if (filePath.isEmpty()) return;
+
+    QPdfWriter writer(filePath);
+    writer.setPageSize(QPageSize(QPageSize::A4));
+    writer.setResolution(300);
+    QPainter painter(&writer);
+    if (!painter.isActive()) {
+        QMessageBox::warning(this, "PDF", "Impossible de créer le PDF.");
+        return;
+    }
+
+    int x = 500; // left margin
+    int y = 500; // top margin
+    int line = 400; // line height
+
+    QFont titleFont = painter.font();
+    titleFont.setPointSize(16);
+    titleFont.setBold(true);
+    painter.setFont(titleFont);
+    painter.drawText(x, y, QString("Commande #%1").arg(o.id));
+    y += line * 2;
+
+    QFont bodyFont = painter.font();
+    bodyFont.setPointSize(10);
+    bodyFont.setBold(false);
+    painter.setFont(bodyFont);
+
+    painter.drawText(x, y, QString("Date: %1").arg(o.date.toString("yyyy-MM-dd"))); y += line;
+    painter.drawText(x, y, QString("Client ID: %1").arg(o.clientId)); y += line;
+    painter.drawText(x, y, QString("Etat: %1").arg(o.etat)); y += line;
+    painter.drawText(x, y, QString("Montant: %1").arg(QString::number(o.montant, 'f', 3))); y += line;
+    painter.drawText(x, y, QString("Adresse de livraison: %1").arg(o.adrLiv)); y += line;
+
+    painter.end();
+
+    QMessageBox::information(this, "PDF", "PDF généré avec succès.");
 }
 
 void MainWindow::loadClientsCombo() {

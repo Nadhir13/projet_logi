@@ -1,4 +1,4 @@
-QT += core gui widgets sql
+QT += core gui widgets sql printsupport
 CONFIG += c++17
 TEMPLATE = app
 TARGET = projet_logi

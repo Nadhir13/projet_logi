@@ -24,6 +24,7 @@ private slots:
     void updOrder();
     void delOrder();
     void refOrder();
+    void exportOrderPdf();
 
 private:
     void loadClientsTable();
