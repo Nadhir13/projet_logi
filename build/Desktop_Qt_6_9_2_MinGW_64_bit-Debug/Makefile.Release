@@ -328,7 +328,22 @@ release/moc_mainwindow.cpp: ../../mainwindow.h \
 		C:/Qt/6.9.2/mingw_64/include/QtCore/qlocale.h \
 		C:/Qt/6.9.2/mingw_64/include/QtGui/qguiapplication_platform.h \
 		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qtabwidget.h \
-		ui_mainwindow.h \
+		C:/Qt/6.9.2/mingw_64/include/QtWidgets/QAbstractItemView \
+		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qabstractitemview.h \
+		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qabstractscrollarea.h \
+		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qframe.h \
+		C:/Qt/6.9.2/mingw_64/include/QtCore/qabstractitemmodel.h \
+		C:/Qt/6.9.2/mingw_64/include/QtCore/qitemselectionmodel.h \
+		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qabstractitemdelegate.h \
+		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qstyleoption.h \
+		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qabstractspinbox.h \
+		C:/Qt/6.9.2/mingw_64/include/QtGui/qvalidator.h \
+		C:/Qt/6.9.2/mingw_64/include/QtCore/qregularexpression.h \
+		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qslider.h \
+		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qabstractslider.h \
+		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qstyle.h \
+		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qtabbar.h \
+		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qrubberband.h \
 		release/moc_predefs.h \
 		C:/Qt/6.9.2/mingw_64/bin/moc.exe
 	C:\Qt\6.9.2\mingw_64\bin\moc.exe $(DEFINES) --include C:/Users/nadhi/Documents/projet_logi/build/Desktop_Qt_6_9_2_MinGW_64_bit-Debug/release/moc_predefs.h -IC:/Qt/6.9.2/mingw_64/mkspecs/win32-g++ -IC:/Users/nadhi/Documents/projet_logi -IC:/Qt/6.9.2/mingw_64/include -IC:/Qt/6.9.2/mingw_64/include/QtWidgets -IC:/Qt/6.9.2/mingw_64/include/QtGui -IC:/Qt/6.9.2/mingw_64/include/QtSql -IC:/Qt/6.9.2/mingw_64/include/QtCore -I. -IC:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++ -IC:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/x86_64-w64-mingw32 -IC:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/backward -IC:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include -IC:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include-fixed -IC:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include ..\..\mainwindow.h -o release\moc_mainwindow.cpp
@@ -558,7 +573,22 @@ release/main.o: ../../main.cpp C:/Qt/6.9.2/mingw_64/include/QtWidgets/QApplicati
 		C:/Qt/6.9.2/mingw_64/include/QtGui/QTransform \
 		C:/Qt/6.9.2/mingw_64/include/QtGui/qscreen_platform.h \
 		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qtabwidget.h \
-		ui_mainwindow.h \
+		C:/Qt/6.9.2/mingw_64/include/QtWidgets/QAbstractItemView \
+		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qabstractitemview.h \
+		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qabstractscrollarea.h \
+		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qframe.h \
+		C:/Qt/6.9.2/mingw_64/include/QtCore/qabstractitemmodel.h \
+		C:/Qt/6.9.2/mingw_64/include/QtCore/qitemselectionmodel.h \
+		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qabstractitemdelegate.h \
+		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qstyleoption.h \
+		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qabstractspinbox.h \
+		C:/Qt/6.9.2/mingw_64/include/QtGui/qvalidator.h \
+		C:/Qt/6.9.2/mingw_64/include/QtCore/qregularexpression.h \
+		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qslider.h \
+		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qabstractslider.h \
+		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qstyle.h \
+		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qtabbar.h \
+		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qrubberband.h \
 		../../db.h \
 		C:/Qt/6.9.2/mingw_64/include/QtSql/QSqlDatabase \
 		C:/Qt/6.9.2/mingw_64/include/QtSql/qsqldatabase.h \
@@ -1456,14 +1486,7 @@ release/mainwindow.o: ../../mainwindow.cpp ../../mainwindow.h \
 		C:/Qt/6.9.2/mingw_64/include/QtCore/qlocale.h \
 		C:/Qt/6.9.2/mingw_64/include/QtGui/qguiapplication_platform.h \
 		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qtabwidget.h \
-		ui_mainwindow.h \
-		C:/Qt/6.9.2/mingw_64/include/QtWidgets/QMessageBox \
-		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qmessagebox.h \
-		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qdialog.h \
-		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qdialogbuttonbox.h \
-		C:/Qt/6.9.2/mingw_64/include/QtWidgets/QTableWidget \
-		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qtablewidget.h \
-		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qtableview.h \
+		C:/Qt/6.9.2/mingw_64/include/QtWidgets/QAbstractItemView \
 		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qabstractitemview.h \
 		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qabstractscrollarea.h \
 		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qframe.h \
@@ -1479,6 +1502,14 @@ release/mainwindow.o: ../../mainwindow.cpp ../../mainwindow.h \
 		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qstyle.h \
 		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qtabbar.h \
 		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qrubberband.h \
+		ui_mainwindow.h \
+		C:/Qt/6.9.2/mingw_64/include/QtWidgets/QMessageBox \
+		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qmessagebox.h \
+		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qdialog.h \
+		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qdialogbuttonbox.h \
+		C:/Qt/6.9.2/mingw_64/include/QtWidgets/QTableWidget \
+		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qtablewidget.h \
+		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qtableview.h \
 		C:/Qt/6.9.2/mingw_64/include/QtWidgets/QTableWidgetItem \
 		C:/Qt/6.9.2/mingw_64/include/QtWidgets/QComboBox \
 		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qcombobox.h \
@@ -1491,11 +1522,18 @@ release/mainwindow.o: ../../mainwindow.cpp ../../mainwindow.h \
 		C:/Qt/6.9.2/mingw_64/include/QtGui/qtextoption.h \
 		C:/Qt/6.9.2/mingw_64/include/QtWidgets/QDoubleSpinBox \
 		C:/Qt/6.9.2/mingw_64/include/QtWidgets/qspinbox.h \
+		../../db.h \
+		C:/Qt/6.9.2/mingw_64/include/QtSql/QSqlDatabase \
+		C:/Qt/6.9.2/mingw_64/include/QtSql/qsqldatabase.h \
+		C:/Qt/6.9.2/mingw_64/include/QtSql/qtsqlglobal.h \
+		C:/Qt/6.9.2/mingw_64/include/QtSql/qtsql-config.h \
+		C:/Qt/6.9.2/mingw_64/include/QtSql/qtsqlexports.h \
+		C:/Qt/6.9.2/mingw_64/include/QtCore/qmetaobject.h \
+		C:/Qt/6.9.2/mingw_64/include/QtCore/QString \
 		../../clientdao.h \
 		C:/Qt/6.9.2/mingw_64/include/QtCore/QVector \
 		C:/Qt/6.9.2/mingw_64/include/QtCore/qvector.h \
 		../../client.h \
-		C:/Qt/6.9.2/mingw_64/include/QtCore/QString \
 		C:/Qt/6.9.2/mingw_64/include/QtCore/QDate \
 		C:/Qt/6.9.2/mingw_64/include/QtCore/qdatetime.h \
 		C:/Qt/6.9.2/mingw_64/include/QtCore/qcalendar.h \

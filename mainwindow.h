@@ -1,7 +1,6 @@
 #pragma once
 #include <QMainWindow>
-#include "ui_mainwindow.h"
-
+#include <QAbstractItemView>  // Add this for table selection properties
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -30,6 +29,7 @@ private:
     void loadClientsTable();
     void loadOrdersTable();
     void loadClientsCombo();
+    bool validateClientForm();  // ADD THIS LINE
 
 private:
     Ui::MainWindow *ui;

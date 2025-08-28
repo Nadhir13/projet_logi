@@ -76,6 +76,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName("MainWindow");
+        MainWindow->resize(615, 474);
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName("centralwidget");
         verticalLayout = new QVBoxLayout(centralwidget);
@@ -180,6 +181,8 @@ public:
 
         tblClients = new QTableWidget(tabClients);
         tblClients->setObjectName("tblClients");
+        tblClients->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
+        tblClients->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
 
         vlc->addWidget(tblClients);
 
@@ -265,6 +268,8 @@ public:
 
         tblOrders = new QTableWidget(tabOrders);
         tblOrders->setObjectName("tblOrders");
+        tblOrders->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
+        tblOrders->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
 
         vlo->addWidget(tblOrders);
 
