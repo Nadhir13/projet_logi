@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="windowTitle">
+   <string>projet_logi</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="tabClients">
+       <attribute name="title">
+        <string>Clients</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="vlc">
+        <item>
+         <layout class="QFormLayout" name="formClient">
+          <item row="0" column="0"><widget class="QLabel"><property name="text"><string>Nom</string></property></widget></item>
+          <item row="0" column="1"><widget class="QLineEdit" name="leNom"/></item>
+          <item row="1" column="0"><widget class="QLabel"><property name="text"><string>Prenom</string></property></widget></item>
+          <item row="1" column="1"><widget class="QLineEdit" name="lePrenom"/></item>
+          <item row="2" column="0"><widget class="QLabel"><property name="text"><string>Tel</string></property></widget></item>
+          <item row="2" column="1"><widget class="QLineEdit" name="leTel"/></item>
+          <item row="3" column="0"><widget class="QLabel"><property name="text"><string>Email</string></property></widget></item>
+          <item row="3" column="1"><widget class="QLineEdit" name="leEmail"/></item>
+          <item row="4" column="0"><widget class="QLabel"><property name="text"><string>Adr</string></property></widget></item>
+          <item row="4" column="1"><widget class="QLineEdit" name="leAdr"/></item>
+          <item row="5" column="0"><widget class="QLabel"><property name="text"><string>Statut</string></property></widget></item>
+          <item row="5" column="1"><widget class="QComboBox" name="cbStatut">
+            <item><property name="text"><string>ACTIVE</string></property></item>
+            <item><property name="text"><string>INACTIVE</string></property></item>
+          </widget></item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="btnRowClient">
+          <item><widget class="QPushButton" name="btnAddClient"><property name="text"><string>Ajouter</string></property></widget></item>
+          <item><widget class="QPushButton" name="btnUpdClient"><property name="text"><string>Modifier</string></property></widget></item>
+          <item><widget class="QPushButton" name="btnDelClient"><property name="text"><string>Supprimer</string></property></widget></item>
+          <item><widget class="QPushButton" name="btnRefClient"><property name="text"><string>Rafraîchir</string></property></widget></item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QTableWidget" name="tblClients"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tabOrders">
+       <attribute name="title">
+        <string>Commandes</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="vlo">
+        <item>
+         <layout class="QFormLayout" name="formOrder">
+          <item row="0" column="0"><widget class="QLabel"><property name="text"><string>Client</string></property></widget></item>
+          <item row="0" column="1"><widget class="QComboBox" name="cbClient"/></item>
+          <item row="1" column="0"><widget class="QLabel"><property name="text"><string>Etat</string></property></widget></item>
+          <item row="1" column="1"><widget class="QComboBox" name="cbEtat">
+            <item><property name="text"><string>EN_ATTENTE</string></property></item>
+            <item><property name="text"><string>EN_COURS</string></property></item>
+            <item><property name="text"><string>LIVREE</string></property></item>
+            <item><property name="text"><string>ANNULEE</string></property></item>
+          </widget></item>
+          <item row="2" column="0"><widget class="QLabel"><property name="text"><string>Montant</string></property></widget></item>
+          <item row="2" column="1"><widget class="QDoubleSpinBox" name="dsMontant"><property name="decimals"><number>3</number></property></widget></item>
+          <item row="3" column="0"><widget class="QLabel"><property name="text"><string>Adr Liv.</string></property></widget></item>
+          <item row="3" column="1"><widget class="QLineEdit" name="leAdrLiv"/></item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="btnRowOrder">
+          <item><widget class="QPushButton" name="btnAddOrd"><property name="text"><string>Ajouter</string></property></widget></item>
+          <item><widget class="QPushButton" name="btnUpdOrd"><property name="text"><string>Modifier</string></property></widget></item>
+          <item><widget class="QPushButton" name="btnDelOrd"><property name="text"><string>Supprimer</string></property></widget></item>
+          <item><widget class="QPushButton" name="btnRefOrd"><property name="text"><string>Rafraîchir</string></property></widget></item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QTableWidget" name="tblOrders"/>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
