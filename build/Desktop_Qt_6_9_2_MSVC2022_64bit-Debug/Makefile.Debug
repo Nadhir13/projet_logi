@@ -198,6 +198,7 @@ compiler_rcc_clean:
 	-$(DEL_FILE) debug\qrc_resources.cpp
 debug\qrc_resources.cpp: ..\..\resources\resources.qrc \
 		C:\Qt\6.9.2\msvc2022_64\bin\rcc.exe \
+		..\..\resources\image\blue1.png \
 		..\..\resources\image\blue.jpg
 	C:\Qt\6.9.2\msvc2022_64\bin\rcc.exe -name resources --no-zstd ..\..\resources\resources.qrc -o debug\qrc_resources.cpp
 
@@ -410,15 +411,8 @@ debug\moc_logindialog.cpp: ..\..\logindialog.h \
 		C:\Qt\6.9.2\msvc2022_64\include\QtCore\qlocale.h \
 		C:\Qt\6.9.2\msvc2022_64\include\QtGui\qguiapplication_platform.h \
 		C:\Qt\6.9.2\msvc2022_64\include\QtCore\QString \
-		..\..\db.h \
-		C:\Qt\6.9.2\msvc2022_64\include\QtSql\QSqlDatabase \
-		C:\Qt\6.9.2\msvc2022_64\include\QtSql\qsqldatabase.h \
-		C:\Qt\6.9.2\msvc2022_64\include\QtSql\qtsqlglobal.h \
-		C:\Qt\6.9.2\msvc2022_64\include\QtSql\qtsql-config.h \
-		C:\Qt\6.9.2\msvc2022_64\include\QtSql\qtsqlexports.h \
-		C:\Qt\6.9.2\msvc2022_64\include\QtCore\qmetaobject.h \
-		C:\Qt\6.9.2\msvc2022_64\include\QtSql\QSqlError \
-		C:\Qt\6.9.2\msvc2022_64\include\QtSql\qsqlerror.h \
+		C:\Qt\6.9.2\msvc2022_64\include\QtGui\QResizeEvent \
+		C:\Qt\6.9.2\msvc2022_64\include\QtGui\QPixmap \
 		debug\moc_predefs.h \
 		C:\Qt\6.9.2\msvc2022_64\bin\moc.exe
 	C:\Qt\6.9.2\msvc2022_64\bin\moc.exe $(DEFINES) --compiler-flavor=msvc --include C:/Users/nadhi/Documents/projet_logi/build/Desktop_Qt_6_9_2_MSVC2022_64bit-Debug/debug/moc_predefs.h -IC:/Qt/6.9.2/msvc2022_64/mkspecs/win32-msvc -IC:/Users/nadhi/Documents/projet_logi -IC:/Qt/6.9.2/msvc2022_64/include -IC:/Qt/6.9.2/msvc2022_64/include/QtPrintSupport -IC:/Qt/6.9.2/msvc2022_64/include/QtCharts -IC:/Qt/6.9.2/msvc2022_64/include/QtOpenGLWidgets -IC:/Qt/6.9.2/msvc2022_64/include/QtWidgets -IC:/Qt/6.9.2/msvc2022_64/include/QtOpenGL -IC:/Qt/6.9.2/msvc2022_64/include/QtGui -IC:/Qt/6.9.2/msvc2022_64/include/QtSql -IC:/Qt/6.9.2/msvc2022_64/include/QtCore -I. -I"C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include" -I"C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\ATLMFC\include" -I"C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\VS\include" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\um" -I"C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\shared" -I"C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\winrt" -I"C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt" ..\..\logindialog.h -o debug\moc_logindialog.cpp
@@ -1320,6 +1314,9 @@ debug\logindialog.obj: ..\..\logindialog.cpp ..\..\logindialog.h \
 		C:\Qt\6.9.2\msvc2022_64\include\QtCore\qlocale.h \
 		C:\Qt\6.9.2\msvc2022_64\include\QtGui\qguiapplication_platform.h \
 		C:\Qt\6.9.2\msvc2022_64\include\QtCore\QString \
+		C:\Qt\6.9.2\msvc2022_64\include\QtGui\QResizeEvent \
+		C:\Qt\6.9.2\msvc2022_64\include\QtGui\QPixmap \
+		ui_logindialog.h \
 		..\..\db.h \
 		C:\Qt\6.9.2\msvc2022_64\include\QtSql\QSqlDatabase \
 		C:\Qt\6.9.2\msvc2022_64\include\QtSql\qsqldatabase.h \
@@ -1329,15 +1326,21 @@ debug\logindialog.obj: ..\..\logindialog.cpp ..\..\logindialog.h \
 		C:\Qt\6.9.2\msvc2022_64\include\QtCore\qmetaobject.h \
 		C:\Qt\6.9.2\msvc2022_64\include\QtSql\QSqlError \
 		C:\Qt\6.9.2\msvc2022_64\include\QtSql\qsqlerror.h \
-		ui_logindialog.h \
 		C:\Qt\6.9.2\msvc2022_64\include\QtWidgets\QMessageBox \
 		C:\Qt\6.9.2\msvc2022_64\include\QtWidgets\qmessagebox.h \
 		C:\Qt\6.9.2\msvc2022_64\include\QtWidgets\qdialogbuttonbox.h \
 		C:\Qt\6.9.2\msvc2022_64\include\QtSql\QSqlQuery \
 		C:\Qt\6.9.2\msvc2022_64\include\QtSql\qsqlquery.h \
-		C:\Qt\6.9.2\msvc2022_64\include\QtGui\QPixmap \
 		C:\Qt\6.9.2\msvc2022_64\include\QtGui\QScreen \
-		C:\Qt\6.9.2\msvc2022_64\include\QtGui\QGuiApplication
+		C:\Qt\6.9.2\msvc2022_64\include\QtGui\QGuiApplication \
+		C:\Qt\6.9.2\msvc2022_64\include\QtGui\QPainter \
+		C:\Qt\6.9.2\msvc2022_64\include\QtGui\qpainter.h \
+		C:\Qt\6.9.2\msvc2022_64\include\QtGui\qtextoption.h \
+		C:\Qt\6.9.2\msvc2022_64\include\QtGui\qpen.h \
+		C:\Qt\6.9.2\msvc2022_64\include\QtCore\QDebug \
+		C:\Qt\6.9.2\msvc2022_64\include\QtCore\QFile \
+		C:\Qt\6.9.2\msvc2022_64\include\QtCore\qfile.h \
+		C:\Qt\6.9.2\msvc2022_64\include\QtCore\qfiledevice.h
 
 debug\main.obj: ..\..\main.cpp C:\Qt\6.9.2\msvc2022_64\include\QtWidgets\QApplication \
 		C:\Qt\6.9.2\msvc2022_64\include\QtWidgets\qapplication.h \
@@ -2015,7 +2018,9 @@ debug\main.obj: ..\..\main.cpp C:\Qt\6.9.2\msvc2022_64\include\QtWidgets\QApplic
 		C:\Qt\6.9.2\msvc2022_64\include\QtSql\QSqlError \
 		C:\Qt\6.9.2\msvc2022_64\include\QtSql\qsqlerror.h \
 		..\..\logindialog.h \
-		C:\Qt\6.9.2\msvc2022_64\include\QtWidgets\QDialog
+		C:\Qt\6.9.2\msvc2022_64\include\QtWidgets\QDialog \
+		C:\Qt\6.9.2\msvc2022_64\include\QtGui\QResizeEvent \
+		C:\Qt\6.9.2\msvc2022_64\include\QtGui\QPixmap
 
 debug\db.obj: ..\..\db.cpp ..\..\db.h \
 		C:\Qt\6.9.2\msvc2022_64\include\QtSql\QSqlDatabase \
