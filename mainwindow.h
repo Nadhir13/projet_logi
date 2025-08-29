@@ -4,6 +4,11 @@
 #include <QAbstractItemView>
 #include <QtCharts>
 
+// Add forward declarations for the controllers
+class ClientController;
+class OrderController;
+class UserController;
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -14,70 +19,31 @@ public:
     explicit MainWindow(int userId, const QString &username, const QString &role, QWidget *parent = nullptr);
     ~MainWindow();
 
+    // Make the UI accessible to the controllers (e.g., via friend class or getters)
+    Ui::MainWindow* getUi() const { return ui; }
+
 private slots:
-    // client
-    void addClient();
-    void updClient();
-    void delClient();
-    void refClient();
-
-    // order
-    void addOrder();
-    void updOrder();
-    void delOrder();
-    void refOrder();
-    void exportOrderPdf();
-
-    // user management
-    void addUser();
-    void updUser();
-    void delUser();
-    void refUser();
-    void changeUserPassword();
-
-    // Business functions
-    void showClientStats();
-    void showOrderStats();
-    void exportClientsExcel();
-    void updateClientCategory();
-    void updateOrderPriority();
-    void autoCategorizeClients();
-
-    // New logout function
+    // Only general app slots remain here
     void logout();
-
-    // Tab changed
     void onTabChanged(int index);
 
 private:
-    void loadClientsTable();
-    void loadOrdersTable();
-    void loadUsersTable();
-    void loadClientsCombo();
-    void loadClientFilterCombo();
-    bool validateClientForm();
-    bool validateOrderForm();
-    bool validateUserForm();
+    void setupPermissionsBasedOnRole();
+    void setupMenuBar();
 
-    // filters
-    void applyClientFilters();
-    void applyOrderFilters();
-    void applyUserFilters();
-
-    // charts
-    void updateClientChart();
-    void updateOrderChart();
-    void updateUserChart();
-
-private:
     Ui::MainWindow *ui;
-    QChartView* clientChartView = nullptr;
-    QChartView* orderChartView = nullptr;
-    QChartView* userChartView = nullptr;
     int m_userId;
     QString m_username;
     QString m_role;
 
-    void setupPermissionsBasedOnRole();
-    void setupMenuBar();
+    // Add pointers to the controllers
+    ClientController* m_clientController = nullptr;
+    OrderController* m_orderController = nullptr;
+    UserController* m_userController = nullptr;
+
+public:
+    // Make chart views accessible to controllers
+    QChartView* clientChartView = nullptr;
+    QChartView* orderChartView = nullptr;
+    QChartView* userChartView = nullptr;
 };

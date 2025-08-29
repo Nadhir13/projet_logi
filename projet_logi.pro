@@ -13,7 +13,10 @@ SOURCES += \
     order.cpp \
     clientdao.cpp \
     orderdao.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    clientcontroller.cpp \
+    ordercontroller.cpp \
+    usercontroller.cpp
 
 HEADERS += \
     db.h \
@@ -22,7 +25,10 @@ HEADERS += \
     order.h \
     clientdao.h \
     orderdao.h \
-    mainwindow.h
+    mainwindow.h \
+    clientcontroller.h \
+    ordercontroller.h \
+    usercontroller.h
 
 FORMS += \
     logindialog.ui \

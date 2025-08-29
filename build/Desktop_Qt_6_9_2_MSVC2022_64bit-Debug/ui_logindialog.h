@@ -383,7 +383,7 @@ public:
         btnLogin->setText(QCoreApplication::translate("LoginDialog", "Se connecter", nullptr));
         btnCancel->setText(QCoreApplication::translate("LoginDialog", "Annuler", nullptr));
         btnSwitchToSignup->setText(QCoreApplication::translate("LoginDialog", "Cr\303\251er un nouveau compte", nullptr));
-        lblVersion->setText(QCoreApplication::translate("LoginDialog", "       Version 1.0 - Septembre 2025      ", nullptr));
+        lblVersion->setText(QCoreApplication::translate("LoginDialog", "          Version 1.6 - MADE BY NADHIR.TR       ", nullptr));
         label_2->setText(QCoreApplication::translate("LoginDialog", "           Cr\303\251ation de Compte          ", nullptr));
         lblSignupUsername->setText(QCoreApplication::translate("LoginDialog", "Nom d'utilisateur:", nullptr));
         lblSignupPassword->setText(QCoreApplication::translate("LoginDialog", "Mot de passe:", nullptr));

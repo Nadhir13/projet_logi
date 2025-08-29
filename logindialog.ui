@@ -283,7 +283,7 @@
        <item alignment="Qt::AlignmentFlag::AlignHCenter">
         <widget class="QLabel" name="lblVersion">
          <property name="text">
-          <string>       Version 1.0 - Septembre 2025      </string>
+          <string>          Version 1.6 - MADE BY NADHIR.TR       </string>
          </property>
          <property name="alignment">
           <set>Qt::AlignmentFlag::AlignCenter</set>
