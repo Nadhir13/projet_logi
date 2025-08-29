@@ -6,19 +6,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>615</width>
-    <height>474</height>
+    <width>900</width>
+    <height>700</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>projet_logi</string>
+   <string>Système de Gestion Logistique</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tabClients">
        <attribute name="title">
@@ -40,7 +40,7 @@
           <item row="1" column="0">
            <widget class="QLabel" name="lblPrenom">
             <property name="text">
-             <string>Prenom</string>
+             <string>Prénom</string>
             </property>
            </widget>
           </item>
@@ -50,7 +50,7 @@
           <item row="2" column="0">
            <widget class="QLabel" name="lblTel">
             <property name="text">
-             <string>Tel</string>
+             <string>Téléphone</string>
             </property>
            </widget>
           </item>
@@ -70,7 +70,7 @@
           <item row="4" column="0">
            <widget class="QLabel" name="lblAdr">
             <property name="text">
-             <string>Adr</string>
+             <string>Adresse</string>
             </property>
            </widget>
           </item>
@@ -110,17 +110,60 @@
            </widget>
           </item>
           <item>
+           <widget class="QLineEdit" name="leEmailFilter">
+            <property name="placeholderText">
+             <string>Filtrer par email</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QComboBox" name="cbStatutFilter">
-            <item><property name="text"><string>Tous</string></property></item>
-            <item><property name="text"><string>ACTIVE</string></property></item>
-            <item><property name="text"><string>INACTIVE</string></property></item>
+            <item>
+             <property name="text">
+              <string>Tous</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>ACTIVE</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>INACTIVE</string>
+             </property>
+            </item>
            </widget>
           </item>
           <item>
            <widget class="QComboBox" name="cbClientSort">
-            <item><property name="text"><string>Nom</string></property></item>
-            <item><property name="text"><string>Prénom</string></property></item>
-            <item><property name="text"><string>Créé</string></property></item>
+            <item>
+             <property name="text">
+              <string>Trier par</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Nom</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Prénom</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Créé</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnAdvSearchClient">
+            <property name="text">
+             <string>Recherche Avancée</string>
+            </property>
            </widget>
           </item>
          </layout>
@@ -155,6 +198,27 @@
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QPushButton" name="btnClientStats">
+            <property name="text">
+             <string>Statistiques</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnExportExcel">
+            <property name="text">
+             <string>Exporter Excel</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnUpdateCategory">
+            <property name="text">
+             <string>Modifier Catégorie</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </item>
         <item>
@@ -165,10 +229,66 @@
           <property name="selectionBehavior">
            <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
           </property>
+          <property name="columnCount">
+           <number>8</number>
+          </property>
+          <attribute name="horizontalHeaderVisible">
+           <bool>true</bool>
+          </attribute>
+          <attribute name="verticalHeaderVisible">
+           <bool>true</bool>
+          </attribute>
+          <column>
+           <property name="text">
+            <string>ID</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Nom</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Prénom</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Téléphone</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Email</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Adresse</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Statut</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Créé le</string>
+           </property>
+          </column>
          </widget>
         </item>
         <item>
-         <widget class="QWidget" name="clientChartContainer"/>
+         <widget class="QWidget" name="clientChartContainer" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>200</height>
+           </size>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -192,7 +312,7 @@
           <item row="1" column="0">
            <widget class="QLabel" name="lblEtat">
             <property name="text">
-             <string>Etat</string>
+             <string>État</string>
             </property>
            </widget>
           </item>
@@ -232,17 +352,51 @@
             <property name="decimals">
              <number>3</number>
             </property>
+            <property name="maximum">
+             <double>1000000.000000000000000</double>
+            </property>
            </widget>
           </item>
           <item row="3" column="0">
            <widget class="QLabel" name="lblAdrLiv">
             <property name="text">
-             <string>Adr Liv.</string>
+             <string>Adresse Livraison</string>
             </property>
            </widget>
           </item>
           <item row="3" column="1">
            <widget class="QLineEdit" name="leAdrLiv"/>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="lblPriority">
+            <property name="text">
+             <string>Priorité</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QComboBox" name="cbPriority">
+            <item>
+             <property name="text">
+              <string>LOW</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>NORMAL</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>HIGH</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>URGENT</string>
+             </property>
+            </item>
+           </widget>
           </item>
          </layout>
         </item>
@@ -251,24 +405,115 @@
           <item>
            <widget class="QLineEdit" name="leSearchOrder">
             <property name="placeholderText">
-             <string>Rechercher (état, adr)</string>
+             <string>Rechercher (état, adresse)</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="cbEtatFilter">
-            <item><property name="text"><string>Tous</string></property></item>
-            <item><property name="text"><string>EN_ATTENTE</string></property></item>
-            <item><property name="text"><string>EN_COURS</string></property></item>
-            <item><property name="text"><string>LIVREE</string></property></item>
-            <item><property name="text"><string>ANNULEE</string></property></item>
+           <widget class="QComboBox" name="cbClientFilter">
+            <item>
+             <property name="text">
+              <string>Tous les clients</string>
+             </property>
+            </item>
            </widget>
           </item>
           <item>
+           <widget class="QComboBox" name="cbEtatFilter">
+            <item>
+             <property name="text">
+              <string>Tous</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>EN_ATTENTE</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>EN_COURS</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>LIVREE</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>ANNULEE</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="amountFilterLayout">
+            <item>
+             <widget class="QLabel" name="lblMinAmount">
+              <property name="text">
+               <string>Min:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="dsMinAmount">
+              <property name="decimals">
+               <number>3</number>
+              </property>
+              <property name="maximum">
+               <double>1000000.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="lblMaxAmount">
+              <property name="text">
+               <string>Max:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="dsMaxAmount">
+              <property name="decimals">
+               <number>3</number>
+              </property>
+              <property name="maximum">
+               <double>1000000.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
            <widget class="QComboBox" name="cbOrderSort">
-            <item><property name="text"><string>Date</string></property></item>
-            <item><property name="text"><string>Montant</string></property></item>
-            <item><property name="text"><string>État</string></property></item>
+            <item>
+             <property name="text">
+              <string>Trier par</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Date</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Montant</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>État</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnAdvSearchOrder">
+            <property name="text">
+             <string>Recherche Avancée</string>
+            </property>
            </widget>
           </item>
          </layout>
@@ -310,6 +555,20 @@
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QPushButton" name="btnOrderStats">
+            <property name="text">
+             <string>Statistiques</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnUpdatePriority">
+            <property name="text">
+             <string>Modifier Priorité</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </item>
         <item>
@@ -320,10 +579,61 @@
           <property name="selectionBehavior">
            <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
           </property>
+          <property name="columnCount">
+           <number>7</number>
+          </property>
+          <attribute name="horizontalHeaderVisible">
+           <bool>true</bool>
+          </attribute>
+          <attribute name="verticalHeaderVisible">
+           <bool>true</bool>
+          </attribute>
+          <column>
+           <property name="text">
+            <string>ID</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Client</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Date</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>État</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Montant</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Adresse Livraison</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Priorité</string>
+           </property>
+          </column>
          </widget>
         </item>
         <item>
-         <widget class="QWidget" name="orderChartContainer"/>
+         <widget class="QWidget" name="orderChartContainer" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>200</height>
+           </size>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -331,6 +641,7 @@
     </item>
    </layout>
   </widget>
+  <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
  <connections/>

@@ -2,7 +2,7 @@
 #include <QString>
 #include <QDate>
 
-    struct Client {
+struct Client {
     int id = 0;
     QString nom;
     QString prenom;
@@ -11,4 +11,6 @@
     QString adr;
     QString statut = "ACTIVE";
     QDate created = QDate::currentDate();
+    QString category = "REGULAR";
+    int totalOrders = 0;
 };

@@ -1,6 +1,7 @@
 #pragma once
 #include <QSqlDatabase>
 #include <QString>
+#include <QSqlError>
 
 class Db {
 public:

@@ -1,7 +1,7 @@
 #pragma once
 #include <QMainWindow>
-#include <QAbstractItemView>  // Add this for table selection properties
-// Keep charts types out of the header to avoid compile-time namespace issues
+#include <QAbstractItemView>
+#include <QtCharts>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -27,11 +27,22 @@ private slots:
     void refOrder();
     void exportOrderPdf();
 
+    // Business functions
+    void showClientStats();
+    void showOrderStats();
+    void exportClientsExcel();
+    void updateClientCategory();
+    void updateOrderPriority();
+    void advancedClientSearch();
+    void advancedOrderSearch();
+
 private:
     void loadClientsTable();
     void loadOrdersTable();
     void loadClientsCombo();
-    bool validateClientForm();  // ADD THIS LINE
+    void loadClientFilterCombo();
+    bool validateClientForm();
+    bool validateOrderForm();
 
     // filters
     void applyClientFilters();
@@ -43,7 +54,6 @@ private:
 
 private:
     Ui::MainWindow *ui;
-    // charts (stored as QWidget* to decouple header from QtCharts)
-    QWidget* clientChartView = nullptr;
-    QWidget* orderChartView = nullptr;
+    QChartView* clientChartView = nullptr;
+    QChartView* orderChartView = nullptr;
 };

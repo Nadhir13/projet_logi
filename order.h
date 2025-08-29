@@ -9,4 +9,6 @@ struct Order {
     QString etat = "EN_ATTENTE";
     double montant = 0.0;
     QString adrLiv;
+    QString priority = "NORMAL";
+    QDate estimatedDelivery;
 };

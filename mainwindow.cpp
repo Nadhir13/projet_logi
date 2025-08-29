@@ -7,24 +7,15 @@
 #include <QLineEdit>
 #include <QDoubleSpinBox>
 #include "db.h"
-
 #include "clientdao.h"
 #include "orderdao.h"
-
 #include <QFileDialog>
 #include <QPdfWriter>
 #include <QPainter>
 #include <QPageSize>
-#include <QGraphicsView>
-#include <QGraphicsScene>
-#include <QGraphicsEllipseItem>
-#include <QGraphicsRectItem>
-#include <QGraphicsTextItem>
-#include <QPen>
-#include <QBrush>
-#include <QVBoxLayout>
 #include <QHeaderView>
-
+#include <QInputDialog>
+#include <QTextStream>
 
 bool MainWindow::validateClientForm() {
     if (ui->leNom->text().isEmpty()) {
@@ -40,6 +31,25 @@ bool MainWindow::validateClientForm() {
     if (!ui->leEmail->text().isEmpty() && !ui->leEmail->text().contains('@')) {
         QMessageBox::warning(this, "Validation", "Email invalide");
         ui->leEmail->setFocus();
+        return false;
+    }
+    return true;
+}
+
+bool MainWindow::validateOrderForm() {
+    if (ui->cbClient->currentData().toInt() <= 0) {
+        QMessageBox::warning(this, "Validation", "Veuillez sélectionner un client");
+        ui->cbClient->setFocus();
+        return false;
+    }
+    if (ui->dsMontant->value() <= 0) {
+        QMessageBox::warning(this, "Validation", "Le montant doit être positif");
+        ui->dsMontant->setFocus();
+        return false;
+    }
+    if (ui->leAdrLiv->text().isEmpty()) {
+        QMessageBox::warning(this, "Validation", "L'adresse de livraison est obligatoire");
+        ui->leAdrLiv->setFocus();
         return false;
     }
     return true;
@@ -61,12 +71,22 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->btnRefOrd, &QPushButton::clicked, this, &MainWindow::refOrder);
     connect(ui->btnPdfOrd, &QPushButton::clicked, this, &MainWindow::exportOrderPdf);
 
+    // Connect advanced search buttons
+    connect(ui->btnAdvSearchClient, &QPushButton::clicked, this, &MainWindow::advancedClientSearch);
+    connect(ui->btnAdvSearchOrder, &QPushButton::clicked, this, &MainWindow::advancedOrderSearch);
+
+    // Connect business function buttons
+    connect(ui->btnClientStats, &QPushButton::clicked, this, &MainWindow::showClientStats);
+    connect(ui->btnOrderStats, &QPushButton::clicked, this, &MainWindow::showOrderStats);
+    connect(ui->btnExportExcel, &QPushButton::clicked, this, &MainWindow::exportClientsExcel);
+    connect(ui->btnUpdateCategory, &QPushButton::clicked, this, &MainWindow::updateClientCategory);
+    connect(ui->btnUpdatePriority, &QPushButton::clicked, this, &MainWindow::updateOrderPriority);
+
     // Connect selection changes
     connect(ui->tblClients, &QTableWidget::itemSelectionChanged, this, [this]() {
         auto items = ui->tblClients->selectedItems();
         if (!items.isEmpty()) {
             int row = items.first()->row();
-            // Load client data into form
             ui->leNom->setText(ui->tblClients->item(row, 1)->text());
             ui->lePrenom->setText(ui->tblClients->item(row, 2)->text());
             ui->leTel->setText(ui->tblClients->item(row, 3)->text());
@@ -83,10 +103,8 @@ MainWindow::MainWindow(QWidget *parent)
         auto items = ui->tblOrders->selectedItems();
         if (!items.isEmpty()) {
             int row = items.first()->row();
-            // Load order data into form
             int clientId = ui->tblOrders->item(row, 1)->text().toInt();
 
-            // Find client in combo box
             for (int i = 0; i < ui->cbClient->count(); ++i) {
                 if (ui->cbClient->itemData(i).toInt() == clientId) {
                     ui->cbClient->setCurrentIndex(i);
@@ -100,34 +118,36 @@ MainWindow::MainWindow(QWidget *parent)
 
             ui->dsMontant->setValue(ui->tblOrders->item(row, 4)->text().toDouble());
             ui->leAdrLiv->setText(ui->tblOrders->item(row, 5)->text());
+
+            QString priority = ui->tblOrders->item(row, 6)->text();
+            index = ui->cbPriority->findText(priority);
+            if (index >= 0) ui->cbPriority->setCurrentIndex(index);
         }
     });
 
     // initial load
     loadClientsTable();
     loadClientsCombo();
+    loadClientFilterCombo();
     loadOrdersTable();
 
-    // setup charts containers
-    if (!clientChartView) {
-        auto chartView = new QGraphicsView(new QGraphicsScene());
-        auto container = this->findChild<QWidget*>("clientChartContainer");
-        if (container) {
-            auto lay = new QVBoxLayout(container);
-            lay->setContentsMargins(0,0,0,0);
-            lay->addWidget(chartView);
-        }
-        clientChartView = chartView;
+    // setup charts containers with QtCharts
+    clientChartView = new QChartView();
+    clientChartView->setRenderHint(QPainter::Antialiasing);
+    auto clientContainer = this->findChild<QWidget*>("clientChartContainer");
+    if (clientContainer) {
+        auto lay = new QVBoxLayout(clientContainer);
+        lay->setContentsMargins(0,0,0,0);
+        lay->addWidget(clientChartView);
     }
-    if (!orderChartView) {
-        auto chartView = new QGraphicsView(new QGraphicsScene());
-        auto container = this->findChild<QWidget*>("orderChartContainer");
-        if (container) {
-            auto lay = new QVBoxLayout(container);
-            lay->setContentsMargins(0,0,0,0);
-            lay->addWidget(chartView);
-        }
-        orderChartView = chartView;
+
+    orderChartView = new QChartView();
+    orderChartView->setRenderHint(QPainter::Antialiasing);
+    auto orderContainer = this->findChild<QWidget*>("orderChartContainer");
+    if (orderContainer) {
+        auto lay = new QVBoxLayout(orderContainer);
+        lay->setContentsMargins(0,0,0,0);
+        lay->addWidget(orderChartView);
     }
 
     // wire filters
@@ -156,7 +176,10 @@ void MainWindow::addClient() {
     c.email = ui->leEmail->text();
     c.adr = ui->leAdr->text();
     c.statut = ui->cbStatut->currentText();
-    if (!dao.add(c)) QMessageBox::warning(this, "Client", "Insert failed");
+    c.category = "REGULAR";
+    if (!dao.add(c)) {
+        QMessageBox::warning(this, "Client", "Échec de l'ajout: " + Db::instance().lastError());
+    }
     refClient();
 }
 
@@ -200,24 +223,32 @@ void MainWindow::delClient() {
     int id = ui->tblClients->item(row, 0)->text().toInt();
 
     ClientDao dao;
-    if (!dao.del(id)) QMessageBox::warning(this, "Client", "Delete failed");
+    if (!dao.del(id)) {
+        QMessageBox::warning(this, "Client", "Échec de la suppression: " + Db::instance().lastError());
+    }
     refClient();
 }
 
 void MainWindow::refClient() {
     loadClientsTable();
     loadClientsCombo();
+    loadClientFilterCombo();
 }
 
 // ===== Orders
 void MainWindow::addOrder() {
+    if (!validateOrderForm()) return;
+
     OrderDao dao;
     Order o;
     o.clientId = ui->cbClient->currentData().toInt();
     o.etat = ui->cbEtat->currentText();
     o.montant = ui->dsMontant->value();
     o.adrLiv = ui->leAdrLiv->text();
-    if (!dao.add(o)) QMessageBox::warning(this, "Order", "Insert failed");
+    o.priority = ui->cbPriority->currentText();
+    if (!dao.add(o)) {
+        QMessageBox::warning(this, "Commande", "Échec de l'ajout: " + Db::instance().lastError());
+    }
     refOrder();
 }
 
@@ -243,6 +274,7 @@ void MainWindow::updOrder() {
     o.etat = ui->cbEtat->currentText();
     o.montant = ui->dsMontant->value();
     o.adrLiv = ui->leAdrLiv->text();
+    o.priority = ui->cbPriority->currentText();
 
     if (!dao.upd(o)) {
         QMessageBox::warning(this, "Commande", "Échec de la modification: " + Db::instance().lastError());
@@ -259,7 +291,9 @@ void MainWindow::delOrder() {
     int id = ui->tblOrders->item(row, 0)->text().toInt();
 
     OrderDao dao;
-    if (!dao.del(id)) QMessageBox::warning(this, "Order", "Delete failed");
+    if (!dao.del(id)) {
+        QMessageBox::warning(this, "Commande", "Échec de la suppression: " + Db::instance().lastError());
+    }
     refOrder();
 }
 
@@ -273,8 +307,8 @@ void MainWindow::loadClientsTable() {
     auto v = dao.all();
     ui->tblClients->clearContents();
     ui->tblClients->setRowCount(v.size());
-    ui->tblClients->setColumnCount(8);
-    QStringList headers = {"ID","Nom","Prenom","Tel","Email","Adr","Statut","Cree"};
+    ui->tblClients->setColumnCount(9);
+    QStringList headers = {"ID","Nom","Prénom","Tel","Email","Adresse","Statut","Créé","Catégorie"};
     ui->tblClients->setHorizontalHeaderLabels(headers);
     ui->tblClients->horizontalHeader()->setStretchLastSection(true);
     for (int i=0;i<v.size();++i) {
@@ -287,6 +321,7 @@ void MainWindow::loadClientsTable() {
         ui->tblClients->setItem(i,5,new QTableWidgetItem(c.adr));
         ui->tblClients->setItem(i,6,new QTableWidgetItem(c.statut));
         ui->tblClients->setItem(i,7,new QTableWidgetItem(c.created.toString("yyyy-MM-dd")));
+        ui->tblClients->setItem(i,8,new QTableWidgetItem(c.category));
     }
     applyClientFilters();
     updateClientChart();
@@ -297,8 +332,8 @@ void MainWindow::loadOrdersTable() {
     auto v = dao.all();
     ui->tblOrders->clearContents();
     ui->tblOrders->setRowCount(v.size());
-    ui->tblOrders->setColumnCount(6);
-    QStringList headers = {"ID","Client","Date","Etat","Montant","Adr"};
+    ui->tblOrders->setColumnCount(8);
+    QStringList headers = {"ID","Client ID","Date","État","Montant","Adresse Livraison","Priorité","Livraison Estimée"};
     ui->tblOrders->setHorizontalHeaderLabels(headers);
     ui->tblOrders->horizontalHeader()->setStretchLastSection(true);
     for (int i=0;i<v.size();++i) {
@@ -309,10 +344,32 @@ void MainWindow::loadOrdersTable() {
         ui->tblOrders->setItem(i,3,new QTableWidgetItem(o.etat));
         ui->tblOrders->setItem(i,4,new QTableWidgetItem(QString::number(o.montant, 'f', 3)));
         ui->tblOrders->setItem(i,5,new QTableWidgetItem(o.adrLiv));
+        ui->tblOrders->setItem(i,6,new QTableWidgetItem(o.priority));
+        ui->tblOrders->setItem(i,7,new QTableWidgetItem(o.estimatedDelivery.toString("yyyy-MM-dd")));
     }
     applyOrderFilters();
     updateOrderChart();
 }
+
+void MainWindow::loadClientsCombo() {
+    ClientDao dao;
+    auto v = dao.all();
+    ui->cbClient->clear();
+    for (const auto& c: v) {
+        ui->cbClient->addItem(QString("%1 %2").arg(c.nom, c.prenom), c.id);
+    }
+}
+
+void MainWindow::loadClientFilterCombo() {
+    ClientDao dao;
+    auto v = dao.all();
+    ui->cbClientFilter->clear();
+    ui->cbClientFilter->addItem("Tous les clients", -1);
+    for (const auto& c: v) {
+        ui->cbClientFilter->addItem(QString("%1 %2").arg(c.nom, c.prenom), c.id);
+    }
+}
+
 void MainWindow::exportOrderPdf() {
     auto items = ui->tblOrders->selectedItems();
     if (items.isEmpty()) {
@@ -343,9 +400,9 @@ void MainWindow::exportOrderPdf() {
         return;
     }
 
-    int x = 500; // left margin
-    int y = 500; // top margin
-    int line = 400; // line height
+    int x = 500;
+    int y = 500;
+    int line = 400;
 
     QFont titleFont = painter.font();
     titleFont.setPointSize(16);
@@ -361,30 +418,23 @@ void MainWindow::exportOrderPdf() {
 
     painter.drawText(x, y, QString("Date: %1").arg(o.date.toString("yyyy-MM-dd"))); y += line;
     painter.drawText(x, y, QString("Client ID: %1").arg(o.clientId)); y += line;
-    painter.drawText(x, y, QString("Etat: %1").arg(o.etat)); y += line;
-    painter.drawText(x, y, QString("Montant: %1").arg(QString::number(o.montant, 'f', 3))); y += line;
+    painter.drawText(x, y, QString("État: %1").arg(o.etat)); y += line;
+    painter.drawText(x, y, QString("Montant: %1 DT").arg(QString::number(o.montant, 'f', 3))); y += line;
     painter.drawText(x, y, QString("Adresse de livraison: %1").arg(o.adrLiv)); y += line;
+    painter.drawText(x, y, QString("Priorité: %1").arg(o.priority)); y += line;
+    if (o.estimatedDelivery.isValid()) {
+        painter.drawText(x, y, QString("Livraison estimée: %1").arg(o.estimatedDelivery.toString("yyyy-MM-dd"))); y += line;
+    }
 
     painter.end();
-
     QMessageBox::information(this, "PDF", "PDF généré avec succès.");
 }
 
-void MainWindow::loadClientsCombo() {
-    ClientDao dao;
-    auto v = dao.all();
-    ui->cbClient->clear();
-    for (const auto& c: v) {
-        ui->cbClient->addItem(QString("%1 %2").arg(c.nom, c.prenom), c.id);
-    }
-}
-
 void MainWindow::applyClientFilters() {
-    QString text = ui->leSearchClient ? ui->leSearchClient->text().trimmed() : QString();
-    QString statut = ui->cbStatutFilter ? ui->cbStatutFilter->currentText() : QString("Tous");
-    QString sortKey = ui->cbClientSort ? ui->cbClientSort->currentText() : QString();
+    QString text = ui->leSearchClient->text().trimmed();
+    QString statut = ui->cbStatutFilter->currentText();
+    QString sortKey = ui->cbClientSort->currentText();
 
-    // show all rows first
     for (int r=0; r<ui->tblClients->rowCount(); ++r) ui->tblClients->setRowHidden(r, false);
 
     for (int r=0; r<ui->tblClients->rowCount(); ++r) {
@@ -399,16 +449,15 @@ void MainWindow::applyClientFilters() {
         if (!match) ui->tblClients->setRowHidden(r, true);
     }
 
-    // sorting: simple in-place sort by column
     if (sortKey == "Nom") ui->tblClients->sortItems(1);
     else if (sortKey == "Prénom") ui->tblClients->sortItems(2);
     else if (sortKey == "Créé") ui->tblClients->sortItems(7);
 }
 
 void MainWindow::applyOrderFilters() {
-    QString text = ui->leSearchOrder ? ui->leSearchOrder->text().trimmed() : QString();
-    QString etat = ui->cbEtatFilter ? ui->cbEtatFilter->currentText() : QString("Tous");
-    QString sortKey = ui->cbOrderSort ? ui->cbOrderSort->currentText() : QString();
+    QString text = ui->leSearchOrder->text().trimmed();
+    QString etat = ui->cbEtatFilter->currentText();
+    QString sortKey = ui->cbOrderSort->currentText();
 
     for (int r=0; r<ui->tblOrders->rowCount(); ++r) ui->tblOrders->setRowHidden(r, false);
 
@@ -431,73 +480,232 @@ void MainWindow::applyOrderFilters() {
 
 void MainWindow::updateClientChart() {
     if (!clientChartView) return;
-    auto view = static_cast<QGraphicsView*>(clientChartView);
-    QGraphicsScene* scene = view->scene();
-    scene->clear();
 
-    QMap<QString,int> counts; counts["ACTIVE"]=0; counts["INACTIVE"]=0;
-    for (int r=0; r<ui->tblClients->rowCount(); ++r) {
-        if (ui->tblClients->isRowHidden(r)) continue;
-        counts[ ui->tblClients->item(r,6)->text() ]++;
-    }
-    int total = 0; for (auto v : counts) total += v;
-    if (total == 0) { scene->addText("Aucune donnée"); return; }
+    ClientDao dao;
+    auto clients = dao.all();
 
-    QRectF pieRect(10, 10, 220, 220);
-    int startAngle16 = 0;
-    QList<QColor> colors { QColor("#4caf50"), QColor("#f44336"), QColor("#2196f3"), QColor("#ff9800") };
-    int colorIdx = 0;
-    int legendY = 10;
-    for (auto it = counts.begin(); it != counts.end(); ++it) {
-        if (it.value() == 0) continue;
-        int span16 = int(5760.0 * (double(it.value()) / double(total)) + 0.5);
-        QColor color = colors[colorIdx++ % colors.size()];
-        auto slice = scene->addEllipse(pieRect, QPen(Qt::NoPen), QBrush(color));
-        slice->setStartAngle(startAngle16);
-        slice->setSpanAngle(span16);
-        // legend
-        auto rect = scene->addRect(250, legendY, 12, 12, QPen(Qt::black), QBrush(color));
-        Q_UNUSED(rect);
-        scene->addText(QString("%1 (%2)").arg(it.key()).arg(it.value()))->setPos(270, legendY-2);
-        legendY += 18;
-        startAngle16 += span16;
+    QMap<QString, int> counts;
+    counts["ACTIVE"] = 0;
+    counts["INACTIVE"] = 0;
+
+    for (const auto &client : clients) {
+        counts[client.statut]++;
     }
-    scene->addText("Clients par statut (filtrés)")->setPos(10, 240);
+
+    QPieSeries *series = new QPieSeries();
+    if (counts["ACTIVE"] > 0) series->append("Actif", counts["ACTIVE"]);
+    if (counts["INACTIVE"] > 0) series->append("Inactif", counts["INACTIVE"]);
+
+    if (series->slices().count() > 0) {
+        series->slices().at(0)->setColor(QColor("#4caf50"));
+        if (series->slices().count() > 1) {
+            series->slices().at(1)->setColor(QColor("#f44336"));
+        }
+    }
+
+    QChart *chart = new QChart();
+    chart->addSeries(series);
+    chart->setTitle("Répartition des clients par statut");
+    chart->legend()->setVisible(true);
+    chart->legend()->setAlignment(Qt::AlignBottom);
+
+    clientChartView->setChart(chart);
 }
 
 void MainWindow::updateOrderChart() {
     if (!orderChartView) return;
-    auto view = static_cast<QGraphicsView*>(orderChartView);
-    QGraphicsScene* scene = view->scene();
-    scene->clear();
 
-    QMap<QString,double> sums; sums["EN_ATTENTE"]=0; sums["EN_COURS"]=0; sums["LIVREE"]=0; sums["ANNULEE"]=0;
-    for (int r=0; r<ui->tblOrders->rowCount(); ++r) {
-        if (ui->tblOrders->isRowHidden(r)) continue;
-        QString e = ui->tblOrders->item(r,3)->text();
-        double m = ui->tblOrders->item(r,4)->text().toDouble();
-        sums[e] += m;
-    }
-    QStringList cats; cats << "EN_ATTENTE" << "EN_COURS" << "LIVREE" << "ANNULEE";
-    double maxVal = 0; for (const auto& c : cats) maxVal = std::max(maxVal, sums.value(c,0));
-    if (maxVal <= 0) { scene->addText("Aucune donnée"); return; }
+    OrderDao dao;
+    auto statusCounts = dao.getOrdersByStatus();
 
-    int left = 40, top = 20, width = 360, height = 220;
-    scene->addRect(left, top, width, height, QPen(Qt::black));
-    int barWidth = 50; int gap = 30; int x = left + 20;
-    QList<QColor> colors { QColor("#3f51b5"), QColor("#009688"), QColor("#ff5722"), QColor("#9c27b0") };
-    int idx = 0;
-    for (const auto& c : cats) {
-        double val = sums.value(c,0);
-        int barH = int((val / maxVal) * (height - 20));
-        int y = top + height - barH;
-        QColor color = colors[idx++ % colors.size()];
-        scene->addRect(x, y, barWidth, barH, QPen(Qt::black), QBrush(color));
-        auto txt = scene->addText(c);
-        txt->setPos(x, top + height + 5);
-        auto valTxt = scene->addText(QString::number(val, 'f', 2));
-        valTxt->setPos(x, y - 18);
-        x += barWidth + gap;
+    QBarSeries *series = new QBarSeries();
+    QBarSet *set = new QBarSet("Commandes");
+
+    QStringList categories;
+    for (const auto &pair : statusCounts) {
+        *set << pair.second;
+        categories << pair.first;
     }
-    scene->addText("Somme des commandes par état (filtrées)")->setPos(left, top + height + 40);
+
+    series->append(set);
+
+    QChart *chart = new QChart();
+    chart->addSeries(series);
+    chart->setTitle("Commandes par état");
+    chart->setAnimationOptions(QChart::SeriesAnimations);
+
+    QBarCategoryAxis *axisX = new QBarCategoryAxis();
+    axisX->append(categories);
+    chart->addAxis(axisX, Qt::AlignBottom);
+    series->attachAxis(axisX);
+
+    QValueAxis *axisY = new QValueAxis();
+    chart->addAxis(axisY, Qt::AlignLeft);
+    series->attachAxis(axisY);
+
+    chart->legend()->setVisible(true);
+    chart->legend()->setAlignment(Qt::AlignBottom);
+
+    orderChartView->setChart(chart);
+}
+
+void MainWindow::advancedClientSearch() {
+    QString name = ui->leSearchClient->text();
+    QString status = ui->cbStatutFilter->currentText();
+    QString email = ui->leEmailFilter->text();
+
+    ClientDao dao;
+    auto clients = dao.search(name, status, email);
+
+    ui->tblClients->setRowCount(clients.size());
+    for (int i = 0; i < clients.size(); ++i) {
+        const auto &c = clients[i];
+        ui->tblClients->setItem(i, 0, new QTableWidgetItem(QString::number(c.id)));
+        ui->tblClients->setItem(i, 1, new QTableWidgetItem(c.nom));
+        ui->tblClients->setItem(i, 2, new QTableWidgetItem(c.prenom));
+        ui->tblClients->setItem(i, 3, new QTableWidgetItem(c.tel));
+        ui->tblClients->setItem(i, 4, new QTableWidgetItem(c.email));
+        ui->tblClients->setItem(i, 5, new QTableWidgetItem(c.adr));
+        ui->tblClients->setItem(i, 6, new QTableWidgetItem(c.statut));
+        ui->tblClients->setItem(i, 7, new QTableWidgetItem(c.created.toString("yyyy-MM-dd")));
+        ui->tblClients->setItem(i, 8, new QTableWidgetItem(c.category));
+    }
+}
+
+void MainWindow::advancedOrderSearch() {
+    int clientId = ui->cbClientFilter->currentData().toInt();
+    QString status = ui->cbEtatFilter->currentText();
+    double minAmount = ui->dsMinAmount->value();
+    double maxAmount = ui->dsMaxAmount->value();
+
+    OrderDao dao;
+    auto orders = dao.search(clientId, status, minAmount, maxAmount);
+
+    ui->tblOrders->setRowCount(orders.size());
+    for (int i = 0; i < orders.size(); ++i) {
+        const auto &o = orders[i];
+        ui->tblOrders->setItem(i, 0, new QTableWidgetItem(QString::number(o.id)));
+        ui->tblOrders->setItem(i, 1, new QTableWidgetItem(QString::number(o.clientId)));
+        ui->tblOrders->setItem(i, 2, new QTableWidgetItem(o.date.toString("yyyy-MM-dd")));
+        ui->tblOrders->setItem(i, 3, new QTableWidgetItem(o.etat));
+        ui->tblOrders->setItem(i, 4, new QTableWidgetItem(QString::number(o.montant, 'f', 3)));
+        ui->tblOrders->setItem(i, 5, new QTableWidgetItem(o.adrLiv));
+        ui->tblOrders->setItem(i, 6, new QTableWidgetItem(o.priority));
+        ui->tblOrders->setItem(i, 7, new QTableWidgetItem(o.estimatedDelivery.toString("yyyy-MM-dd")));
+    }
+}
+
+void MainWindow::showClientStats() {
+    ClientDao dao;
+    auto topClients = dao.getTopClients(5);
+
+    QString message = "Statistiques clients:\n\n";
+    message += "Top 5 clients par nombre de commandes:\n";
+
+    for (const auto &client : topClients) {
+        message += QString("%1 %2: %3 commandes\n")
+        .arg(client.nom)
+            .arg(client.prenom)
+            .arg(client.totalOrders);
+    }
+
+    QMessageBox::information(this, "Statistiques Clients", message);
+}
+
+void MainWindow::showOrderStats() {
+    OrderDao dao;
+    double totalRevenue = dao.getTotalRevenue();
+    auto statusCounts = dao.getOrdersByStatus();
+
+    QString message = "Statistiques commandes:\n\n";
+    message += QString("Revenu total: %1 DT\n").arg(totalRevenue, 0, 'f', 3);
+    message += "Commandes par état:\n";
+
+    for (const auto &pair : statusCounts) {
+        message += QString("%1: %2 commandes\n").arg(pair.first).arg(pair.second);
+    }
+
+    QMessageBox::information(this, "Statistiques Commandes", message);
+}
+
+void MainWindow::exportClientsExcel() {
+    QString fileName = QFileDialog::getSaveFileName(this, "Exporter clients", "clients.csv", "CSV Files (*.csv)");
+    if (fileName.isEmpty()) return;
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::warning(this, "Export", "Impossible de créer le fichier");
+        return;
+    }
+
+    QTextStream stream(&file);
+    stream << "ID,Nom,Prénom,Téléphone,Email,Adresse,Statut,Date création,Catégorie\n";
+
+    ClientDao dao;
+    auto clients = dao.all();
+
+    for (const auto &client : clients) {
+        stream << client.id << ","
+               << client.nom << ","
+               << client.prenom << ","
+               << client.tel << ","
+               << client.email << ","
+               << client.adr << ","
+               << client.statut << ","
+               << client.created.toString("yyyy-MM-dd") << ","
+               << client.category << "\n";
+    }
+
+    file.close();
+    QMessageBox::information(this, "Export", "Clients exportés avec succès");
+}
+
+void MainWindow::updateClientCategory() {
+    auto items = ui->tblClients->selectedItems();
+    if (items.isEmpty()) {
+        QMessageBox::warning(this, "Catégorie", "Veuillez sélectionner un client");
+        return;
+    }
+
+    int row = items.first()->row();
+    int id = ui->tblClients->item(row, 0)->text().toInt();
+
+    QStringList categories = {"REGULAR", "SILVER", "GOLD", "PLATINUM"};
+    QString category = QInputDialog::getItem(this, "Catégorie client",
+                                             "Sélectionnez la catégorie:", categories, 0, false);
+
+    if (category.isEmpty()) return;
+
+    ClientDao dao;
+    if (dao.updateClientCategory(id, category)) {
+        QMessageBox::information(this, "Catégorie", "Catégorie mise à jour avec succès");
+        refClient();
+    } else {
+        QMessageBox::warning(this, "Catégorie", "Échec de la mise à jour");
+    }
+}
+
+void MainWindow::updateOrderPriority() {
+    auto items = ui->tblOrders->selectedItems();
+    if (items.isEmpty()) {
+        QMessageBox::warning(this, "Priorité", "Veuillez sélectionner une commande");
+        return;
+    }
+
+    int row = items.first()->row();
+    int id = ui->tblOrders->item(row, 0)->text().toInt();
+
+    QStringList priorities = {"LOW", "NORMAL", "HIGH", "URGENT"};
+    QString priority = QInputDialog::getItem(this, "Priorité commande",
+                                             "Sélectionnez la priorité:", priorities, 1, false);
+
+    if (priority.isEmpty()) return;
+
+    OrderDao dao;
+    if (dao.updateOrderPriority(id, priority)) {
+        QMessageBox::information(this, "Priorité", "Priorité mise à jour avec succès");
+        refOrder();
+    } else {
+        QMessageBox::warning(this, "Priorité", "Échec de la mise à jour");
+    }
 }

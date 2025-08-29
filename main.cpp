@@ -2,7 +2,7 @@
 #include "mainwindow.h"
 #include "db.h"
 
-    int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
 
     // Connect once for the whole app
@@ -14,4 +14,3 @@
     w.show();
     return a.exec();
 }
-
