@@ -54,7 +54,6 @@ public:
     QLineEdit *leEmailFilter;
     QComboBox *cbStatutFilter;
     QComboBox *cbClientSort;
-    QPushButton *btnAdvSearchClient;
     QHBoxLayout *btnRowClient;
     QPushButton *btnAddClient;
     QPushButton *btnUpdClient;
@@ -88,7 +87,6 @@ public:
     QLabel *lblMaxAmount;
     QDoubleSpinBox *dsMaxAmount;
     QComboBox *cbOrderSort;
-    QPushButton *btnAdvSearchOrder;
     QHBoxLayout *btnRowOrder;
     QPushButton *btnAddOrd;
     QPushButton *btnUpdOrd;
@@ -211,11 +209,6 @@ public:
         cbClientSort->setObjectName("cbClientSort");
 
         filterRowClient->addWidget(cbClientSort);
-
-        btnAdvSearchClient = new QPushButton(tabClients);
-        btnAdvSearchClient->setObjectName("btnAdvSearchClient");
-
-        filterRowClient->addWidget(btnAdvSearchClient);
 
 
         vlc->addLayout(filterRowClient);
@@ -425,11 +418,6 @@ public:
 
         filterRowOrder->addWidget(cbOrderSort);
 
-        btnAdvSearchOrder = new QPushButton(tabOrders);
-        btnAdvSearchOrder->setObjectName("btnAdvSearchOrder");
-
-        filterRowOrder->addWidget(btnAdvSearchOrder);
-
 
         vlo->addLayout(filterRowOrder);
 
@@ -545,14 +533,13 @@ public:
         cbClientSort->setItemText(2, QCoreApplication::translate("MainWindow", "Pr\303\251nom", nullptr));
         cbClientSort->setItemText(3, QCoreApplication::translate("MainWindow", "Cr\303\251\303\251", nullptr));
 
-        btnAdvSearchClient->setText(QCoreApplication::translate("MainWindow", "Recherche Avanc\303\251e", nullptr));
         btnAddClient->setText(QCoreApplication::translate("MainWindow", "Ajouter", nullptr));
         btnUpdClient->setText(QCoreApplication::translate("MainWindow", "Modifier", nullptr));
         btnDelClient->setText(QCoreApplication::translate("MainWindow", "Supprimer", nullptr));
         btnRefClient->setText(QCoreApplication::translate("MainWindow", "Rafra\303\256chir", nullptr));
         btnClientStats->setText(QCoreApplication::translate("MainWindow", "Statistiques", nullptr));
         btnExportExcel->setText(QCoreApplication::translate("MainWindow", "Exporter Excel", nullptr));
-        btnUpdateCategory->setText(QCoreApplication::translate("MainWindow", "Modifier Cat\303\251gorie", nullptr));
+        btnUpdateCategory->setText(QCoreApplication::translate("MainWindow", "Auto Cat\303\251goriser", nullptr));
         QTableWidgetItem *___qtablewidgetitem = tblClients->horizontalHeaderItem(0);
         ___qtablewidgetitem->setText(QCoreApplication::translate("MainWindow", "ID", nullptr));
         QTableWidgetItem *___qtablewidgetitem1 = tblClients->horizontalHeaderItem(1);
@@ -601,7 +588,6 @@ public:
         cbOrderSort->setItemText(2, QCoreApplication::translate("MainWindow", "Montant", nullptr));
         cbOrderSort->setItemText(3, QCoreApplication::translate("MainWindow", "\303\211tat", nullptr));
 
-        btnAdvSearchOrder->setText(QCoreApplication::translate("MainWindow", "Recherche Avanc\303\251e", nullptr));
         btnAddOrd->setText(QCoreApplication::translate("MainWindow", "Ajouter", nullptr));
         btnUpdOrd->setText(QCoreApplication::translate("MainWindow", "Modifier", nullptr));
         btnDelOrd->setText(QCoreApplication::translate("MainWindow", "Supprimer", nullptr));

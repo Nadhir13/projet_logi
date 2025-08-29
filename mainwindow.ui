@@ -159,13 +159,6 @@
             </item>
            </widget>
           </item>
-          <item>
-           <widget class="QPushButton" name="btnAdvSearchClient">
-            <property name="text">
-             <string>Recherche Avancée</string>
-            </property>
-           </widget>
-          </item>
          </layout>
         </item>
         <item>
@@ -215,7 +208,7 @@
           <item>
            <widget class="QPushButton" name="btnUpdateCategory">
             <property name="text">
-             <string>Modifier Catégorie</string>
+             <string>Auto Catégoriser</string>
             </property>
            </widget>
           </item>
@@ -507,13 +500,6 @@
               <string>État</string>
              </property>
             </item>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="btnAdvSearchOrder">
-            <property name="text">
-             <string>Recherche Avancée</string>
-            </property>
            </widget>
           </item>
          </layout>

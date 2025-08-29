@@ -167,3 +167,17 @@ QVector<Client> ClientDao::getTopClients(int limit) {
     }
     return v;
 }
+bool ClientDao::autoCategorizeClients() {
+    QSqlQuery q(Db::instance().conn());
+    q.prepare(R"(
+        UPDATE CLIENT c
+        SET CATEGORY =
+            CASE
+                WHEN (SELECT COUNT(*) FROM COMMANDE WHERE ID_CLIENT = c.ID_CLIENT AND ETAT = 'LIVREE') >= 10 THEN 'PLATINUM'
+                WHEN (SELECT COUNT(*) FROM COMMANDE WHERE ID_CLIENT = c.ID_CLIENT AND ETAT = 'LIVREE') >= 5 THEN 'GOLD'
+                WHEN (SELECT COUNT(*) FROM COMMANDE WHERE ID_CLIENT = c.ID_CLIENT AND ETAT = 'LIVREE') >= 2 THEN 'SILVER'
+                ELSE 'REGULAR'
+            END
+    )");
+    return q.exec();
+}

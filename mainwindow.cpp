@@ -59,6 +59,12 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
 
+    ui->leSearchClient->setToolTip("Recherche par nom et prénom");
+    ui->leEmailFilter->setToolTip("Filtrer par email spécifique");
+    ui->leSearchOrder->setToolTip("Recherche par état et adresse");
+    ui->dsMinAmount->setToolTip("Montant minimum");
+    ui->dsMaxAmount->setToolTip("Montant maximum");
+
     // wire buttons
     connect(ui->btnAddClient, &QPushButton::clicked, this, &MainWindow::addClient);
     connect(ui->btnUpdClient, &QPushButton::clicked, this, &MainWindow::updClient);
@@ -71,9 +77,12 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->btnRefOrd, &QPushButton::clicked, this, &MainWindow::refOrder);
     connect(ui->btnPdfOrd, &QPushButton::clicked, this, &MainWindow::exportOrderPdf);
 
-    // Connect advanced search buttons
-    connect(ui->btnAdvSearchClient, &QPushButton::clicked, this, &MainWindow::advancedClientSearch);
-    connect(ui->btnAdvSearchOrder, &QPushButton::clicked, this, &MainWindow::advancedOrderSearch);
+    connect(ui->leEmailFilter, &QLineEdit::textChanged, this, &MainWindow::applyClientFilters);
+    connect(ui->cbClientFilter, &QComboBox::currentTextChanged, this, &MainWindow::applyOrderFilters);
+    connect(ui->dsMinAmount, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::applyOrderFilters);
+    connect(ui->dsMaxAmount, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::applyOrderFilters);
+
+
 
     // Connect business function buttons
     connect(ui->btnClientStats, &QPushButton::clicked, this, &MainWindow::showClientStats);
@@ -322,6 +331,15 @@ void MainWindow::loadClientsTable() {
         ui->tblClients->setItem(i,6,new QTableWidgetItem(c.statut));
         ui->tblClients->setItem(i,7,new QTableWidgetItem(c.created.toString("yyyy-MM-dd")));
         ui->tblClients->setItem(i,8,new QTableWidgetItem(c.category));
+        QTableWidgetItem *categoryItem = new QTableWidgetItem(c.category);
+        if (c.category == "PLATINUM") {
+            categoryItem->setBackground(QColor("#E5E4E2")); // Platinum color
+        } else if (c.category == "GOLD") {
+            categoryItem->setBackground(QColor("#FFD700")); // Gold color
+        } else if (c.category == "SILVER") {
+            categoryItem->setBackground(QColor("#C0C0C0")); // Silver color
+        }
+        ui->tblClients->setItem(i,8,categoryItem);
     }
     applyClientFilters();
     updateClientChart();
@@ -432,6 +450,7 @@ void MainWindow::exportOrderPdf() {
 
 void MainWindow::applyClientFilters() {
     QString text = ui->leSearchClient->text().trimmed();
+    QString emailFilter = ui->leEmailFilter->text().trimmed();
     QString statut = ui->cbStatutFilter->currentText();
     QString sortKey = ui->cbClientSort->currentText();
 
@@ -439,13 +458,24 @@ void MainWindow::applyClientFilters() {
 
     for (int r=0; r<ui->tblClients->rowCount(); ++r) {
         bool match = true;
+
+        // Name search (nom, prénom)
         if (!text.isEmpty()) {
-            QString rowText = ui->tblClients->item(r,1)->text() + " " + ui->tblClients->item(r,2)->text() + " " + ui->tblClients->item(r,4)->text();
+            QString rowText = ui->tblClients->item(r,1)->text() + " " + ui->tblClients->item(r,2)->text();
             match &= rowText.contains(text, Qt::CaseInsensitive);
         }
+
+        // Email filter
+        if (!emailFilter.isEmpty()) {
+            QString email = ui->tblClients->item(r,4)->text();
+            match &= email.contains(emailFilter, Qt::CaseInsensitive);
+        }
+
+        // Status filter
         if (statut != "Tous") {
             match &= ui->tblClients->item(r,6)->text() == statut;
         }
+
         if (!match) ui->tblClients->setRowHidden(r, true);
     }
 
@@ -456,26 +486,55 @@ void MainWindow::applyClientFilters() {
 
 void MainWindow::applyOrderFilters() {
     QString text = ui->leSearchOrder->text().trimmed();
+    int clientId = ui->cbClientFilter->currentData().toInt();
     QString etat = ui->cbEtatFilter->currentText();
+    double minAmount = ui->dsMinAmount->value();
+    double maxAmount = ui->dsMaxAmount->value();
     QString sortKey = ui->cbOrderSort->currentText();
 
     for (int r=0; r<ui->tblOrders->rowCount(); ++r) ui->tblOrders->setRowHidden(r, false);
 
     for (int r=0; r<ui->tblOrders->rowCount(); ++r) {
         bool match = true;
+
+        // Text search (état, adresse)
         if (!text.isEmpty()) {
             QString rowText = ui->tblOrders->item(r,3)->text() + " " + ui->tblOrders->item(r,5)->text();
             match &= rowText.contains(text, Qt::CaseInsensitive);
         }
+
+        // Client filter
+        if (clientId > 0) {
+            int rowClientId = ui->tblOrders->item(r,1)->text().toInt();
+            match &= (rowClientId == clientId);
+        }
+
+        // Status filter
         if (etat != "Tous") {
             match &= ui->tblOrders->item(r,3)->text() == etat;
         }
+
+        // Amount range filter
+        double amount = ui->tblOrders->item(r,4)->text().toDouble();
+        if (minAmount > 0) match &= (amount >= minAmount);
+        if (maxAmount > 0) match &= (amount <= maxAmount);
+
         if (!match) ui->tblOrders->setRowHidden(r, true);
     }
 
     if (sortKey == "Date") ui->tblOrders->sortItems(2);
     else if (sortKey == "Montant") ui->tblOrders->sortItems(4);
     else if (sortKey == "État") ui->tblOrders->sortItems(3);
+}
+
+void MainWindow::autoCategorizeClients() {
+    ClientDao dao;
+    if (dao.autoCategorizeClients()) {
+        QMessageBox::information(this, "Catégorisation", "Clients catégorisés automatiquement avec succès");
+        refClient();
+    } else {
+        QMessageBox::warning(this, "Catégorisation", "Échec de la catégorisation automatique");
+    }
 }
 
 void MainWindow::updateClientChart() {
@@ -549,51 +608,6 @@ void MainWindow::updateOrderChart() {
     orderChartView->setChart(chart);
 }
 
-void MainWindow::advancedClientSearch() {
-    QString name = ui->leSearchClient->text();
-    QString status = ui->cbStatutFilter->currentText();
-    QString email = ui->leEmailFilter->text();
-
-    ClientDao dao;
-    auto clients = dao.search(name, status, email);
-
-    ui->tblClients->setRowCount(clients.size());
-    for (int i = 0; i < clients.size(); ++i) {
-        const auto &c = clients[i];
-        ui->tblClients->setItem(i, 0, new QTableWidgetItem(QString::number(c.id)));
-        ui->tblClients->setItem(i, 1, new QTableWidgetItem(c.nom));
-        ui->tblClients->setItem(i, 2, new QTableWidgetItem(c.prenom));
-        ui->tblClients->setItem(i, 3, new QTableWidgetItem(c.tel));
-        ui->tblClients->setItem(i, 4, new QTableWidgetItem(c.email));
-        ui->tblClients->setItem(i, 5, new QTableWidgetItem(c.adr));
-        ui->tblClients->setItem(i, 6, new QTableWidgetItem(c.statut));
-        ui->tblClients->setItem(i, 7, new QTableWidgetItem(c.created.toString("yyyy-MM-dd")));
-        ui->tblClients->setItem(i, 8, new QTableWidgetItem(c.category));
-    }
-}
-
-void MainWindow::advancedOrderSearch() {
-    int clientId = ui->cbClientFilter->currentData().toInt();
-    QString status = ui->cbEtatFilter->currentText();
-    double minAmount = ui->dsMinAmount->value();
-    double maxAmount = ui->dsMaxAmount->value();
-
-    OrderDao dao;
-    auto orders = dao.search(clientId, status, minAmount, maxAmount);
-
-    ui->tblOrders->setRowCount(orders.size());
-    for (int i = 0; i < orders.size(); ++i) {
-        const auto &o = orders[i];
-        ui->tblOrders->setItem(i, 0, new QTableWidgetItem(QString::number(o.id)));
-        ui->tblOrders->setItem(i, 1, new QTableWidgetItem(QString::number(o.clientId)));
-        ui->tblOrders->setItem(i, 2, new QTableWidgetItem(o.date.toString("yyyy-MM-dd")));
-        ui->tblOrders->setItem(i, 3, new QTableWidgetItem(o.etat));
-        ui->tblOrders->setItem(i, 4, new QTableWidgetItem(QString::number(o.montant, 'f', 3)));
-        ui->tblOrders->setItem(i, 5, new QTableWidgetItem(o.adrLiv));
-        ui->tblOrders->setItem(i, 6, new QTableWidgetItem(o.priority));
-        ui->tblOrders->setItem(i, 7, new QTableWidgetItem(o.estimatedDelivery.toString("yyyy-MM-dd")));
-    }
-}
 
 void MainWindow::showClientStats() {
     ClientDao dao;

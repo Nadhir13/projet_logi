@@ -33,8 +33,7 @@ private slots:
     void exportClientsExcel();
     void updateClientCategory();
     void updateOrderPriority();
-    void advancedClientSearch();
-    void advancedOrderSearch();
+    void autoCategorizeClients();
 
 private:
     void loadClientsTable();

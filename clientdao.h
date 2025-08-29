@@ -17,4 +17,5 @@ public:
                            const QString& emailFilter = "");
     bool updateClientCategory(int clientId, const QString& category);
     QVector<Client> getTopClients(int limit = 5);
+    bool autoCategorizeClients();
 };
