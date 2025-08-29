@@ -16,6 +16,90 @@
 #include <QHeaderView>
 #include <QInputDialog>
 #include <QTextStream>
+#include <QSqlQuery>
+#include <QMenuBar>
+#include <QMenu>
+#include <QAction>
+#include <QStatusBar>
+
+// User structure
+struct User {
+    int id = 0;
+    QString username;
+    QString role;
+    QString status;
+    QDate created;
+};
+
+// User DAO class
+class UserDao {
+public:
+    static bool add(const QString &username, const QString &password, const QString &role) {
+        QSqlQuery q(Db::instance().conn());
+        q.prepare("INSERT INTO USERS (USERNAME, PASSWORD, ROLE, STATUS) VALUES (:user, :pass, :role, 'ACTIVE')");
+        q.bindValue(":user", username);
+        q.bindValue(":pass", password);
+        q.bindValue(":role", role);
+        return q.exec();
+    }
+
+    static bool update(int userId, const QString &username, const QString &role, const QString &status) {
+        QSqlQuery q(Db::instance().conn());
+        q.prepare("UPDATE USERS SET USERNAME = :user, ROLE = :role, STATUS = :status WHERE ID_USER = :id");
+        q.bindValue(":user", username);
+        q.bindValue(":role", role);
+        q.bindValue(":status", status);
+        q.bindValue(":id", userId);
+        return q.exec();
+    }
+
+    static bool updatePassword(int userId, const QString &password) {
+        QSqlQuery q(Db::instance().conn());
+        q.prepare("UPDATE USERS SET PASSWORD = :pass WHERE ID_USER = :id");
+        q.bindValue(":pass", password);
+        q.bindValue(":id", userId);
+        return q.exec();
+    }
+
+    static bool remove(int userId) {
+        QSqlQuery q(Db::instance().conn());
+        q.prepare("DELETE FROM USERS WHERE ID_USER = :id");
+        q.bindValue(":id", userId);
+        return q.exec();
+    }
+
+    static QVector<User> all() {
+        QVector<User> users;
+        QSqlQuery q("SELECT ID_USER, USERNAME, ROLE, STATUS, DATE_CREATION FROM USERS ORDER BY ID_USER", Db::instance().conn());
+        if (q.exec()) {
+            while (q.next()) {
+                User u;
+                u.id = q.value(0).toInt();
+                u.username = q.value(1).toString();
+                u.role = q.value(2).toString();
+                u.status = q.value(3).toString();
+                u.created = q.value(4).toDate();
+                users.append(u);
+            }
+        }
+        return users;
+    }
+
+    static User getById(int userId) {
+        User u;
+        QSqlQuery q(Db::instance().conn());
+        q.prepare("SELECT ID_USER, USERNAME, ROLE, STATUS, DATE_CREATION FROM USERS WHERE ID_USER = :id");
+        q.bindValue(":id", userId);
+        if (q.exec() && q.next()) {
+            u.id = q.value(0).toInt();
+            u.username = q.value(1).toString();
+            u.role = q.value(2).toString();
+            u.status = q.value(3).toString();
+            u.created = q.value(4).toDate();
+        }
+        return u;
+    }
+};
 
 bool MainWindow::validateClientForm() {
     if (ui->leNom->text().isEmpty()) {
@@ -55,6 +139,20 @@ bool MainWindow::validateOrderForm() {
     return true;
 }
 
+bool MainWindow::validateUserForm() {
+    if (ui->leUserUsername->text().isEmpty()) {
+        QMessageBox::warning(this, "Validation", "Le nom d'utilisateur est obligatoire");
+        ui->leUserUsername->setFocus();
+        return false;
+    }
+    if (ui->leUserPassword->text().isEmpty() && ui->stackedUser->currentIndex() == 0) {
+        QMessageBox::warning(this, "Validation", "Le mot de passe est obligatoire");
+        ui->leUserPassword->setFocus();
+        return false;
+    }
+    return true;
+}
+
 MainWindow::MainWindow(int userId, const QString &username, const QString &role, QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow), m_userId(userId), m_username(username), m_role(role)
 {
@@ -62,6 +160,9 @@ MainWindow::MainWindow(int userId, const QString &username, const QString &role,
 
     // Set window title with user info
     setWindowTitle(QString("Système de Gestion Logistique - Connecté en tant que: %1 (%2)").arg(username).arg(role));
+
+    // Setup menu bar with logout option
+    setupMenuBar();
 
     // Setup UI based on user role
     setupPermissionsBasedOnRole();
@@ -71,6 +172,7 @@ MainWindow::MainWindow(int userId, const QString &username, const QString &role,
     ui->leSearchOrder->setToolTip("Recherche par état et adresse");
     ui->dsMinAmount->setToolTip("Montant minimum");
     ui->dsMaxAmount->setToolTip("Montant maximum");
+    ui->leSearchUser->setToolTip("Recherche par nom d'utilisateur");
 
     // wire buttons
     connect(ui->btnAddClient, &QPushButton::clicked, this, &MainWindow::addClient);
@@ -84,12 +186,19 @@ MainWindow::MainWindow(int userId, const QString &username, const QString &role,
     connect(ui->btnRefOrd, &QPushButton::clicked, this, &MainWindow::refOrder);
     connect(ui->btnPdfOrd, &QPushButton::clicked, this, &MainWindow::exportOrderPdf);
 
+    connect(ui->btnAddUser, &QPushButton::clicked, this, &MainWindow::addUser);
+    connect(ui->btnUpdUser, &QPushButton::clicked, this, &MainWindow::updUser);
+    connect(ui->btnDelUser, &QPushButton::clicked, this, &MainWindow::delUser);
+    connect(ui->btnRefUser, &QPushButton::clicked, this, &MainWindow::refUser);
+    connect(ui->btnChangePassword, &QPushButton::clicked, this, &MainWindow::changeUserPassword);
+
     connect(ui->leEmailFilter, &QLineEdit::textChanged, this, &MainWindow::applyClientFilters);
     connect(ui->cbClientFilter, &QComboBox::currentTextChanged, this, &MainWindow::applyOrderFilters);
     connect(ui->dsMinAmount, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::applyOrderFilters);
     connect(ui->dsMaxAmount, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::applyOrderFilters);
-
-
+    connect(ui->leSearchUser, &QLineEdit::textChanged, this, &MainWindow::applyUserFilters);
+    connect(ui->cbUserRoleFilter, &QComboBox::currentTextChanged, this, &MainWindow::applyUserFilters);
+    connect(ui->cbUserStatusFilter, &QComboBox::currentTextChanged, this, &MainWindow::applyUserFilters);
 
     // Connect business function buttons
     connect(ui->btnClientStats, &QPushButton::clicked, this, &MainWindow::showClientStats);
@@ -97,6 +206,9 @@ MainWindow::MainWindow(int userId, const QString &username, const QString &role,
     connect(ui->btnExportExcel, &QPushButton::clicked, this, &MainWindow::exportClientsExcel);
     connect(ui->btnUpdateCategory, &QPushButton::clicked, this, &MainWindow::updateClientCategory);
     connect(ui->btnUpdatePriority, &QPushButton::clicked, this, &MainWindow::updateOrderPriority);
+
+    // Connect tab changes
+    connect(ui->tabWidget, &QTabWidget::currentChanged, this, &MainWindow::onTabChanged);
 
     // Connect selection changes
     connect(ui->tblClients, &QTableWidget::itemSelectionChanged, this, [this]() {
@@ -141,11 +253,31 @@ MainWindow::MainWindow(int userId, const QString &username, const QString &role,
         }
     });
 
+    connect(ui->tblUsers, &QTableWidget::itemSelectionChanged, this, [this]() {
+        auto items = ui->tblUsers->selectedItems();
+        if (!items.isEmpty()) {
+            int row = items.first()->row();
+            ui->leUserUsername->setText(ui->tblUsers->item(row, 1)->text());
+
+            QString role = ui->tblUsers->item(row, 2)->text();
+            int index = ui->cbUserRole->findText(role);
+            if (index >= 0) ui->cbUserRole->setCurrentIndex(index);
+
+            QString status = ui->tblUsers->item(row, 3)->text();
+            index = ui->cbUserStatus->findText(status);
+            if (index >= 0) ui->cbUserStatus->setCurrentIndex(index);
+
+            // Switch to edit mode
+            ui->stackedUser->setCurrentIndex(1);
+        }
+    });
+
     // initial load
     loadClientsTable();
     loadClientsCombo();
     loadClientFilterCombo();
     loadOrdersTable();
+    loadUsersTable();
 
     // setup charts containers with QtCharts
     clientChartView = new QChartView();
@@ -166,6 +298,15 @@ MainWindow::MainWindow(int userId, const QString &username, const QString &role,
         lay->addWidget(orderChartView);
     }
 
+    userChartView = new QChartView();
+    userChartView->setRenderHint(QPainter::Antialiasing);
+    auto userContainer = this->findChild<QWidget*>("userChartContainer");
+    if (userContainer) {
+        auto lay = new QVBoxLayout(userContainer);
+        lay->setContentsMargins(0,0,0,0);
+        lay->addWidget(userChartView);
+    }
+
     // wire filters
     connect(ui->leSearchClient, &QLineEdit::textChanged, this, &MainWindow::applyClientFilters);
     connect(ui->cbStatutFilter, &QComboBox::currentTextChanged, this, &MainWindow::applyClientFilters);
@@ -176,27 +317,53 @@ MainWindow::MainWindow(int userId, const QString &username, const QString &role,
 
     updateClientChart();
     updateOrderChart();
+    updateUserChart();
 }
 
 MainWindow::~MainWindow() { delete ui; }
 
+void MainWindow::setupMenuBar()
+{
+    // Create menu bar
+    QMenuBar *menuBar = new QMenuBar(this);
+    setMenuBar(menuBar);
+
+    // Create user menu
+    QMenu *userMenu = menuBar->addMenu("Utilisateur");
+
+    // Add user info action
+    QAction *userInfoAction = new QAction(QString("Connecté: %1").arg(m_username), this);
+    userInfoAction->setEnabled(false);
+    userMenu->addAction(userInfoAction);
+
+    userMenu->addSeparator();
+
+    // Add logout action
+    QAction *logoutAction = new QAction("Déconnexion", this);
+    logoutAction->setShortcut(QKeySequence::Quit);
+    connect(logoutAction, &QAction::triggered, this, &MainWindow::logout);
+    userMenu->addAction(logoutAction);
+}
+
 void MainWindow::setupPermissionsBasedOnRole()
 {
     // Admin has full access
-    if (m_role == "ADMIN") {
+    if (m_role == "Administrateur" || m_role == "ADMIN") {
         return; // No restrictions
     }
 
     // Manager (Gestionnaire logistique) can access everything except user management
-    if (m_role == "MANAGER") {
-        // No specific restrictions for now
+    if (m_role == "Gestionnaire logistique" || m_role == "MANAGER") {
+        // Hide user management tab
+        ui->tabWidget->removeTab(2); // Remove Users tab
         return;
     }
 
     // Delivery (Livreur) has limited access
-    if (m_role == "DELIVERY") {
-        // Hide client management tab
+    if (m_role == "Livreur" || m_role == "DELIVERY") {
+        // Hide client and user management tabs
         ui->tabWidget->removeTab(0); // Remove Clients tab
+        ui->tabWidget->removeTab(1); // Remove Users tab (index changed after first removal)
 
         // Disable order modification buttons
         ui->btnAddOrd->setEnabled(false);
@@ -207,6 +374,31 @@ void MainWindow::setupPermissionsBasedOnRole()
         ui->btnPdfOrd->setEnabled(false);
         ui->btnOrderStats->setEnabled(false);
         ui->btnUpdatePriority->setEnabled(false);
+    }
+}
+
+void MainWindow::onTabChanged(int index)
+{
+    if (index == 0) { // Clients tab
+        refClient();
+    } else if (index == 1) { // Orders tab
+        refOrder();
+    } else if (index == 2) { // Users tab
+        refUser();
+    }
+}
+
+void MainWindow::logout()
+{
+    // Confirm logout
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, "Déconnexion",
+                                  "Êtes-vous sûr de vouloir vous déconnecter?",
+                                  QMessageBox::Yes | QMessageBox::No);
+
+    if (reply == QMessageBox::Yes) {
+        // Close main window and show login dialog again
+        this->close();
     }
 }
 
@@ -347,6 +539,113 @@ void MainWindow::refOrder() {
     loadOrdersTable();
 }
 
+// ===== Users
+void MainWindow::addUser() {
+    if (!validateUserForm()) return;
+
+    QString username = ui->leUserUsername->text();
+    QString password = ui->leUserPassword->text();
+    QString role = ui->cbUserRole->currentText().toUpper();
+
+    if (UserDao::add(username, password, role)) {
+        QMessageBox::information(this, "Utilisateur", "Utilisateur ajouté avec succès");
+        // Clear form and switch to view mode
+        ui->leUserUsername->clear();
+        ui->leUserPassword->clear();
+        ui->cbUserRole->setCurrentIndex(0);
+        ui->stackedUser->setCurrentIndex(0);
+        refUser();
+    } else {
+        QMessageBox::warning(this, "Utilisateur", "Échec de l'ajout: " + Db::instance().lastError());
+    }
+}
+
+void MainWindow::updUser() {
+    auto items = ui->tblUsers->selectedItems();
+    if (items.isEmpty()) {
+        QMessageBox::warning(this, "Utilisateur", "Veuillez sélectionner un utilisateur à modifier");
+        return;
+    }
+
+    int row = items.first()->row();
+    int id = ui->tblUsers->item(row, 0)->text().toInt();
+
+    QString username = ui->leUserUsername->text();
+    QString role = ui->cbUserRole->currentText().toUpper();
+    QString status = ui->cbUserStatus->currentText();
+
+    if (UserDao::update(id, username, role, status)) {
+        QMessageBox::information(this, "Utilisateur", "Utilisateur modifié avec succès");
+        // Switch back to view mode
+        ui->stackedUser->setCurrentIndex(0);
+        refUser();
+    } else {
+        QMessageBox::warning(this, "Utilisateur", "Échec de la modification: " + Db::instance().lastError());
+    }
+}
+
+void MainWindow::delUser() {
+    auto items = ui->tblUsers->selectedItems();
+    if (items.isEmpty()) {
+        QMessageBox::warning(this, "Utilisateur", "Veuillez sélectionner un utilisateur à supprimer");
+        return;
+    }
+
+    int row = items.first()->row();
+    int id = ui->tblUsers->item(row, 0)->text().toInt();
+    QString username = ui->tblUsers->item(row, 1)->text();
+
+    // Prevent self-deletion
+    if (id == m_userId) {
+        QMessageBox::warning(this, "Utilisateur", "Vous ne pouvez pas supprimer votre propre compte");
+        return;
+    }
+
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, "Confirmation",
+                                  QString("Êtes-vous sûr de vouloir supprimer l'utilisateur %1?").arg(username),
+                                  QMessageBox::Yes | QMessageBox::No);
+
+    if (reply == QMessageBox::Yes) {
+        if (UserDao::remove(id)) {
+            QMessageBox::information(this, "Utilisateur", "Utilisateur supprimé avec succès");
+            refUser();
+        } else {
+            QMessageBox::warning(this, "Utilisateur", "Échec de la suppression: " + Db::instance().lastError());
+        }
+    }
+}
+
+void MainWindow::refUser() {
+    loadUsersTable();
+}
+
+void MainWindow::changeUserPassword() {
+    auto items = ui->tblUsers->selectedItems();
+    if (items.isEmpty()) {
+        QMessageBox::warning(this, "Utilisateur", "Veuillez sélectionner un utilisateur");
+        return;
+    }
+
+    int row = items.first()->row();
+    int id = ui->tblUsers->item(row, 0)->text().toInt();
+    QString username = ui->tblUsers->item(row, 1)->text();
+
+    QString password = QInputDialog::getText(this, "Changer le mot de passe",
+                                             QString("Nouveau mot de passe pour %1:").arg(username),
+                                             QLineEdit::Password);
+
+    if (password.isEmpty()) {
+        return;
+    }
+
+    if (UserDao::updatePassword(id, password)) {
+        QMessageBox::information(this, "Utilisateur", "Mot de passe changé avec succès");
+    } else {
+        QMessageBox::warning(this, "Utilisateur", "Échec du changement de mot de passe: " + Db::instance().lastError());
+    }
+}
+
 // ===== loads
 void MainWindow::loadClientsTable() {
     ClientDao dao;
@@ -404,6 +703,38 @@ void MainWindow::loadOrdersTable() {
     }
     applyOrderFilters();
     updateOrderChart();
+}
+
+void MainWindow::loadUsersTable() {
+    auto users = UserDao::all();
+    ui->tblUsers->clearContents();
+    ui->tblUsers->setRowCount(users.size());
+    ui->tblUsers->setColumnCount(5);
+    QStringList headers = {"ID","Nom d'utilisateur","Rôle","Statut","Date création"};
+    ui->tblUsers->setHorizontalHeaderLabels(headers);
+    ui->tblUsers->horizontalHeader()->setStretchLastSection(true);
+
+    for (int i = 0; i < users.size(); ++i) {
+        const auto &u = users[i];
+        ui->tblUsers->setItem(i, 0, new QTableWidgetItem(QString::number(u.id)));
+        ui->tblUsers->setItem(i, 1, new QTableWidgetItem(u.username));
+        ui->tblUsers->setItem(i, 2, new QTableWidgetItem(u.role));
+        ui->tblUsers->setItem(i, 3, new QTableWidgetItem(u.status));
+        ui->tblUsers->setItem(i, 4, new QTableWidgetItem(u.created.toString("yyyy-MM-dd")));
+
+        // Color code based on status
+        QTableWidgetItem *statusItem = new QTableWidgetItem(u.status);
+        if (u.status == "ACTIVE") {
+            statusItem->setBackground(QColor("#d4edda")); // Light green
+            statusItem->setForeground(QColor("#155724")); // Dark green
+        } else {
+            statusItem->setBackground(QColor("#f8d7da")); // Light red
+            statusItem->setForeground(QColor("#721c24")); // Dark red
+        }
+        ui->tblUsers->setItem(i, 3, statusItem);
+    }
+    applyUserFilters();
+    updateUserChart();
 }
 
 void MainWindow::loadClientsCombo() {
@@ -564,6 +895,42 @@ void MainWindow::applyOrderFilters() {
     else if (sortKey == "État") ui->tblOrders->sortItems(3);
 }
 
+void MainWindow::applyUserFilters() {
+    QString text = ui->leSearchUser->text().trimmed();
+    QString roleFilter = ui->cbUserRoleFilter->currentText();
+    QString statusFilter = ui->cbUserStatusFilter->currentText();
+    QString sortKey = ui->cbUserSort->currentText();
+
+    for (int r=0; r<ui->tblUsers->rowCount(); ++r) ui->tblUsers->setRowHidden(r, false);
+
+    for (int r=0; r<ui->tblUsers->rowCount(); ++r) {
+        bool match = true;
+
+        // Username search
+        if (!text.isEmpty()) {
+            QString username = ui->tblUsers->item(r,1)->text();
+            match &= username.contains(text, Qt::CaseInsensitive);
+        }
+
+        // Role filter
+        if (roleFilter != "Tous") {
+            match &= ui->tblUsers->item(r,2)->text() == roleFilter;
+        }
+
+        // Status filter
+        if (statusFilter != "Tous") {
+            match &= ui->tblUsers->item(r,3)->text() == statusFilter;
+        }
+
+        if (!match) ui->tblUsers->setRowHidden(r, true);
+    }
+
+    if (sortKey == "Nom d'utilisateur") ui->tblUsers->sortItems(1);
+    else if (sortKey == "Rôle") ui->tblUsers->sortItems(2);
+    else if (sortKey == "Statut") ui->tblUsers->sortItems(3);
+    else if (sortKey == "Date création") ui->tblUsers->sortItems(4);
+}
+
 void MainWindow::autoCategorizeClients() {
     ClientDao dao;
     if (dao.autoCategorizeClients()) {
@@ -643,6 +1010,33 @@ void MainWindow::updateOrderChart() {
     chart->legend()->setAlignment(Qt::AlignBottom);
 
     orderChartView->setChart(chart);
+}
+
+void MainWindow::updateUserChart() {
+    if (!userChartView) return;
+
+    auto users = UserDao::all();
+
+    QMap<QString, int> roleCounts;
+    QMap<QString, int> statusCounts;
+
+    for (const auto &user : users) {
+        roleCounts[user.role]++;
+        statusCounts[user.status]++;
+    }
+
+    QPieSeries *series = new QPieSeries();
+    for (auto it = roleCounts.begin(); it != roleCounts.end(); ++it) {
+        series->append(it.key(), it.value());
+    }
+
+    QChart *chart = new QChart();
+    chart->addSeries(series);
+    chart->setTitle("Répartition des utilisateurs par rôle");
+    chart->legend()->setVisible(true);
+    chart->legend()->setAlignment(Qt::AlignBottom);
+
+    userChartView->setChart(chart);
 }
 
 

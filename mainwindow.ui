@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>900</width>
-    <height>700</height>
+    <width>1200</width>
+    <height>800</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -619,6 +619,290 @@
             <height>200</height>
            </size>
           </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tabUsers">
+       <attribute name="title">
+        <string>Utilisateurs</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <widget class="QStackedWidget" name="stackedUser">
+          <property name="currentIndex">
+           <number>0</number>
+          </property>
+          <widget class="QWidget" name="pageUserView">
+           <layout class="QVBoxLayout" name="verticalLayout_5">
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_5">
+              <item>
+               <widget class="QLineEdit" name="leSearchUser">
+                <property name="placeholderText">
+                 <string>Rechercher par nom d'utilisateur</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="cbUserRoleFilter">
+                <item>
+                 <property name="text">
+                  <string>Tous les rôles</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>ADMIN</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>MANAGER</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>DELIVERY</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="cbUserStatusFilter">
+                <item>
+                 <property name="text">
+                  <string>Tous les statuts</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>ACTIVE</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>SUSPENDED</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="cbUserSort">
+                <item>
+                 <property name="text">
+                  <string>Trier par</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Nom d'utilisateur</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Rôle</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Statut</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Date création</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_6">
+              <item>
+               <widget class="QPushButton" name="btnAddUser">
+                <property name="text">
+                 <string>Nouvel Utilisateur</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btnRefUser">
+                <property name="text">
+                 <string>Rafraîchir</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btnChangePassword">
+                <property name="text">
+                 <string>Changer Mot de Passe</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QTableWidget" name="tblUsers">
+              <property name="selectionMode">
+               <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
+              </property>
+              <property name="selectionBehavior">
+               <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+              </property>
+              <property name="columnCount">
+               <number>5</number>
+              </property>
+              <attribute name="horizontalHeaderVisible">
+               <bool>true</bool>
+              </attribute>
+              <attribute name="verticalHeaderVisible">
+               <bool>true</bool>
+              </attribute>
+              <column>
+               <property name="text">
+                <string>ID</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Nom d'utilisateur</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Rôle</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Statut</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Date création</string>
+               </property>
+              </column>
+             </widget>
+            </item>
+            <item>
+             <widget class="QWidget" name="userChartContainer" native="true">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>200</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="pageUserEdit">
+           <layout class="QVBoxLayout" name="verticalLayout_6">
+            <item>
+             <layout class="QFormLayout" name="formLayout_3">
+              <item row="0" column="0">
+               <widget class="QLabel" name="lblUserUsername">
+                <property name="text">
+                 <string>Nom d'utilisateur:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLineEdit" name="leUserUsername"/>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="lblUserPassword">
+                <property name="text">
+                 <string>Mot de passe:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLineEdit" name="leUserPassword">
+                <property name="echoMode">
+                 <enum>QLineEdit::EchoMode::Password</enum>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="lblUserRole">
+                <property name="text">
+                 <string>Rôle:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QComboBox" name="cbUserRole">
+                <item>
+                 <property name="text">
+                  <string>ADMIN</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>MANAGER</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>DELIVERY</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="lblUserStatus">
+                <property name="text">
+                 <string>Statut:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QComboBox" name="cbUserStatus">
+                <item>
+                 <property name="text">
+                  <string>ACTIVE</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>SUSPENDED</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_7">
+              <item>
+               <widget class="QPushButton" name="btnUpdUser">
+                <property name="text">
+                 <string>Modifier</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btnDelUser">
+                <property name="text">
+                 <string>Supprimer</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btnCancelUser">
+                <property name="text">
+                 <string>Annuler</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
          </widget>
         </item>
        </layout>

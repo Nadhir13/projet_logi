@@ -20,6 +20,7 @@
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QTableWidget>
@@ -97,13 +98,44 @@ public:
     QPushButton *btnUpdatePriority;
     QTableWidget *tblOrders;
     QWidget *orderChartContainer;
+    QWidget *tabUsers;
+    QVBoxLayout *verticalLayout_4;
+    QStackedWidget *stackedUser;
+    QWidget *pageUserView;
+    QVBoxLayout *verticalLayout_5;
+    QHBoxLayout *horizontalLayout_5;
+    QLineEdit *leSearchUser;
+    QComboBox *cbUserRoleFilter;
+    QComboBox *cbUserStatusFilter;
+    QComboBox *cbUserSort;
+    QHBoxLayout *horizontalLayout_6;
+    QPushButton *btnAddUser;
+    QPushButton *btnRefUser;
+    QPushButton *btnChangePassword;
+    QTableWidget *tblUsers;
+    QWidget *userChartContainer;
+    QWidget *pageUserEdit;
+    QVBoxLayout *verticalLayout_6;
+    QFormLayout *formLayout_3;
+    QLabel *lblUserUsername;
+    QLineEdit *leUserUsername;
+    QLabel *lblUserPassword;
+    QLineEdit *leUserPassword;
+    QLabel *lblUserRole;
+    QComboBox *cbUserRole;
+    QLabel *lblUserStatus;
+    QComboBox *cbUserStatus;
+    QHBoxLayout *horizontalLayout_7;
+    QPushButton *btnUpdUser;
+    QPushButton *btnDelUser;
+    QPushButton *btnCancelUser;
     QStatusBar *statusbar;
 
     void setupUi(QMainWindow *MainWindow)
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName("MainWindow");
-        MainWindow->resize(900, 700);
+        MainWindow->resize(1200, 800);
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName("centralwidget");
         verticalLayout = new QVBoxLayout(centralwidget);
@@ -494,6 +526,182 @@ public:
         vlo->addWidget(orderChartContainer);
 
         tabWidget->addTab(tabOrders, QString());
+        tabUsers = new QWidget();
+        tabUsers->setObjectName("tabUsers");
+        verticalLayout_4 = new QVBoxLayout(tabUsers);
+        verticalLayout_4->setObjectName("verticalLayout_4");
+        stackedUser = new QStackedWidget(tabUsers);
+        stackedUser->setObjectName("stackedUser");
+        pageUserView = new QWidget();
+        pageUserView->setObjectName("pageUserView");
+        verticalLayout_5 = new QVBoxLayout(pageUserView);
+        verticalLayout_5->setObjectName("verticalLayout_5");
+        horizontalLayout_5 = new QHBoxLayout();
+        horizontalLayout_5->setObjectName("horizontalLayout_5");
+        leSearchUser = new QLineEdit(pageUserView);
+        leSearchUser->setObjectName("leSearchUser");
+
+        horizontalLayout_5->addWidget(leSearchUser);
+
+        cbUserRoleFilter = new QComboBox(pageUserView);
+        cbUserRoleFilter->addItem(QString());
+        cbUserRoleFilter->addItem(QString());
+        cbUserRoleFilter->addItem(QString());
+        cbUserRoleFilter->addItem(QString());
+        cbUserRoleFilter->setObjectName("cbUserRoleFilter");
+
+        horizontalLayout_5->addWidget(cbUserRoleFilter);
+
+        cbUserStatusFilter = new QComboBox(pageUserView);
+        cbUserStatusFilter->addItem(QString());
+        cbUserStatusFilter->addItem(QString());
+        cbUserStatusFilter->addItem(QString());
+        cbUserStatusFilter->setObjectName("cbUserStatusFilter");
+
+        horizontalLayout_5->addWidget(cbUserStatusFilter);
+
+        cbUserSort = new QComboBox(pageUserView);
+        cbUserSort->addItem(QString());
+        cbUserSort->addItem(QString());
+        cbUserSort->addItem(QString());
+        cbUserSort->addItem(QString());
+        cbUserSort->addItem(QString());
+        cbUserSort->setObjectName("cbUserSort");
+
+        horizontalLayout_5->addWidget(cbUserSort);
+
+
+        verticalLayout_5->addLayout(horizontalLayout_5);
+
+        horizontalLayout_6 = new QHBoxLayout();
+        horizontalLayout_6->setObjectName("horizontalLayout_6");
+        btnAddUser = new QPushButton(pageUserView);
+        btnAddUser->setObjectName("btnAddUser");
+
+        horizontalLayout_6->addWidget(btnAddUser);
+
+        btnRefUser = new QPushButton(pageUserView);
+        btnRefUser->setObjectName("btnRefUser");
+
+        horizontalLayout_6->addWidget(btnRefUser);
+
+        btnChangePassword = new QPushButton(pageUserView);
+        btnChangePassword->setObjectName("btnChangePassword");
+
+        horizontalLayout_6->addWidget(btnChangePassword);
+
+
+        verticalLayout_5->addLayout(horizontalLayout_6);
+
+        tblUsers = new QTableWidget(pageUserView);
+        if (tblUsers->columnCount() < 5)
+            tblUsers->setColumnCount(5);
+        QTableWidgetItem *__qtablewidgetitem15 = new QTableWidgetItem();
+        tblUsers->setHorizontalHeaderItem(0, __qtablewidgetitem15);
+        QTableWidgetItem *__qtablewidgetitem16 = new QTableWidgetItem();
+        tblUsers->setHorizontalHeaderItem(1, __qtablewidgetitem16);
+        QTableWidgetItem *__qtablewidgetitem17 = new QTableWidgetItem();
+        tblUsers->setHorizontalHeaderItem(2, __qtablewidgetitem17);
+        QTableWidgetItem *__qtablewidgetitem18 = new QTableWidgetItem();
+        tblUsers->setHorizontalHeaderItem(3, __qtablewidgetitem18);
+        QTableWidgetItem *__qtablewidgetitem19 = new QTableWidgetItem();
+        tblUsers->setHorizontalHeaderItem(4, __qtablewidgetitem19);
+        tblUsers->setObjectName("tblUsers");
+        tblUsers->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
+        tblUsers->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
+        tblUsers->setColumnCount(5);
+        tblUsers->horizontalHeader()->setVisible(true);
+        tblUsers->verticalHeader()->setVisible(true);
+
+        verticalLayout_5->addWidget(tblUsers);
+
+        userChartContainer = new QWidget(pageUserView);
+        userChartContainer->setObjectName("userChartContainer");
+        userChartContainer->setMinimumSize(QSize(0, 200));
+
+        verticalLayout_5->addWidget(userChartContainer);
+
+        stackedUser->addWidget(pageUserView);
+        pageUserEdit = new QWidget();
+        pageUserEdit->setObjectName("pageUserEdit");
+        verticalLayout_6 = new QVBoxLayout(pageUserEdit);
+        verticalLayout_6->setObjectName("verticalLayout_6");
+        formLayout_3 = new QFormLayout();
+        formLayout_3->setObjectName("formLayout_3");
+        lblUserUsername = new QLabel(pageUserEdit);
+        lblUserUsername->setObjectName("lblUserUsername");
+
+        formLayout_3->setWidget(0, QFormLayout::ItemRole::LabelRole, lblUserUsername);
+
+        leUserUsername = new QLineEdit(pageUserEdit);
+        leUserUsername->setObjectName("leUserUsername");
+
+        formLayout_3->setWidget(0, QFormLayout::ItemRole::FieldRole, leUserUsername);
+
+        lblUserPassword = new QLabel(pageUserEdit);
+        lblUserPassword->setObjectName("lblUserPassword");
+
+        formLayout_3->setWidget(1, QFormLayout::ItemRole::LabelRole, lblUserPassword);
+
+        leUserPassword = new QLineEdit(pageUserEdit);
+        leUserPassword->setObjectName("leUserPassword");
+        leUserPassword->setEchoMode(QLineEdit::EchoMode::Password);
+
+        formLayout_3->setWidget(1, QFormLayout::ItemRole::FieldRole, leUserPassword);
+
+        lblUserRole = new QLabel(pageUserEdit);
+        lblUserRole->setObjectName("lblUserRole");
+
+        formLayout_3->setWidget(2, QFormLayout::ItemRole::LabelRole, lblUserRole);
+
+        cbUserRole = new QComboBox(pageUserEdit);
+        cbUserRole->addItem(QString());
+        cbUserRole->addItem(QString());
+        cbUserRole->addItem(QString());
+        cbUserRole->setObjectName("cbUserRole");
+
+        formLayout_3->setWidget(2, QFormLayout::ItemRole::FieldRole, cbUserRole);
+
+        lblUserStatus = new QLabel(pageUserEdit);
+        lblUserStatus->setObjectName("lblUserStatus");
+
+        formLayout_3->setWidget(3, QFormLayout::ItemRole::LabelRole, lblUserStatus);
+
+        cbUserStatus = new QComboBox(pageUserEdit);
+        cbUserStatus->addItem(QString());
+        cbUserStatus->addItem(QString());
+        cbUserStatus->setObjectName("cbUserStatus");
+
+        formLayout_3->setWidget(3, QFormLayout::ItemRole::FieldRole, cbUserStatus);
+
+
+        verticalLayout_6->addLayout(formLayout_3);
+
+        horizontalLayout_7 = new QHBoxLayout();
+        horizontalLayout_7->setObjectName("horizontalLayout_7");
+        btnUpdUser = new QPushButton(pageUserEdit);
+        btnUpdUser->setObjectName("btnUpdUser");
+
+        horizontalLayout_7->addWidget(btnUpdUser);
+
+        btnDelUser = new QPushButton(pageUserEdit);
+        btnDelUser->setObjectName("btnDelUser");
+
+        horizontalLayout_7->addWidget(btnDelUser);
+
+        btnCancelUser = new QPushButton(pageUserEdit);
+        btnCancelUser->setObjectName("btnCancelUser");
+
+        horizontalLayout_7->addWidget(btnCancelUser);
+
+
+        verticalLayout_6->addLayout(horizontalLayout_7);
+
+        stackedUser->addWidget(pageUserEdit);
+
+        verticalLayout_4->addWidget(stackedUser);
+
+        tabWidget->addTab(tabUsers, QString());
 
         verticalLayout->addWidget(tabWidget);
 
@@ -505,6 +713,7 @@ public:
         retranslateUi(MainWindow);
 
         tabWidget->setCurrentIndex(0);
+        stackedUser->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -610,6 +819,50 @@ public:
         QTableWidgetItem *___qtablewidgetitem14 = tblOrders->horizontalHeaderItem(6);
         ___qtablewidgetitem14->setText(QCoreApplication::translate("MainWindow", "Priorit\303\251", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tabOrders), QCoreApplication::translate("MainWindow", "Commandes", nullptr));
+        leSearchUser->setPlaceholderText(QCoreApplication::translate("MainWindow", "Rechercher par nom d'utilisateur", nullptr));
+        cbUserRoleFilter->setItemText(0, QCoreApplication::translate("MainWindow", "Tous les r\303\264les", nullptr));
+        cbUserRoleFilter->setItemText(1, QCoreApplication::translate("MainWindow", "ADMIN", nullptr));
+        cbUserRoleFilter->setItemText(2, QCoreApplication::translate("MainWindow", "MANAGER", nullptr));
+        cbUserRoleFilter->setItemText(3, QCoreApplication::translate("MainWindow", "DELIVERY", nullptr));
+
+        cbUserStatusFilter->setItemText(0, QCoreApplication::translate("MainWindow", "Tous les statuts", nullptr));
+        cbUserStatusFilter->setItemText(1, QCoreApplication::translate("MainWindow", "ACTIVE", nullptr));
+        cbUserStatusFilter->setItemText(2, QCoreApplication::translate("MainWindow", "SUSPENDED", nullptr));
+
+        cbUserSort->setItemText(0, QCoreApplication::translate("MainWindow", "Trier par", nullptr));
+        cbUserSort->setItemText(1, QCoreApplication::translate("MainWindow", "Nom d'utilisateur", nullptr));
+        cbUserSort->setItemText(2, QCoreApplication::translate("MainWindow", "R\303\264le", nullptr));
+        cbUserSort->setItemText(3, QCoreApplication::translate("MainWindow", "Statut", nullptr));
+        cbUserSort->setItemText(4, QCoreApplication::translate("MainWindow", "Date cr\303\251ation", nullptr));
+
+        btnAddUser->setText(QCoreApplication::translate("MainWindow", "Nouvel Utilisateur", nullptr));
+        btnRefUser->setText(QCoreApplication::translate("MainWindow", "Rafra\303\256chir", nullptr));
+        btnChangePassword->setText(QCoreApplication::translate("MainWindow", "Changer Mot de Passe", nullptr));
+        QTableWidgetItem *___qtablewidgetitem15 = tblUsers->horizontalHeaderItem(0);
+        ___qtablewidgetitem15->setText(QCoreApplication::translate("MainWindow", "ID", nullptr));
+        QTableWidgetItem *___qtablewidgetitem16 = tblUsers->horizontalHeaderItem(1);
+        ___qtablewidgetitem16->setText(QCoreApplication::translate("MainWindow", "Nom d'utilisateur", nullptr));
+        QTableWidgetItem *___qtablewidgetitem17 = tblUsers->horizontalHeaderItem(2);
+        ___qtablewidgetitem17->setText(QCoreApplication::translate("MainWindow", "R\303\264le", nullptr));
+        QTableWidgetItem *___qtablewidgetitem18 = tblUsers->horizontalHeaderItem(3);
+        ___qtablewidgetitem18->setText(QCoreApplication::translate("MainWindow", "Statut", nullptr));
+        QTableWidgetItem *___qtablewidgetitem19 = tblUsers->horizontalHeaderItem(4);
+        ___qtablewidgetitem19->setText(QCoreApplication::translate("MainWindow", "Date cr\303\251ation", nullptr));
+        lblUserUsername->setText(QCoreApplication::translate("MainWindow", "Nom d'utilisateur:", nullptr));
+        lblUserPassword->setText(QCoreApplication::translate("MainWindow", "Mot de passe:", nullptr));
+        lblUserRole->setText(QCoreApplication::translate("MainWindow", "R\303\264le:", nullptr));
+        cbUserRole->setItemText(0, QCoreApplication::translate("MainWindow", "ADMIN", nullptr));
+        cbUserRole->setItemText(1, QCoreApplication::translate("MainWindow", "MANAGER", nullptr));
+        cbUserRole->setItemText(2, QCoreApplication::translate("MainWindow", "DELIVERY", nullptr));
+
+        lblUserStatus->setText(QCoreApplication::translate("MainWindow", "Statut:", nullptr));
+        cbUserStatus->setItemText(0, QCoreApplication::translate("MainWindow", "ACTIVE", nullptr));
+        cbUserStatus->setItemText(1, QCoreApplication::translate("MainWindow", "SUSPENDED", nullptr));
+
+        btnUpdUser->setText(QCoreApplication::translate("MainWindow", "Modifier", nullptr));
+        btnDelUser->setText(QCoreApplication::translate("MainWindow", "Supprimer", nullptr));
+        btnCancelUser->setText(QCoreApplication::translate("MainWindow", "Annuler", nullptr));
+        tabWidget->setTabText(tabWidget->indexOf(tabUsers), QCoreApplication::translate("MainWindow", "Utilisateurs", nullptr));
     } // retranslateUi
 
 };

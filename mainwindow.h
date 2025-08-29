@@ -1,4 +1,5 @@
 #pragma once
+
 #include <QMainWindow>
 #include <QAbstractItemView>
 #include <QtCharts>
@@ -27,6 +28,13 @@ private slots:
     void refOrder();
     void exportOrderPdf();
 
+    // user management
+    void addUser();
+    void updUser();
+    void delUser();
+    void refUser();
+    void changeUserPassword();
+
     // Business functions
     void showClientStats();
     void showOrderStats();
@@ -35,29 +43,41 @@ private slots:
     void updateOrderPriority();
     void autoCategorizeClients();
 
+    // New logout function
+    void logout();
+
+    // Tab changed
+    void onTabChanged(int index);
+
 private:
     void loadClientsTable();
     void loadOrdersTable();
+    void loadUsersTable();
     void loadClientsCombo();
     void loadClientFilterCombo();
     bool validateClientForm();
     bool validateOrderForm();
+    bool validateUserForm();
 
     // filters
     void applyClientFilters();
     void applyOrderFilters();
+    void applyUserFilters();
 
     // charts
     void updateClientChart();
     void updateOrderChart();
+    void updateUserChart();
 
 private:
     Ui::MainWindow *ui;
     QChartView* clientChartView = nullptr;
     QChartView* orderChartView = nullptr;
+    QChartView* userChartView = nullptr;
     int m_userId;
     QString m_username;
     QString m_role;
 
     void setupPermissionsBasedOnRole();
+    void setupMenuBar();
 };

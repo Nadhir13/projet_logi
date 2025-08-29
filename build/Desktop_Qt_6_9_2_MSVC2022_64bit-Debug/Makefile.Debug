@@ -198,8 +198,7 @@ compiler_rcc_clean:
 	-$(DEL_FILE) debug\qrc_resources.cpp
 debug\qrc_resources.cpp: ..\..\resources\resources.qrc \
 		C:\Qt\6.9.2\msvc2022_64\bin\rcc.exe \
-		..\..\resources\image\blue1.png \
-		..\..\resources\image\blue.jpg
+		..\..\resources\image\nature.jpg
 	C:\Qt\6.9.2\msvc2022_64\bin\rcc.exe -name resources --no-zstd ..\..\resources\resources.qrc -o debug\qrc_resources.cpp
 
 compiler_moc_predefs_make_all: debug\moc_predefs.h
@@ -413,6 +412,11 @@ debug\moc_logindialog.cpp: ..\..\logindialog.h \
 		C:\Qt\6.9.2\msvc2022_64\include\QtCore\QString \
 		C:\Qt\6.9.2\msvc2022_64\include\QtGui\QResizeEvent \
 		C:\Qt\6.9.2\msvc2022_64\include\QtGui\QPixmap \
+		C:\Qt\6.9.2\msvc2022_64\include\QtCore\QPropertyAnimation \
+		C:\Qt\6.9.2\msvc2022_64\include\QtCore\qpropertyanimation.h \
+		C:\Qt\6.9.2\msvc2022_64\include\QtCore\qvariantanimation.h \
+		C:\Qt\6.9.2\msvc2022_64\include\QtCore\qabstractanimation.h \
+		C:\Qt\6.9.2\msvc2022_64\include\QtCore\qeasingcurve.h \
 		debug\moc_predefs.h \
 		C:\Qt\6.9.2\msvc2022_64\bin\moc.exe
 	C:\Qt\6.9.2\msvc2022_64\bin\moc.exe $(DEFINES) --compiler-flavor=msvc --include C:/Users/nadhi/Documents/projet_logi/build/Desktop_Qt_6_9_2_MSVC2022_64bit-Debug/debug/moc_predefs.h -IC:/Qt/6.9.2/msvc2022_64/mkspecs/win32-msvc -IC:/Users/nadhi/Documents/projet_logi -IC:/Qt/6.9.2/msvc2022_64/include -IC:/Qt/6.9.2/msvc2022_64/include/QtPrintSupport -IC:/Qt/6.9.2/msvc2022_64/include/QtCharts -IC:/Qt/6.9.2/msvc2022_64/include/QtOpenGLWidgets -IC:/Qt/6.9.2/msvc2022_64/include/QtWidgets -IC:/Qt/6.9.2/msvc2022_64/include/QtOpenGL -IC:/Qt/6.9.2/msvc2022_64/include/QtGui -IC:/Qt/6.9.2/msvc2022_64/include/QtSql -IC:/Qt/6.9.2/msvc2022_64/include/QtCore -I. -I"C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include" -I"C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\ATLMFC\include" -I"C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\VS\include" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\um" -I"C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\shared" -I"C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\winrt" -I"C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt" ..\..\logindialog.h -o debug\moc_logindialog.cpp
@@ -1316,6 +1320,11 @@ debug\logindialog.obj: ..\..\logindialog.cpp ..\..\logindialog.h \
 		C:\Qt\6.9.2\msvc2022_64\include\QtCore\QString \
 		C:\Qt\6.9.2\msvc2022_64\include\QtGui\QResizeEvent \
 		C:\Qt\6.9.2\msvc2022_64\include\QtGui\QPixmap \
+		C:\Qt\6.9.2\msvc2022_64\include\QtCore\QPropertyAnimation \
+		C:\Qt\6.9.2\msvc2022_64\include\QtCore\qpropertyanimation.h \
+		C:\Qt\6.9.2\msvc2022_64\include\QtCore\qvariantanimation.h \
+		C:\Qt\6.9.2\msvc2022_64\include\QtCore\qabstractanimation.h \
+		C:\Qt\6.9.2\msvc2022_64\include\QtCore\qeasingcurve.h \
 		ui_logindialog.h \
 		..\..\db.h \
 		C:\Qt\6.9.2\msvc2022_64\include\QtSql\QSqlDatabase \
@@ -1340,7 +1349,12 @@ debug\logindialog.obj: ..\..\logindialog.cpp ..\..\logindialog.h \
 		C:\Qt\6.9.2\msvc2022_64\include\QtCore\QDebug \
 		C:\Qt\6.9.2\msvc2022_64\include\QtCore\QFile \
 		C:\Qt\6.9.2\msvc2022_64\include\QtCore\qfile.h \
-		C:\Qt\6.9.2\msvc2022_64\include\QtCore\qfiledevice.h
+		C:\Qt\6.9.2\msvc2022_64\include\QtCore\qfiledevice.h \
+		C:\Qt\6.9.2\msvc2022_64\include\QtCore\QParallelAnimationGroup \
+		C:\Qt\6.9.2\msvc2022_64\include\QtCore\qparallelanimationgroup.h \
+		C:\Qt\6.9.2\msvc2022_64\include\QtCore\qanimationgroup.h \
+		C:\Qt\6.9.2\msvc2022_64\include\QtCore\QSequentialAnimationGroup \
+		C:\Qt\6.9.2\msvc2022_64\include\QtCore\qsequentialanimationgroup.h
 
 debug\main.obj: ..\..\main.cpp C:\Qt\6.9.2\msvc2022_64\include\QtWidgets\QApplication \
 		C:\Qt\6.9.2\msvc2022_64\include\QtWidgets\qapplication.h \
@@ -2020,7 +2034,8 @@ debug\main.obj: ..\..\main.cpp C:\Qt\6.9.2\msvc2022_64\include\QtWidgets\QApplic
 		..\..\logindialog.h \
 		C:\Qt\6.9.2\msvc2022_64\include\QtWidgets\QDialog \
 		C:\Qt\6.9.2\msvc2022_64\include\QtGui\QResizeEvent \
-		C:\Qt\6.9.2\msvc2022_64\include\QtGui\QPixmap
+		C:\Qt\6.9.2\msvc2022_64\include\QtGui\QPixmap \
+		C:\Qt\6.9.2\msvc2022_64\include\QtCore\QPropertyAnimation
 
 debug\db.obj: ..\..\db.cpp ..\..\db.h \
 		C:\Qt\6.9.2\msvc2022_64\include\QtSql\QSqlDatabase \
@@ -3397,7 +3412,12 @@ debug\mainwindow.obj: ..\..\mainwindow.cpp ..\..\mainwindow.h \
 		C:\Qt\6.9.2\msvc2022_64\include\QtGui\QPageSize \
 		C:\Qt\6.9.2\msvc2022_64\include\QtWidgets\QHeaderView \
 		C:\Qt\6.9.2\msvc2022_64\include\QtWidgets\QInputDialog \
-		C:\Qt\6.9.2\msvc2022_64\include\QtCore\QTextStream
+		C:\Qt\6.9.2\msvc2022_64\include\QtCore\QTextStream \
+		C:\Qt\6.9.2\msvc2022_64\include\QtSql\QSqlQuery \
+		C:\Qt\6.9.2\msvc2022_64\include\QtSql\qsqlquery.h \
+		C:\Qt\6.9.2\msvc2022_64\include\QtWidgets\QMenuBar \
+		C:\Qt\6.9.2\msvc2022_64\include\QtWidgets\QMenu \
+		C:\Qt\6.9.2\msvc2022_64\include\QtWidgets\QStatusBar
 
 debug\qrc_resources.obj: debug\qrc_resources.cpp 
 

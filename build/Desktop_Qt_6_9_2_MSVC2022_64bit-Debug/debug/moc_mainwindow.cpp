@@ -74,12 +74,20 @@ template <> constexpr inline auto MainWindow::qt_create_metaobjectdata<qt_meta_t
         "delOrder",
         "refOrder",
         "exportOrderPdf",
+        "addUser",
+        "updUser",
+        "delUser",
+        "refUser",
+        "changeUserPassword",
         "showClientStats",
         "showOrderStats",
         "exportClientsExcel",
         "updateClientCategory",
         "updateOrderPriority",
-        "autoCategorizeClients"
+        "autoCategorizeClients",
+        "logout",
+        "onTabChanged",
+        "index"
     };
 
     QtMocHelpers::UintData qt_methods {
@@ -101,18 +109,34 @@ template <> constexpr inline auto MainWindow::qt_create_metaobjectdata<qt_meta_t
         QtMocHelpers::SlotData<void()>(9, 2, QMC::AccessPrivate, QMetaType::Void),
         // Slot 'exportOrderPdf'
         QtMocHelpers::SlotData<void()>(10, 2, QMC::AccessPrivate, QMetaType::Void),
-        // Slot 'showClientStats'
+        // Slot 'addUser'
         QtMocHelpers::SlotData<void()>(11, 2, QMC::AccessPrivate, QMetaType::Void),
-        // Slot 'showOrderStats'
+        // Slot 'updUser'
         QtMocHelpers::SlotData<void()>(12, 2, QMC::AccessPrivate, QMetaType::Void),
-        // Slot 'exportClientsExcel'
+        // Slot 'delUser'
         QtMocHelpers::SlotData<void()>(13, 2, QMC::AccessPrivate, QMetaType::Void),
-        // Slot 'updateClientCategory'
+        // Slot 'refUser'
         QtMocHelpers::SlotData<void()>(14, 2, QMC::AccessPrivate, QMetaType::Void),
-        // Slot 'updateOrderPriority'
+        // Slot 'changeUserPassword'
         QtMocHelpers::SlotData<void()>(15, 2, QMC::AccessPrivate, QMetaType::Void),
-        // Slot 'autoCategorizeClients'
+        // Slot 'showClientStats'
         QtMocHelpers::SlotData<void()>(16, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'showOrderStats'
+        QtMocHelpers::SlotData<void()>(17, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'exportClientsExcel'
+        QtMocHelpers::SlotData<void()>(18, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'updateClientCategory'
+        QtMocHelpers::SlotData<void()>(19, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'updateOrderPriority'
+        QtMocHelpers::SlotData<void()>(20, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'autoCategorizeClients'
+        QtMocHelpers::SlotData<void()>(21, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'logout'
+        QtMocHelpers::SlotData<void()>(22, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onTabChanged'
+        QtMocHelpers::SlotData<void(int)>(23, 2, QMC::AccessPrivate, QMetaType::Void, {{
+            { QMetaType::Int, 24 },
+        }}),
     };
     QtMocHelpers::UintData qt_properties {
     };
@@ -145,16 +169,22 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 6: _t->delOrder(); break;
         case 7: _t->refOrder(); break;
         case 8: _t->exportOrderPdf(); break;
-        case 9: _t->showClientStats(); break;
-        case 10: _t->showOrderStats(); break;
-        case 11: _t->exportClientsExcel(); break;
-        case 12: _t->updateClientCategory(); break;
-        case 13: _t->updateOrderPriority(); break;
-        case 14: _t->autoCategorizeClients(); break;
+        case 9: _t->addUser(); break;
+        case 10: _t->updUser(); break;
+        case 11: _t->delUser(); break;
+        case 12: _t->refUser(); break;
+        case 13: _t->changeUserPassword(); break;
+        case 14: _t->showClientStats(); break;
+        case 15: _t->showOrderStats(); break;
+        case 16: _t->exportClientsExcel(); break;
+        case 17: _t->updateClientCategory(); break;
+        case 18: _t->updateOrderPriority(); break;
+        case 19: _t->autoCategorizeClients(); break;
+        case 20: _t->logout(); break;
+        case 21: _t->onTabChanged((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
         default: ;
         }
     }
-    (void)_a;
 }
 
 const QMetaObject *MainWindow::metaObject() const
@@ -176,14 +206,14 @@ int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 15)
+        if (_id < 22)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 15;
+        _id -= 22;
     }
     if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 15)
+        if (_id < 22)
             *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 15;
+        _id -= 22;
     }
     return _id;
 }
