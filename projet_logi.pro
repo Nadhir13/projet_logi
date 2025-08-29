@@ -16,7 +16,8 @@ SOURCES += \
     mainwindow.cpp \
     clientcontroller.cpp \
     ordercontroller.cpp \
-    usercontroller.cpp
+    usercontroller.cpp \
+    stylemanager.cpp
 
 HEADERS += \
     db.h \
@@ -28,11 +29,32 @@ HEADERS += \
     mainwindow.h \
     clientcontroller.h \
     ordercontroller.h \
-    usercontroller.h
+    usercontroller.h \
+    stylemanager.h
 
 FORMS += \
     logindialog.ui \
     mainwindow.ui
 
 RESOURCES += \
-    resources/resources.qrc
+    resources/resources.qrc \
+    styles.qrc \
+
+# Enable high DPI scaling
+CONFIG += highdpi
+
+# Enable debug information
+CONFIG(debug, debug|release) {
+    DEFINES += DEBUG
+}
+
+# Release configuration
+CONFIG(release, debug|release) {
+    DEFINES += QT_NO_DEBUG_OUTPUT
+}
+
+DISTFILES += \
+    README_ENHANCED_UI.md \
+    icons/app_icon.png \
+    icons/logo.png \
+    projet_logi.pro.user

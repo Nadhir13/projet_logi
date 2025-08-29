@@ -21,14 +21,14 @@ OrderController::OrderController(MainWindow* mainWindow, QObject* parent)
 
 void OrderController::setupUi() {
     Ui::MainWindow* ui = m_mainWindow->getUi();
-    
+
     // Connect order-related buttons
     connect(ui->btnAddOrd, &QPushButton::clicked, this, &OrderController::addOrder);
     connect(ui->btnUpdOrd, &QPushButton::clicked, this, &OrderController::updateOrder);
     connect(ui->btnDelOrd, &QPushButton::clicked, this, &OrderController::deleteOrder);
     connect(ui->btnRefOrd, &QPushButton::clicked, this, &OrderController::refreshOrders);
     connect(ui->btnPdfOrd, &QPushButton::clicked, this, &OrderController::exportToPdf);
-    
+
     // Connect filter signals
     connect(ui->leSearchOrder, &QLineEdit::textChanged, this, &OrderController::applyFilters);
     connect(ui->cbClientFilter, &QComboBox::currentTextChanged, this, &OrderController::applyFilters);
@@ -36,7 +36,7 @@ void OrderController::setupUi() {
     connect(ui->dsMinAmount, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &OrderController::applyFilters);
     connect(ui->dsMaxAmount, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &OrderController::applyFilters);
     connect(ui->cbOrderSort, &QComboBox::currentTextChanged, this, &OrderController::applyFilters);
-    
+
     // Set tooltips
     ui->leSearchOrder->setToolTip("Recherche par état et adresse");
     ui->dsMinAmount->setToolTip("Montant minimum");
@@ -177,8 +177,6 @@ void OrderController::applyFilters() {
 }
 
 void OrderController::updateChart() {
-    Ui::MainWindow* ui = m_mainWindow->getUi();
-    // Access the chart view through the main window's member variable
     QChartView* orderChartView = m_mainWindow->orderChartView;
     if (!orderChartView) return;
 
@@ -326,8 +324,6 @@ bool OrderController::validateForm() {
     }
     if (ui->leAdrLiv->text().isEmpty()) {
         QMessageBox::warning(m_mainWindow, "Validation", "L'adresse de livraison est obligatoire");
-        ui->leAdrLiv->setFocus();
-        return false;
     }
     return true;
 }

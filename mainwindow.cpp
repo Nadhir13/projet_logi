@@ -3,6 +3,7 @@
 #include "clientcontroller.h"
 #include "ordercontroller.h"
 #include "usercontroller.h"
+#include "stylemanager.h"
 #include <QMessageBox>
 #include <QMenuBar>
 #include <QMenu>
@@ -10,11 +11,85 @@
 #include <QStatusBar>
 #include <QVBoxLayout>
 #include <QtCharts>
+#include <QApplication>
+#include <QLabel>
+#include <QTimer>
+#include <QDateTime>
+
+void MainWindow::initializeChartViews()
+{
+    // Create chart views for each tab
+    clientChartView = new QChartView();
+    orderChartView = new QChartView();
+    userChartView = new QChartView();
+
+    // Set chart view properties
+    clientChartView->setRenderHint(QPainter::Antialiasing);
+    orderChartView->setRenderHint(QPainter::Antialiasing);
+    userChartView->setRenderHint(QPainter::Antialiasing);
+
+    // Create layouts for containers if they don't have them
+    if (!ui->clientChartContainer->layout()) {
+        ui->clientChartContainer->setLayout(new QVBoxLayout());
+        ui->clientChartContainer->layout()->setContentsMargins(0, 0, 0, 0);
+    }
+    if (!ui->orderChartContainer->layout()) {
+        ui->orderChartContainer->setLayout(new QVBoxLayout());
+        ui->orderChartContainer->layout()->setContentsMargins(0, 0, 0, 0);
+    }
+    if (!ui->userChartContainer->layout()) {
+        ui->userChartContainer->setLayout(new QVBoxLayout());
+        ui->userChartContainer->layout()->setContentsMargins(0, 0, 0, 0);
+    }
+
+    // Add chart views to their respective containers
+    ui->clientChartContainer->layout()->addWidget(clientChartView);
+    ui->orderChartContainer->layout()->addWidget(orderChartView);
+    ui->userChartContainer->layout()->addWidget(userChartView);
+}
+
+void MainWindow::setupStatusBar()
+{
+    QStatusBar *statusBar = this->statusBar();
+
+    // Add user info to status bar
+    QLabel *userLabel = new QLabel(QString("Utilisateur: %1 (%2)").arg(m_username).arg(m_role));
+    statusBar->addPermanentWidget(userLabel);
+
+    // Add current time
+    QLabel *timeLabel = new QLabel();
+    statusBar->addPermanentWidget(timeLabel);
+
+    // Update time every second
+    QTimer *timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, [timeLabel]() {
+        timeLabel->setText(QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss"));
+    });
+    timer->start(1000);
+}
+
+void MainWindow::applyButtonStyling()
+{
+    // Apply specific button classes for different actions
+    if (ui->btnAddClient) ui->btnAddClient->setProperty("class", "success");
+    if (ui->btnDelClient) ui->btnDelClient->setProperty("class", "danger");
+    if (ui->btnAddOrd) ui->btnAddOrd->setProperty("class", "success");
+    if (ui->btnDelOrd) ui->btnDelOrd->setProperty("class", "danger");
+    if (ui->btnAddUser) ui->btnAddUser->setProperty("class", "success");
+    if (ui->btnDelUser) ui->btnDelUser->setProperty("class", "danger");
+
+    // Force style update
+    style()->unpolish(this);
+    style()->polish(this);
+}
 
 MainWindow::MainWindow(int userId, const QString &username, const QString &role, QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow), m_userId(userId), m_username(username), m_role(role)
 {
     ui->setupUi(this);
+
+    // Apply modern styling
+    StyleManager::instance().applyModernStyle();
 
     // Set window title with user info
     setWindowTitle(QString("Système de Gestion Logistique - Connecté en tant que: %1 (%2)").arg(username).arg(role));
@@ -25,213 +100,136 @@ MainWindow::MainWindow(int userId, const QString &username, const QString &role,
     // Setup UI based on user role
     setupPermissionsBasedOnRole();
 
-    // Create the controllers
-    m_clientController = new ClientController(this);
-    m_orderController = new OrderController(this);
-    m_userController = new UserController(this);
+    // Initialize controllers
+    m_clientController = new ClientController(this, this);
+    m_orderController = new OrderController(this, this);
+    m_userController = new UserController(this, this);
 
-    // Let each controller set up its part of the UI and connections
+    // Setup controllers
     m_clientController->setupUi();
     m_orderController->setupUi();
     m_userController->setupUi();
 
-    // Connect the main window's tab change signal
-    connect(ui->tabWidget, &QTabWidget::currentChanged, this, &MainWindow::onTabChanged);
-
-    // Connect selection changes for form population
-    connect(ui->tblClients, &QTableWidget::itemSelectionChanged, this, [this]() {
-        auto items = ui->tblClients->selectedItems();
-        if (!items.isEmpty()) {
-            int row = items.first()->row();
-            ui->leNom->setText(ui->tblClients->item(row, 1)->text());
-            ui->lePrenom->setText(ui->tblClients->item(row, 2)->text());
-            ui->leTel->setText(ui->tblClients->item(row, 3)->text());
-            ui->leEmail->setText(ui->tblClients->item(row, 4)->text());
-            ui->leAdr->setText(ui->tblClients->item(row, 5)->text());
-
-            QString statut = ui->tblClients->item(row, 6)->text();
-            int index = ui->cbStatut->findText(statut);
-            if (index >= 0) ui->cbStatut->setCurrentIndex(index);
-        }
-    });
-
-    connect(ui->tblOrders, &QTableWidget::itemSelectionChanged, this, [this]() {
-        auto items = ui->tblOrders->selectedItems();
-        if (!items.isEmpty()) {
-            int row = items.first()->row();
-            int clientId = ui->tblOrders->item(row, 1)->text().toInt();
-
-            for (int i = 0; i < ui->cbClient->count(); ++i) {
-                if (ui->cbClient->itemData(i).toInt() == clientId) {
-                    ui->cbClient->setCurrentIndex(i);
-                    break;
-                }
-            }
-
-            QString etat = ui->tblOrders->item(row, 3)->text();
-            int index = ui->cbEtat->findText(etat);
-            if (index >= 0) ui->cbEtat->setCurrentIndex(index);
-
-            ui->dsMontant->setValue(ui->tblOrders->item(row, 4)->text().toDouble());
-            ui->leAdrLiv->setText(ui->tblOrders->item(row, 5)->text());
-
-            QString priority = ui->tblOrders->item(row, 6)->text();
-            index = ui->cbPriority->findText(priority);
-            if (index >= 0) ui->cbPriority->setCurrentIndex(index);
-        }
-    });
-
-    connect(ui->tblUsers, &QTableWidget::itemSelectionChanged, this, [this]() {
-        auto items = ui->tblUsers->selectedItems();
-        if (!items.isEmpty()) {
-            int row = items.first()->row();
-            ui->leUserUsername->setText(ui->tblUsers->item(row, 1)->text());
-
-            QString role = ui->tblUsers->item(row, 2)->text();
-            int index = ui->cbUserRole->findText(role);
-            if (index >= 0) ui->cbUserRole->setCurrentIndex(index);
-
-            QString status = ui->tblUsers->item(row, 3)->text();
-            index = ui->cbUserStatus->findText(status);
-            if (index >= 0) ui->cbUserStatus->setCurrentIndex(index);
-
-            // Switch to edit mode
-            ui->stackedUser->setCurrentIndex(1);
-        }
-    });
-
-    // Connect business function buttons
-    connect(ui->btnClientStats, &QPushButton::clicked, m_clientController, &ClientController::showStats);
-    connect(ui->btnOrderStats, &QPushButton::clicked, m_orderController, &OrderController::showStats);
-    connect(ui->btnExportExcel, &QPushButton::clicked, m_clientController, &ClientController::exportToExcel);
-    connect(ui->btnUpdateCategory, &QPushButton::clicked, m_clientController, &ClientController::updateClientCategory);
-    connect(ui->btnUpdatePriority, &QPushButton::clicked, m_orderController, &OrderController::updateOrderPriority);
+    // Initialize chart views
+    initializeChartViews();
 
     // Load initial data
-    m_clientController->loadClientsTable();
-    m_clientController->loadClientsCombo();
-    m_clientController->loadClientFilterCombo();
-    m_orderController->loadOrdersTable();
-    m_userController->loadUsersTable();
+    m_clientController->refreshClients();
+    m_orderController->refreshOrders();
+    m_userController->refreshUsers();
 
-    // Setup charts containers with QtCharts
-    clientChartView = new QChartView();
-    clientChartView->setRenderHint(QPainter::Antialiasing);
-    auto clientContainer = this->findChild<QWidget*>("clientChartContainer");
-    if (clientContainer) {
-        auto lay = new QVBoxLayout(clientContainer);
-        lay->setContentsMargins(0,0,0,0);
-        lay->addWidget(clientChartView);
-    }
+    // Connect tab change signal
+    connect(ui->tabWidget, &QTabWidget::currentChanged, this, &MainWindow::onTabChanged);
 
-    orderChartView = new QChartView();
-    orderChartView->setRenderHint(QPainter::Antialiasing);
-    auto orderContainer = this->findChild<QWidget*>("orderChartContainer");
-    if (orderContainer) {
-        auto lay = new QVBoxLayout(orderContainer);
-        lay->setContentsMargins(0,0,0,0);
-        lay->addWidget(orderChartView);
-    }
+    // Setup status bar
+    setupStatusBar();
 
-    userChartView = new QChartView();
-    userChartView->setRenderHint(QPainter::Antialiasing);
-    auto userContainer = this->findChild<QWidget*>("userChartContainer");
-    if (userContainer) {
-        auto lay = new QVBoxLayout(userContainer);
-        lay->setContentsMargins(0,0,0,0);
-        lay->addWidget(userChartView);
-    }
-
-    // Update charts
-    m_clientController->updateChart();
-    m_orderController->updateChart();
-    m_userController->updateChart();
-}
-
-MainWindow::~MainWindow() {
-    delete ui;
-    // Delete the controllers
-    delete m_clientController;
-    delete m_orderController;
-    delete m_userController;
+    // Apply button styling
+    applyButtonStyling();
 }
 
 void MainWindow::setupMenuBar()
 {
-    // Create menu bar
-    QMenuBar *menuBar = new QMenuBar(this);
-    setMenuBar(menuBar);
+    QMenuBar *menuBar = this->menuBar();
 
-    // Create user menu
-    QMenu *userMenu = menuBar->addMenu("Utilisateur");
+    // File menu
+    QMenu *fileMenu = menuBar->addMenu("&Fichier");
 
-    // Add user info action
-    QAction *userInfoAction = new QAction(QString("Connecté: %1").arg(m_username), this);
-    userInfoAction->setEnabled(false);
-    userMenu->addAction(userInfoAction);
+    QAction *exportAction = new QAction("&Exporter", this);
+    exportAction->setShortcut(QKeySequence::Save);
+    fileMenu->addAction(exportAction);
 
-    userMenu->addSeparator();
+    fileMenu->addSeparator();
 
-    // Add logout action
-    QAction *logoutAction = new QAction("Déconnexion", this);
-    logoutAction->setShortcut(QKeySequence::Quit);
+    QAction *logoutAction = new QAction("&Déconnexion", this);
+    logoutAction->setShortcut(QKeySequence("Ctrl+Q"));
     connect(logoutAction, &QAction::triggered, this, &MainWindow::logout);
-    userMenu->addAction(logoutAction);
+    fileMenu->addAction(logoutAction);
+
+    QAction *exitAction = new QAction("&Quitter", this);
+    exitAction->setShortcut(QKeySequence::Quit);
+    connect(exitAction, &QAction::triggered, this, &QApplication::quit);
+    fileMenu->addAction(exitAction);
+
+    // View menu
+    QMenu *viewMenu = menuBar->addMenu("&Affichage");
+
+    QAction *modernStyleAction = new QAction("Style &Moderne", this);
+    connect(modernStyleAction, &QAction::triggered, [this]() {
+        StyleManager::instance().applyModernStyle();
+    });
+    viewMenu->addAction(modernStyleAction);
+
+    QAction *darkStyleAction = new QAction("Style &Sombre", this);
+    connect(darkStyleAction, &QAction::triggered, [this]() {
+        StyleManager::instance().applyDarkStyle();
+    });
+    viewMenu->addAction(darkStyleAction);
+
+    QAction *lightStyleAction = new QAction("Style &Clair", this);
+    connect(lightStyleAction, &QAction::triggered, [this]() {
+        StyleManager::instance().applyLightStyle();
+    });
+    viewMenu->addAction(lightStyleAction);
+
+    // Help menu
+    QMenu *helpMenu = menuBar->addMenu("&Aide");
+
+    QAction *aboutAction = new QAction("À &propos", this);
+    connect(aboutAction, &QAction::triggered, [this]() {
+        QMessageBox::about(this, "À propos",
+                           "Système de Gestion Logistique\n\n"
+                           "Version 2.0\n"
+                           "Développé avec Qt 6\n\n"
+                           "© 2024 Tous droits réservés");
+    });
+    helpMenu->addAction(aboutAction);
 }
 
 void MainWindow::setupPermissionsBasedOnRole()
 {
-    // Admin has full access
-    if (m_role == "Administrateur" || m_role == "ADMIN") {
-        return; // No restrictions
+    // Disable tabs based on user role
+    if (m_role == "DELIVERY") {
+        ui->tabWidget->setTabEnabled(2, false); // Disable Users tab
+        ui->tabWidget->setTabEnabled(1, false); // Disable Orders tab
+    } else if (m_role == "MANAGER") {
+        ui->tabWidget->setTabEnabled(2, false); // Disable Users tab
     }
+    // ADMIN has access to all tabs
+}
 
-    // Manager (Gestionnaire logistique) can access everything except user management
-    if (m_role == "Gestionnaire logistique" || m_role == "MANAGER") {
-        // Hide user management tab
-        ui->tabWidget->removeTab(2); // Remove Users tab
-        return;
-    }
+void MainWindow::logout()
+{
+    QMessageBox::StandardButton reply = QMessageBox::question(this, "Déconnexion",
+                                                              "Êtes-vous sûr de vouloir vous déconnecter?",
+                                                              QMessageBox::Yes | QMessageBox::No);
 
-    // Delivery (Livreur) has limited access
-    if (m_role == "Livreur" || m_role == "DELIVERY") {
-        // Hide client and user management tabs
-        ui->tabWidget->removeTab(0); // Remove Clients tab
-        ui->tabWidget->removeTab(1); // Remove Users tab (index changed after first removal)
-
-        // Disable order modification buttons
-        ui->btnAddOrd->setEnabled(false);
-        ui->btnUpdOrd->setEnabled(false);
-        ui->btnDelOrd->setEnabled(false);
-
-        // Disable export and statistics buttons
-        ui->btnPdfOrd->setEnabled(false);
-        ui->btnOrderStats->setEnabled(false);
-        ui->btnUpdatePriority->setEnabled(false);
+    if (reply == QMessageBox::Yes) {
+        close();
     }
 }
 
 void MainWindow::onTabChanged(int index)
 {
-    if (index == 0) { // Clients tab
+    // Update status bar with current tab info
+    QString tabName = ui->tabWidget->tabText(index);
+    statusBar()->showMessage(QString("Onglet actuel: %1").arg(tabName), 3000);
+
+    // Refresh data for the current tab
+    switch (index) {
+    case 0: // Clients
         m_clientController->refreshClients();
-    } else if (index == 1) { // Orders tab
+        break;
+    case 1: // Orders
         m_orderController->refreshOrders();
-    } else if (index == 2) { // Users tab
+        break;
+    case 2: // Users
         m_userController->refreshUsers();
+        break;
     }
 }
 
-void MainWindow::logout()
+MainWindow::~MainWindow()
 {
-    // Confirm logout
-    QMessageBox::StandardButton reply;
-    reply = QMessageBox::question(this, "Déconnexion",
-                                  "Êtes-vous sûr de vouloir vous déconnecter?",
-                                  QMessageBox::Yes | QMessageBox::No);
-
-    if (reply == QMessageBox::Yes) {
-        // Close main window and show login dialog again
-        close();
-    }
+    delete ui;
 }

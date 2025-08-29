@@ -30,6 +30,9 @@ private slots:
 private:
     void setupPermissionsBasedOnRole();
     void setupMenuBar();
+    void initializeChartViews();
+    void setupStatusBar();
+    void applyButtonStyling();
 
     Ui::MainWindow *ui;
     int m_userId;

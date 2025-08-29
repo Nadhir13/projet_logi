@@ -19,19 +19,19 @@ ClientController::ClientController(MainWindow* mainWindow, QObject* parent)
 
 void ClientController::setupUi() {
     Ui::MainWindow* ui = m_mainWindow->getUi();
-    
+
     // Connect client-related buttons
     connect(ui->btnAddClient, &QPushButton::clicked, this, &ClientController::addClient);
     connect(ui->btnUpdClient, &QPushButton::clicked, this, &ClientController::updateClient);
     connect(ui->btnDelClient, &QPushButton::clicked, this, &ClientController::deleteClient);
     connect(ui->btnRefClient, &QPushButton::clicked, this, &ClientController::refreshClients);
-    
+
     // Connect filter signals
     connect(ui->leSearchClient, &QLineEdit::textChanged, this, &ClientController::applyFilters);
     connect(ui->leEmailFilter, &QLineEdit::textChanged, this, &ClientController::applyFilters);
     connect(ui->cbStatutFilter, &QComboBox::currentTextChanged, this, &ClientController::applyFilters);
     connect(ui->cbClientSort, &QComboBox::currentTextChanged, this, &ClientController::applyFilters);
-    
+
     // Set tooltips
     ui->leSearchClient->setToolTip("Recherche par nom et prénom");
     ui->leEmailFilter->setToolTip("Filtrer par email spécifique");
@@ -126,7 +126,8 @@ void ClientController::loadClientsTable() {
         ui->tblClients->setItem(i,5,new QTableWidgetItem(c.adr));
         ui->tblClients->setItem(i,6,new QTableWidgetItem(c.statut));
         ui->tblClients->setItem(i,7,new QTableWidgetItem(c.created.toString("yyyy-MM-dd")));
-        ui->tblClients->setItem(i,8,new QTableWidgetItem(c.category));
+
+        // Color code based on category
         QTableWidgetItem *categoryItem = new QTableWidgetItem(c.category);
         if (c.category == "PLATINUM") {
             categoryItem->setBackground(QColor("#E5E4E2")); // Platinum color
@@ -198,8 +199,6 @@ void ClientController::applyFilters() {
 }
 
 void ClientController::updateChart() {
-    Ui::MainWindow* ui = m_mainWindow->getUi();
-    // Access the chart view through the main window's member variable
     QChartView* clientChartView = m_mainWindow->clientChartView;
     if (!clientChartView) return;
 

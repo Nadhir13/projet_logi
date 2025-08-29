@@ -1,14 +1,13 @@
 #pragma once
 
 #include <QDialog>
-#include <QString>
-#include <QResizeEvent>
-#include <QPixmap>
 #include <QPropertyAnimation>
+#include <QMouseEvent>
+#include <QKeyEvent>
 
-namespace Ui {
-class LoginDialog;
-}
+QT_BEGIN_NAMESPACE
+namespace Ui { class LoginDialog; }
+QT_END_NAMESPACE
 
 class LoginDialog : public QDialog
 {
@@ -18,39 +17,34 @@ public:
     explicit LoginDialog(QWidget *parent = nullptr);
     ~LoginDialog();
 
+    int getUserId() const;
     QString getUsername() const;
     QString getRole() const;
-    int getUserId() const;
 
-    void showLoginForm();
-    void showSignupForm();
-
-signals:
-    void signupRequested(const QString &username, const QString &password, const QString &role);
+protected:
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override;
 
 private slots:
     void onLoginClicked();
-    void onSignupClicked();
-    void onCancelClicked();
-    void onSwitchToSignupClicked();
+    void onRegisterClicked();
+    void onSwitchToRegisterClicked();
     void onSwitchToLoginClicked();
 
-protected:
-    void paintEvent(QPaintEvent *event) override;
-    void resizeEvent(QResizeEvent *event) override;
-
 private:
+    void centerOnScreen();
+    void setupAnimations();
+    void showLoginForm();
+    void showRegisterForm();
+    void animateTransition(bool toRegister);
+
     Ui::LoginDialog *ui;
+    int m_userId;
     QString m_username;
     QString m_role;
-    int m_userId;
-    QPixmap m_background;
-    bool m_backgroundLoaded;
-
-    bool authenticateUser(const QString &username, const QString &password);
-    bool registerUser(const QString &username, const QString &password, const QString &role);
-    void loadBackgroundImage();
-    void applyTransparentStyles();
-    void setupAnimations();
-    void animateTransition(bool toSignup);
+    QPoint m_dragPosition;
+    
+    QPropertyAnimation *m_fadeInAnimation;
+    QPropertyAnimation *m_fadeOutAnimation;
 };

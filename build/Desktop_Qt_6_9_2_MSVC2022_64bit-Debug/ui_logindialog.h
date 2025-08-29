@@ -10,10 +10,12 @@
 #define UI_LOGINDIALOG_H
 
 #include <QtCore/QVariant>
+#include <QtGui/QIcon>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QFormLayout>
+#include <QtWidgets/QFrame>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
@@ -28,342 +30,492 @@ QT_BEGIN_NAMESPACE
 class Ui_LoginDialog
 {
 public:
+    QHBoxLayout *horizontalLayout;
+    QFrame *leftPanel;
     QVBoxLayout *verticalLayout;
+    QLabel *logoLabel;
+    QLabel *titleLabel;
+    QLabel *subtitleLabel;
     QSpacerItem *verticalSpacerTop;
     QStackedWidget *stackedWidget;
     QWidget *loginPage;
     QVBoxLayout *verticalLayout_2;
-    QLabel *label;
-    QSpacerItem *verticalSpacerMiddle1;
-    QHBoxLayout *horizontalLayoutCenter;
-    QSpacerItem *horizontalSpacerLeft;
     QFormLayout *formLayout;
     QLabel *lblUsername;
     QLineEdit *leUsername;
     QLabel *lblPassword;
     QLineEdit *lePassword;
-    QSpacerItem *horizontalSpacerRight;
-    QSpacerItem *verticalSpacerMiddle2;
-    QHBoxLayout *horizontalLayout;
-    QSpacerItem *horizontalSpacer;
     QPushButton *btnLogin;
-    QPushButton *btnCancel;
-    QSpacerItem *horizontalSpacer_2;
-    QHBoxLayout *horizontalLayout_2;
-    QSpacerItem *horizontalSpacer_3;
-    QPushButton *btnSwitchToSignup;
-    QSpacerItem *horizontalSpacer_4;
-    QSpacerItem *verticalSpacerBottom;
-    QLabel *lblVersion;
-    QWidget *signupPage;
+    QPushButton *btnSwitchToRegister;
+    QWidget *registerPage;
     QVBoxLayout *verticalLayout_3;
-    QLabel *label_2;
-    QSpacerItem *verticalSpacerMiddle1_2;
-    QHBoxLayout *horizontalLayoutCenter_2;
-    QSpacerItem *horizontalSpacerLeft_2;
     QFormLayout *formLayout_2;
-    QLabel *lblSignupUsername;
-    QLineEdit *leSignupUsername;
-    QLabel *lblSignupPassword;
-    QLineEdit *leSignupPassword;
-    QLabel *lblConfirmPassword;
-    QLineEdit *leConfirmPassword;
-    QLabel *lblRole;
-    QComboBox *cbRole;
-    QSpacerItem *horizontalSpacerRight_2;
-    QSpacerItem *verticalSpacerMiddle2_2;
-    QHBoxLayout *horizontalLayout_3;
-    QSpacerItem *horizontalSpacer_5;
-    QPushButton *btnSignup;
-    QPushButton *btnCancelSignup;
-    QSpacerItem *horizontalSpacer_6;
-    QHBoxLayout *horizontalLayout_4;
-    QSpacerItem *horizontalSpacer_7;
+    QLabel *lblRegUsername;
+    QLineEdit *leRegUsername;
+    QLabel *lblRegPassword;
+    QLineEdit *leRegPassword;
+    QLabel *lblRegRole;
+    QComboBox *cbRegRole;
+    QPushButton *btnRegister;
     QPushButton *btnSwitchToLogin;
-    QSpacerItem *horizontalSpacer_8;
-    QSpacerItem *verticalSpacerBottom_2;
+    QSpacerItem *verticalSpacerBottom;
+    QLabel *footerLabel;
+    QFrame *rightPanel;
+    QVBoxLayout *verticalLayout_4;
+    QSpacerItem *verticalSpacer;
+    QLabel *welcomeLabel;
+    QLabel *descriptionLabel;
+    QSpacerItem *verticalSpacer_2;
 
     void setupUi(QDialog *LoginDialog)
     {
         if (LoginDialog->objectName().isEmpty())
             LoginDialog->setObjectName("LoginDialog");
-        LoginDialog->resize(800, 600);
-        LoginDialog->setMinimumSize(QSize(800, 600));
-        verticalLayout = new QVBoxLayout(LoginDialog);
-        verticalLayout->setSpacing(15);
+        LoginDialog->resize(1000, 700);
+        LoginDialog->setMinimumSize(QSize(900, 600));
+        QIcon icon;
+        icon.addFile(QString::fromUtf8(":/icons/app_icon.png"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
+        LoginDialog->setWindowIcon(icon);
+        LoginDialog->setStyleSheet(QString::fromUtf8("QDialog {\n"
+"    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,\n"
+"                               stop:0 #667eea, stop:1 #764ba2);\n"
+"}"));
+        horizontalLayout = new QHBoxLayout(LoginDialog);
+        horizontalLayout->setSpacing(0);
+        horizontalLayout->setObjectName("horizontalLayout");
+        horizontalLayout->setContentsMargins(0, 0, 0, 0);
+        leftPanel = new QFrame(LoginDialog);
+        leftPanel->setObjectName("leftPanel");
+        leftPanel->setMinimumSize(QSize(400, 0));
+        leftPanel->setMaximumSize(QSize(400, 16777215));
+        leftPanel->setStyleSheet(QString::fromUtf8("QFrame {\n"
+"    background: rgba(255, 255, 255, 0.95);\n"
+"    border-radius: 0px;\n"
+"}"));
+        verticalLayout = new QVBoxLayout(leftPanel);
+        verticalLayout->setSpacing(20);
         verticalLayout->setObjectName("verticalLayout");
+        verticalLayout->setContentsMargins(40, 40, 40, 40);
+        logoLabel = new QLabel(leftPanel);
+        logoLabel->setObjectName("logoLabel");
+        logoLabel->setMinimumSize(QSize(0, 80));
+        logoLabel->setPixmap(QPixmap(QString::fromUtf8(":/icons/logo.png")));
+        logoLabel->setScaledContents(true);
+        logoLabel->setAlignment(Qt::AlignCenter);
+
+        verticalLayout->addWidget(logoLabel);
+
+        titleLabel = new QLabel(leftPanel);
+        titleLabel->setObjectName("titleLabel");
+        titleLabel->setStyleSheet(QString::fromUtf8("QLabel {\n"
+"    color: #2d3748;\n"
+"    font-size: 24px;\n"
+"    font-weight: bold;\n"
+"    font-family: 'Segoe UI', Arial, sans-serif;\n"
+"}"));
+        titleLabel->setAlignment(Qt::AlignCenter);
+
+        verticalLayout->addWidget(titleLabel);
+
+        subtitleLabel = new QLabel(leftPanel);
+        subtitleLabel->setObjectName("subtitleLabel");
+        subtitleLabel->setStyleSheet(QString::fromUtf8("QLabel {\n"
+"    color: #718096;\n"
+"    font-size: 14px;\n"
+"    font-family: 'Segoe UI', Arial, sans-serif;\n"
+"}"));
+        subtitleLabel->setAlignment(Qt::AlignCenter);
+
+        verticalLayout->addWidget(subtitleLabel);
+
         verticalSpacerTop = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
 
         verticalLayout->addItem(verticalSpacerTop);
 
-        stackedWidget = new QStackedWidget(LoginDialog);
+        stackedWidget = new QStackedWidget(leftPanel);
         stackedWidget->setObjectName("stackedWidget");
         loginPage = new QWidget();
         loginPage->setObjectName("loginPage");
         verticalLayout_2 = new QVBoxLayout(loginPage);
+        verticalLayout_2->setSpacing(20);
         verticalLayout_2->setObjectName("verticalLayout_2");
-        label = new QLabel(loginPage);
-        label->setObjectName("label");
-        label->setAlignment(Qt::AlignmentFlag::AlignCenter);
-
-        verticalLayout_2->addWidget(label, 0, Qt::AlignmentFlag::AlignHCenter);
-
-        verticalSpacerMiddle1 = new QSpacerItem(20, 30, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
-
-        verticalLayout_2->addItem(verticalSpacerMiddle1);
-
-        horizontalLayoutCenter = new QHBoxLayout();
-        horizontalLayoutCenter->setSpacing(20);
-        horizontalLayoutCenter->setObjectName("horizontalLayoutCenter");
-        horizontalSpacerLeft = new QSpacerItem(150, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
-
-        horizontalLayoutCenter->addItem(horizontalSpacerLeft);
-
         formLayout = new QFormLayout();
         formLayout->setObjectName("formLayout");
-        formLayout->setHorizontalSpacing(12);
-        formLayout->setVerticalSpacing(12);
+        formLayout->setHorizontalSpacing(15);
+        formLayout->setVerticalSpacing(15);
         lblUsername = new QLabel(loginPage);
         lblUsername->setObjectName("lblUsername");
-        lblUsername->setAlignment(Qt::AlignmentFlag::AlignCenter);
+        lblUsername->setStyleSheet(QString::fromUtf8("QLabel {\n"
+"    color: #4a5568;\n"
+"    font-weight: 600;\n"
+"    font-size: 12px;\n"
+"    font-family: 'Segoe UI', Arial, sans-serif;\n"
+"}"));
+        lblUsername->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
         formLayout->setWidget(0, QFormLayout::ItemRole::LabelRole, lblUsername);
 
         leUsername = new QLineEdit(loginPage);
         leUsername->setObjectName("leUsername");
-        leUsername->setMinimumSize(QSize(200, 35));
-        leUsername->setAlignment(Qt::AlignmentFlag::AlignCenter);
+        leUsername->setMinimumSize(QSize(250, 45));
+        leUsername->setStyleSheet(QString::fromUtf8("QLineEdit {\n"
+"    border: 2px solid #e2e8f0;\n"
+"    border-radius: 8px;\n"
+"    padding: 12px 16px;\n"
+"    font-size: 14px;\n"
+"    background: white;\n"
+"    color: #2d3748;\n"
+"}\n"
+"\n"
+"QLineEdit:focus {\n"
+"    border-color: #667eea;\n"
+"    background: #f7fafc;\n"
+"}\n"
+"\n"
+"QLineEdit::placeholder {\n"
+"    color: #a0aec0;\n"
+"}"));
 
         formLayout->setWidget(0, QFormLayout::ItemRole::FieldRole, leUsername);
 
         lblPassword = new QLabel(loginPage);
         lblPassword->setObjectName("lblPassword");
-        lblPassword->setAlignment(Qt::AlignmentFlag::AlignCenter);
+        lblPassword->setStyleSheet(QString::fromUtf8("QLabel {\n"
+"    color: #4a5568;\n"
+"    font-weight: 600;\n"
+"    font-size: 12px;\n"
+"    font-family: 'Segoe UI', Arial, sans-serif;\n"
+"}"));
+        lblPassword->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
         formLayout->setWidget(1, QFormLayout::ItemRole::LabelRole, lblPassword);
 
         lePassword = new QLineEdit(loginPage);
         lePassword->setObjectName("lePassword");
-        lePassword->setMinimumSize(QSize(200, 35));
-        lePassword->setEchoMode(QLineEdit::EchoMode::Password);
-        lePassword->setAlignment(Qt::AlignmentFlag::AlignCenter);
+        lePassword->setMinimumSize(QSize(250, 45));
+        lePassword->setEchoMode(QLineEdit::Password);
+        lePassword->setStyleSheet(QString::fromUtf8("QLineEdit {\n"
+"    border: 2px solid #e2e8f0;\n"
+"    border-radius: 8px;\n"
+"    padding: 12px 16px;\n"
+"    font-size: 14px;\n"
+"    background: white;\n"
+"    color: #2d3748;\n"
+"}\n"
+"\n"
+"QLineEdit:focus {\n"
+"    border-color: #667eea;\n"
+"    background: #f7fafc;\n"
+"}\n"
+"\n"
+"QLineEdit::placeholder {\n"
+"    color: #a0aec0;\n"
+"}"));
 
         formLayout->setWidget(1, QFormLayout::ItemRole::FieldRole, lePassword);
 
 
-        horizontalLayoutCenter->addLayout(formLayout);
-
-        horizontalSpacerRight = new QSpacerItem(150, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
-
-        horizontalLayoutCenter->addItem(horizontalSpacerRight);
-
-
-        verticalLayout_2->addLayout(horizontalLayoutCenter);
-
-        verticalSpacerMiddle2 = new QSpacerItem(20, 30, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
-
-        verticalLayout_2->addItem(verticalSpacerMiddle2);
-
-        horizontalLayout = new QHBoxLayout();
-        horizontalLayout->setSpacing(20);
-        horizontalLayout->setObjectName("horizontalLayout");
-        horizontalSpacer = new QSpacerItem(150, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
-
-        horizontalLayout->addItem(horizontalSpacer);
+        verticalLayout_2->addLayout(formLayout);
 
         btnLogin = new QPushButton(loginPage);
         btnLogin->setObjectName("btnLogin");
-        btnLogin->setMinimumSize(QSize(120, 40));
+        btnLogin->setMinimumSize(QSize(0, 50));
+        btnLogin->setStyleSheet(QString::fromUtf8("QPushButton {\n"
+"    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,\n"
+"                               stop:0 #667eea, stop:1 #764ba2);\n"
+"    border: none;\n"
+"    border-radius: 8px;\n"
+"    color: white;\n"
+"    font-size: 16px;\n"
+"    font-weight: 600;\n"
+"    font-family: 'Segoe UI', Arial, sans-serif;\n"
+"    padding: 15px;\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,\n"
+"                               stop:0 #5a67d8, stop:1 #6b46c1);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,\n"
+"                               stop:0 #4c51bf, stop:1 #553c9a);\n"
+"}\n"
+"\n"
+"QPushButton:disabled {\n"
+"    background: #a0aec0;\n"
+"    color: #e2e8f0;\n"
+"}"));
+        btnLogin->setCursor(Qt::PointingHandCursor);
 
-        horizontalLayout->addWidget(btnLogin);
+        verticalLayout_2->addWidget(btnLogin);
 
-        btnCancel = new QPushButton(loginPage);
-        btnCancel->setObjectName("btnCancel");
-        btnCancel->setMinimumSize(QSize(120, 40));
+        btnSwitchToRegister = new QPushButton(loginPage);
+        btnSwitchToRegister->setObjectName("btnSwitchToRegister");
+        btnSwitchToRegister->setStyleSheet(QString::fromUtf8("QPushButton {\n"
+"    background: transparent;\n"
+"    border: 2px solid #e2e8f0;\n"
+"    border-radius: 8px;\n"
+"    color: #4a5568;\n"
+"    font-size: 14px;\n"
+"    font-weight: 500;\n"
+"    font-family: 'Segoe UI', Arial, sans-serif;\n"
+"    padding: 12px;\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"    background: #f7fafc;\n"
+"    border-color: #cbd5e0;\n"
+"    color: #2d3748;\n"
+"}"));
+        btnSwitchToRegister->setCursor(Qt::PointingHandCursor);
 
-        horizontalLayout->addWidget(btnCancel);
+        verticalLayout_2->addWidget(btnSwitchToRegister);
 
-        horizontalSpacer_2 = new QSpacerItem(150, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+        stackedWidget->addWidget(loginPage);
+        registerPage = new QWidget();
+        registerPage->setObjectName("registerPage");
+        verticalLayout_3 = new QVBoxLayout(registerPage);
+        verticalLayout_3->setSpacing(20);
+        verticalLayout_3->setObjectName("verticalLayout_3");
+        formLayout_2 = new QFormLayout();
+        formLayout_2->setObjectName("formLayout_2");
+        formLayout_2->setHorizontalSpacing(15);
+        formLayout_2->setVerticalSpacing(15);
+        lblRegUsername = new QLabel(registerPage);
+        lblRegUsername->setObjectName("lblRegUsername");
+        lblRegUsername->setStyleSheet(QString::fromUtf8("QLabel {\n"
+"    color: #4a5568;\n"
+"    font-weight: 600;\n"
+"    font-size: 12px;\n"
+"    font-family: 'Segoe UI', Arial, sans-serif;\n"
+"}"));
+        lblRegUsername->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
-        horizontalLayout->addItem(horizontalSpacer_2);
+        formLayout_2->setWidget(0, QFormLayout::ItemRole::LabelRole, lblRegUsername);
+
+        leRegUsername = new QLineEdit(registerPage);
+        leRegUsername->setObjectName("leRegUsername");
+        leRegUsername->setMinimumSize(QSize(250, 45));
+        leRegUsername->setStyleSheet(QString::fromUtf8("QLineEdit {\n"
+"    border: 2px solid #e2e8f0;\n"
+"    border-radius: 8px;\n"
+"    padding: 12px 16px;\n"
+"    font-size: 14px;\n"
+"    background: white;\n"
+"    color: #2d3748;\n"
+"}\n"
+"\n"
+"QLineEdit:focus {\n"
+"    border-color: #667eea;\n"
+"    background: #f7fafc;\n"
+"}\n"
+"\n"
+"QLineEdit::placeholder {\n"
+"    color: #a0aec0;\n"
+"}"));
+
+        formLayout_2->setWidget(0, QFormLayout::ItemRole::FieldRole, leRegUsername);
+
+        lblRegPassword = new QLabel(registerPage);
+        lblRegPassword->setObjectName("lblRegPassword");
+        lblRegPassword->setStyleSheet(QString::fromUtf8("QLabel {\n"
+"    color: #4a5568;\n"
+"    font-weight: 600;\n"
+"    font-size: 12px;\n"
+"    font-family: 'Segoe UI', Arial, sans-serif;\n"
+"}"));
+        lblRegPassword->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+
+        formLayout_2->setWidget(1, QFormLayout::ItemRole::LabelRole, lblRegPassword);
+
+        leRegPassword = new QLineEdit(registerPage);
+        leRegPassword->setObjectName("leRegPassword");
+        leRegPassword->setMinimumSize(QSize(250, 45));
+        leRegPassword->setEchoMode(QLineEdit::Password);
+        leRegPassword->setStyleSheet(QString::fromUtf8("QLineEdit {\n"
+"    border: 2px solid #e2e8f0;\n"
+"    border-radius: 8px;\n"
+"    padding: 12px 16px;\n"
+"    font-size: 14px;\n"
+"    background: white;\n"
+"    color: #2d3748;\n"
+"}\n"
+"\n"
+"QLineEdit:focus {\n"
+"    border-color: #667eea;\n"
+"    background: #f7fafc;\n"
+"}\n"
+"\n"
+"QLineEdit::placeholder {\n"
+"    color: #a0aec0;\n"
+"}"));
+
+        formLayout_2->setWidget(1, QFormLayout::ItemRole::FieldRole, leRegPassword);
+
+        lblRegRole = new QLabel(registerPage);
+        lblRegRole->setObjectName("lblRegRole");
+        lblRegRole->setStyleSheet(QString::fromUtf8("QLabel {\n"
+"    color: #4a5568;\n"
+"    font-weight: 600;\n"
+"    font-size: 12px;\n"
+"    font-family: 'Segoe UI', Arial, sans-serif;\n"
+"}"));
+        lblRegRole->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+
+        formLayout_2->setWidget(2, QFormLayout::ItemRole::LabelRole, lblRegRole);
+
+        cbRegRole = new QComboBox(registerPage);
+        cbRegRole->addItem(QString());
+        cbRegRole->addItem(QString());
+        cbRegRole->addItem(QString());
+        cbRegRole->setObjectName("cbRegRole");
+        cbRegRole->setMinimumSize(QSize(250, 45));
+        cbRegRole->setStyleSheet(QString::fromUtf8("QComboBox {\n"
+"    border: 2px solid #e2e8f0;\n"
+"    border-radius: 8px;\n"
+"    padding: 12px 16px;\n"
+"    font-size: 14px;\n"
+"    background: white;\n"
+"    color: #2d3748;\n"
+"}\n"
+"\n"
+"QComboBox:focus {\n"
+"    border-color: #667eea;\n"
+"    background: #f7fafc;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down {\n"
+"    border: none;\n"
+"    width: 30px;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow {\n"
+"    image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iOCIgdmlld0JveD0iMCAwIDEyIDgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0xIDFMNiA2TDExIDEiIHN0cm9rZT0iIzY5NzM3NyIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+);\n"
+"    width: 12px;\n"
+"    height: 8px;\n"
+"}"));
+
+        formLayout_2->setWidget(2, QFormLayout::ItemRole::FieldRole, cbRegRole);
 
 
-        verticalLayout_2->addLayout(horizontalLayout);
+        verticalLayout_3->addLayout(formLayout_2);
 
-        horizontalLayout_2 = new QHBoxLayout();
-        horizontalLayout_2->setObjectName("horizontalLayout_2");
-        horizontalSpacer_3 = new QSpacerItem(200, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+        btnRegister = new QPushButton(registerPage);
+        btnRegister->setObjectName("btnRegister");
+        btnRegister->setMinimumSize(QSize(0, 50));
+        btnRegister->setStyleSheet(QString::fromUtf8("QPushButton {\n"
+"    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,\n"
+"                               stop:0 #48bb78, stop:1 #38a169);\n"
+"    border: none;\n"
+"    border-radius: 8px;\n"
+"    color: white;\n"
+"    font-size: 16px;\n"
+"    font-weight: 600;\n"
+"    font-family: 'Segoe UI', Arial, sans-serif;\n"
+"    padding: 15px;\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,\n"
+"                               stop:0 #38a169, stop:1 #2f855a);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,\n"
+"                               stop:0 #2f855a, stop:1 #276749);\n"
+"}"));
+        btnRegister->setCursor(Qt::PointingHandCursor);
 
-        horizontalLayout_2->addItem(horizontalSpacer_3);
+        verticalLayout_3->addWidget(btnRegister);
 
-        btnSwitchToSignup = new QPushButton(loginPage);
-        btnSwitchToSignup->setObjectName("btnSwitchToSignup");
+        btnSwitchToLogin = new QPushButton(registerPage);
+        btnSwitchToLogin->setObjectName("btnSwitchToLogin");
+        btnSwitchToLogin->setStyleSheet(QString::fromUtf8("QPushButton {\n"
+"    background: transparent;\n"
+"    border: 2px solid #e2e8f0;\n"
+"    border-radius: 8px;\n"
+"    color: #4a5568;\n"
+"    font-size: 14px;\n"
+"    font-weight: 500;\n"
+"    font-family: 'Segoe UI', Arial, sans-serif;\n"
+"    padding: 12px;\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"    background: #f7fafc;\n"
+"    border-color: #cbd5e0;\n"
+"    color: #2d3748;\n"
+"}"));
+        btnSwitchToLogin->setCursor(Qt::PointingHandCursor);
 
-        horizontalLayout_2->addWidget(btnSwitchToSignup);
+        verticalLayout_3->addWidget(btnSwitchToLogin);
 
-        horizontalSpacer_4 = new QSpacerItem(200, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+        stackedWidget->addWidget(registerPage);
 
-        horizontalLayout_2->addItem(horizontalSpacer_4);
-
-
-        verticalLayout_2->addLayout(horizontalLayout_2);
+        verticalLayout->addWidget(stackedWidget);
 
         verticalSpacerBottom = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
 
-        verticalLayout_2->addItem(verticalSpacerBottom);
+        verticalLayout->addItem(verticalSpacerBottom);
 
-        lblVersion = new QLabel(loginPage);
-        lblVersion->setObjectName("lblVersion");
-        lblVersion->setAlignment(Qt::AlignmentFlag::AlignCenter);
+        footerLabel = new QLabel(leftPanel);
+        footerLabel->setObjectName("footerLabel");
+        footerLabel->setStyleSheet(QString::fromUtf8("QLabel {\n"
+"    color: #a0aec0;\n"
+"    font-size: 11px;\n"
+"    font-family: 'Segoe UI', Arial, sans-serif;\n"
+"}"));
+        footerLabel->setAlignment(Qt::AlignCenter);
 
-        verticalLayout_2->addWidget(lblVersion, 0, Qt::AlignmentFlag::AlignHCenter);
-
-        stackedWidget->addWidget(loginPage);
-        signupPage = new QWidget();
-        signupPage->setObjectName("signupPage");
-        verticalLayout_3 = new QVBoxLayout(signupPage);
-        verticalLayout_3->setObjectName("verticalLayout_3");
-        label_2 = new QLabel(signupPage);
-        label_2->setObjectName("label_2");
-        label_2->setAlignment(Qt::AlignmentFlag::AlignCenter);
-
-        verticalLayout_3->addWidget(label_2, 0, Qt::AlignmentFlag::AlignHCenter);
-
-        verticalSpacerMiddle1_2 = new QSpacerItem(20, 20, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
-
-        verticalLayout_3->addItem(verticalSpacerMiddle1_2);
-
-        horizontalLayoutCenter_2 = new QHBoxLayout();
-        horizontalLayoutCenter_2->setSpacing(20);
-        horizontalLayoutCenter_2->setObjectName("horizontalLayoutCenter_2");
-        horizontalSpacerLeft_2 = new QSpacerItem(100, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
-
-        horizontalLayoutCenter_2->addItem(horizontalSpacerLeft_2);
-
-        formLayout_2 = new QFormLayout();
-        formLayout_2->setObjectName("formLayout_2");
-        formLayout_2->setHorizontalSpacing(12);
-        formLayout_2->setVerticalSpacing(12);
-        lblSignupUsername = new QLabel(signupPage);
-        lblSignupUsername->setObjectName("lblSignupUsername");
-        lblSignupUsername->setAlignment(Qt::AlignmentFlag::AlignCenter);
-
-        formLayout_2->setWidget(0, QFormLayout::ItemRole::LabelRole, lblSignupUsername);
-
-        leSignupUsername = new QLineEdit(signupPage);
-        leSignupUsername->setObjectName("leSignupUsername");
-        leSignupUsername->setMinimumSize(QSize(200, 35));
-        leSignupUsername->setAlignment(Qt::AlignmentFlag::AlignCenter);
-
-        formLayout_2->setWidget(0, QFormLayout::ItemRole::FieldRole, leSignupUsername);
-
-        lblSignupPassword = new QLabel(signupPage);
-        lblSignupPassword->setObjectName("lblSignupPassword");
-        lblSignupPassword->setAlignment(Qt::AlignmentFlag::AlignCenter);
-
-        formLayout_2->setWidget(1, QFormLayout::ItemRole::LabelRole, lblSignupPassword);
-
-        leSignupPassword = new QLineEdit(signupPage);
-        leSignupPassword->setObjectName("leSignupPassword");
-        leSignupPassword->setMinimumSize(QSize(200, 35));
-        leSignupPassword->setEchoMode(QLineEdit::EchoMode::Password);
-        leSignupPassword->setAlignment(Qt::AlignmentFlag::AlignCenter);
-
-        formLayout_2->setWidget(1, QFormLayout::ItemRole::FieldRole, leSignupPassword);
-
-        lblConfirmPassword = new QLabel(signupPage);
-        lblConfirmPassword->setObjectName("lblConfirmPassword");
-        lblConfirmPassword->setAlignment(Qt::AlignmentFlag::AlignCenter);
-
-        formLayout_2->setWidget(2, QFormLayout::ItemRole::LabelRole, lblConfirmPassword);
-
-        leConfirmPassword = new QLineEdit(signupPage);
-        leConfirmPassword->setObjectName("leConfirmPassword");
-        leConfirmPassword->setMinimumSize(QSize(200, 35));
-        leConfirmPassword->setEchoMode(QLineEdit::EchoMode::Password);
-        leConfirmPassword->setAlignment(Qt::AlignmentFlag::AlignCenter);
-
-        formLayout_2->setWidget(2, QFormLayout::ItemRole::FieldRole, leConfirmPassword);
-
-        lblRole = new QLabel(signupPage);
-        lblRole->setObjectName("lblRole");
-        lblRole->setAlignment(Qt::AlignmentFlag::AlignCenter);
-
-        formLayout_2->setWidget(3, QFormLayout::ItemRole::LabelRole, lblRole);
-
-        cbRole = new QComboBox(signupPage);
-        cbRole->addItem(QString());
-        cbRole->addItem(QString());
-        cbRole->addItem(QString());
-        cbRole->setObjectName("cbRole");
-
-        formLayout_2->setWidget(3, QFormLayout::ItemRole::FieldRole, cbRole);
+        verticalLayout->addWidget(footerLabel);
 
 
-        horizontalLayoutCenter_2->addLayout(formLayout_2);
+        horizontalLayout->addWidget(leftPanel);
 
-        horizontalSpacerRight_2 = new QSpacerItem(100, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+        rightPanel = new QFrame(LoginDialog);
+        rightPanel->setObjectName("rightPanel");
+        rightPanel->setStyleSheet(QString::fromUtf8("QFrame {\n"
+"    background: transparent;\n"
+"}"));
+        verticalLayout_4 = new QVBoxLayout(rightPanel);
+        verticalLayout_4->setSpacing(0);
+        verticalLayout_4->setObjectName("verticalLayout_4");
+        verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
 
-        horizontalLayoutCenter_2->addItem(horizontalSpacerRight_2);
+        verticalLayout_4->addItem(verticalSpacer);
 
+        welcomeLabel = new QLabel(rightPanel);
+        welcomeLabel->setObjectName("welcomeLabel");
+        welcomeLabel->setStyleSheet(QString::fromUtf8("QLabel {\n"
+"    color: white;\n"
+"    font-size: 28px;\n"
+"    font-weight: bold;\n"
+"    font-family: 'Segoe UI', Arial, sans-serif;\n"
+"    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);\n"
+"}"));
+        welcomeLabel->setAlignment(Qt::AlignCenter);
 
-        verticalLayout_3->addLayout(horizontalLayoutCenter_2);
+        verticalLayout_4->addWidget(welcomeLabel);
 
-        verticalSpacerMiddle2_2 = new QSpacerItem(20, 20, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
+        descriptionLabel = new QLabel(rightPanel);
+        descriptionLabel->setObjectName("descriptionLabel");
+        descriptionLabel->setStyleSheet(QString::fromUtf8("QLabel {\n"
+"    color: rgba(255, 255, 255, 0.9);\n"
+"    font-size: 16px;\n"
+"    font-family: 'Segoe UI', Arial, sans-serif;\n"
+"    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);\n"
+"}"));
+        descriptionLabel->setAlignment(Qt::AlignCenter);
 
-        verticalLayout_3->addItem(verticalSpacerMiddle2_2);
+        verticalLayout_4->addWidget(descriptionLabel);
 
-        horizontalLayout_3 = new QHBoxLayout();
-        horizontalLayout_3->setSpacing(20);
-        horizontalLayout_3->setObjectName("horizontalLayout_3");
-        horizontalSpacer_5 = new QSpacerItem(120, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+        verticalSpacer_2 = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
 
-        horizontalLayout_3->addItem(horizontalSpacer_5);
-
-        btnSignup = new QPushButton(signupPage);
-        btnSignup->setObjectName("btnSignup");
-        btnSignup->setMinimumSize(QSize(120, 40));
-
-        horizontalLayout_3->addWidget(btnSignup);
-
-        btnCancelSignup = new QPushButton(signupPage);
-        btnCancelSignup->setObjectName("btnCancelSignup");
-        btnCancelSignup->setMinimumSize(QSize(120, 40));
-
-        horizontalLayout_3->addWidget(btnCancelSignup);
-
-        horizontalSpacer_6 = new QSpacerItem(120, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
-
-        horizontalLayout_3->addItem(horizontalSpacer_6);
-
-
-        verticalLayout_3->addLayout(horizontalLayout_3);
-
-        horizontalLayout_4 = new QHBoxLayout();
-        horizontalLayout_4->setObjectName("horizontalLayout_4");
-        horizontalSpacer_7 = new QSpacerItem(200, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
-
-        horizontalLayout_4->addItem(horizontalSpacer_7);
-
-        btnSwitchToLogin = new QPushButton(signupPage);
-        btnSwitchToLogin->setObjectName("btnSwitchToLogin");
-
-        horizontalLayout_4->addWidget(btnSwitchToLogin);
-
-        horizontalSpacer_8 = new QSpacerItem(200, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
-
-        horizontalLayout_4->addItem(horizontalSpacer_8);
+        verticalLayout_4->addItem(verticalSpacer_2);
 
 
-        verticalLayout_3->addLayout(horizontalLayout_4);
-
-        verticalSpacerBottom_2 = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
-
-        verticalLayout_3->addItem(verticalSpacerBottom_2);
-
-        stackedWidget->addWidget(signupPage);
-
-        verticalLayout->addWidget(stackedWidget);
+        horizontalLayout->addWidget(rightPanel);
 
 
         retranslateUi(LoginDialog);
@@ -376,26 +528,30 @@ public:
 
     void retranslateUi(QDialog *LoginDialog)
     {
-        LoginDialog->setWindowTitle(QCoreApplication::translate("LoginDialog", "Connexion", nullptr));
-        label->setText(QCoreApplication::translate("LoginDialog", "           Syst\303\250me de Gestion Logistique          ", nullptr));
+        LoginDialog->setWindowTitle(QCoreApplication::translate("LoginDialog", "Syst\303\250me de Gestion Logistique - Connexion", nullptr));
+        logoLabel->setText(QString());
+        titleLabel->setText(QCoreApplication::translate("LoginDialog", "Syst\303\250me de Gestion Logistique", nullptr));
+        subtitleLabel->setText(QCoreApplication::translate("LoginDialog", "Connectez-vous \303\240 votre compte", nullptr));
         lblUsername->setText(QCoreApplication::translate("LoginDialog", "Identifiant:", nullptr));
+        leUsername->setPlaceholderText(QCoreApplication::translate("LoginDialog", "Entrez votre nom d'utilisateur", nullptr));
         lblPassword->setText(QCoreApplication::translate("LoginDialog", "Mot de passe:", nullptr));
+        lePassword->setPlaceholderText(QCoreApplication::translate("LoginDialog", "Entrez votre mot de passe", nullptr));
         btnLogin->setText(QCoreApplication::translate("LoginDialog", "Se connecter", nullptr));
-        btnCancel->setText(QCoreApplication::translate("LoginDialog", "Annuler", nullptr));
-        btnSwitchToSignup->setText(QCoreApplication::translate("LoginDialog", "Cr\303\251er un nouveau compte", nullptr));
-        lblVersion->setText(QCoreApplication::translate("LoginDialog", "          Version 1.6 - MADE BY NADHIR.TR       ", nullptr));
-        label_2->setText(QCoreApplication::translate("LoginDialog", "           Cr\303\251ation de Compte          ", nullptr));
-        lblSignupUsername->setText(QCoreApplication::translate("LoginDialog", "Nom d'utilisateur:", nullptr));
-        lblSignupPassword->setText(QCoreApplication::translate("LoginDialog", "Mot de passe:", nullptr));
-        lblConfirmPassword->setText(QCoreApplication::translate("LoginDialog", "Confirmer mot de passe:", nullptr));
-        lblRole->setText(QCoreApplication::translate("LoginDialog", "R\303\264le:", nullptr));
-        cbRole->setItemText(0, QCoreApplication::translate("LoginDialog", "Administrateur", nullptr));
-        cbRole->setItemText(1, QCoreApplication::translate("LoginDialog", "Gestionnaire", nullptr));
-        cbRole->setItemText(2, QCoreApplication::translate("LoginDialog", "Livreur", nullptr));
+        btnSwitchToRegister->setText(QCoreApplication::translate("LoginDialog", "Cr\303\251er un nouveau compte", nullptr));
+        lblRegUsername->setText(QCoreApplication::translate("LoginDialog", "Identifiant:", nullptr));
+        leRegUsername->setPlaceholderText(QCoreApplication::translate("LoginDialog", "Choisissez un nom d'utilisateur", nullptr));
+        lblRegPassword->setText(QCoreApplication::translate("LoginDialog", "Mot de passe:", nullptr));
+        leRegPassword->setPlaceholderText(QCoreApplication::translate("LoginDialog", "Choisissez un mot de passe", nullptr));
+        lblRegRole->setText(QCoreApplication::translate("LoginDialog", "R\303\264le:", nullptr));
+        cbRegRole->setItemText(0, QCoreApplication::translate("LoginDialog", "Administrateur", nullptr));
+        cbRegRole->setItemText(1, QCoreApplication::translate("LoginDialog", "Gestionnaire logistique", nullptr));
+        cbRegRole->setItemText(2, QCoreApplication::translate("LoginDialog", "Livreur", nullptr));
 
-        btnSignup->setText(QCoreApplication::translate("LoginDialog", "S'inscrire", nullptr));
-        btnCancelSignup->setText(QCoreApplication::translate("LoginDialog", "Annuler", nullptr));
-        btnSwitchToLogin->setText(QCoreApplication::translate("LoginDialog", "D\303\251j\303\240 un compte? Se connecter", nullptr));
+        btnRegister->setText(QCoreApplication::translate("LoginDialog", "Cr\303\251er le compte", nullptr));
+        btnSwitchToLogin->setText(QCoreApplication::translate("LoginDialog", "Retour \303\240 la connexion", nullptr));
+        footerLabel->setText(QCoreApplication::translate("LoginDialog", "\302\251 2024 Syst\303\250me de Gestion Logistique. Tous droits r\303\251serv\303\251s.", nullptr));
+        welcomeLabel->setText(QCoreApplication::translate("LoginDialog", "Bienvenue dans votre syst\303\250me de gestion logistique", nullptr));
+        descriptionLabel->setText(QCoreApplication::translate("LoginDialog", "G\303\251rez vos clients, commandes et utilisateurs avec facilit\303\251 et efficacit\303\251", nullptr));
     } // retranslateUi
 
 };
