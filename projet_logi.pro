@@ -4,6 +4,7 @@ TEMPLATE = app
 TARGET = projet_logi
 
 SOURCES += \
+    logindialog.cpp \
     main.cpp \
     db.cpp \
     client.cpp \
@@ -15,10 +16,15 @@ SOURCES += \
 HEADERS += \
     db.h \
     client.h \
+    logindialog.h \
     order.h \
     clientdao.h \
     orderdao.h \
     mainwindow.h
 
 FORMS += \
+    logindialog.ui \
     mainwindow.ui
+
+RESOURCES += \
+    resources/resources.qrc

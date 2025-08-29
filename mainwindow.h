@@ -10,7 +10,7 @@ QT_END_NAMESPACE
 class MainWindow : public QMainWindow {
     Q_OBJECT
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(int userId, const QString &username, const QString &role, QWidget *parent = nullptr);
     ~MainWindow();
 
 private slots:
@@ -55,4 +55,9 @@ private:
     Ui::MainWindow *ui;
     QChartView* clientChartView = nullptr;
     QChartView* orderChartView = nullptr;
+    int m_userId;
+    QString m_username;
+    QString m_role;
+
+    void setupPermissionsBasedOnRole();
 };

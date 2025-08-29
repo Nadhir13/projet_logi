@@ -286,6 +286,7 @@ Makefile: ..\..\projet_logi.pro C:\Qt\6.9.2\msvc2022_64\mkspecs\win32-msvc\qmake
 		C:\Qt\6.9.2\msvc2022_64\lib\Qt6Core.prl \
 		C:\Qt\6.9.2\msvc2022_64\lib\Qt6EntryPoint.prl \
 		C:\Qt\6.9.2\msvc2022_64\mkspecs\features\build_pass.prf \
+		..\..\resources\resources.qrc \
 		C:\Qt\6.9.2\msvc2022_64\lib\Qt6PrintSupportd.prl \
 		C:\Qt\6.9.2\msvc2022_64\lib\Qt6Chartsd.prl \
 		C:\Qt\6.9.2\msvc2022_64\lib\Qt6OpenGLWidgetsd.prl \
@@ -498,6 +499,7 @@ C:\Qt\6.9.2\msvc2022_64\lib\Qt6Sql.prl:
 C:\Qt\6.9.2\msvc2022_64\lib\Qt6Core.prl:
 C:\Qt\6.9.2\msvc2022_64\lib\Qt6EntryPoint.prl:
 C:\Qt\6.9.2\msvc2022_64\mkspecs\features\build_pass.prf:
+..\..\resources\resources.qrc:
 C:\Qt\6.9.2\msvc2022_64\lib\Qt6PrintSupportd.prl:
 C:\Qt\6.9.2\msvc2022_64\lib\Qt6Chartsd.prl:
 C:\Qt\6.9.2\msvc2022_64\lib\Qt6OpenGLWidgetsd.prl:

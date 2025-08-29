@@ -55,9 +55,16 @@ bool MainWindow::validateOrderForm() {
     return true;
 }
 
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), ui(new Ui::MainWindow) {
+MainWindow::MainWindow(int userId, const QString &username, const QString &role, QWidget *parent)
+    : QMainWindow(parent), ui(new Ui::MainWindow), m_userId(userId), m_username(username), m_role(role)
+{
     ui->setupUi(this);
+
+    // Set window title with user info
+    setWindowTitle(QString("Système de Gestion Logistique - Connecté en tant que: %1 (%2)").arg(username).arg(role));
+
+    // Setup UI based on user role
+    setupPermissionsBasedOnRole();
 
     ui->leSearchClient->setToolTip("Recherche par nom et prénom");
     ui->leEmailFilter->setToolTip("Filtrer par email spécifique");
@@ -172,6 +179,36 @@ MainWindow::MainWindow(QWidget *parent)
 }
 
 MainWindow::~MainWindow() { delete ui; }
+
+void MainWindow::setupPermissionsBasedOnRole()
+{
+    // Admin has full access
+    if (m_role == "ADMIN") {
+        return; // No restrictions
+    }
+
+    // Manager (Gestionnaire logistique) can access everything except user management
+    if (m_role == "MANAGER") {
+        // No specific restrictions for now
+        return;
+    }
+
+    // Delivery (Livreur) has limited access
+    if (m_role == "DELIVERY") {
+        // Hide client management tab
+        ui->tabWidget->removeTab(0); // Remove Clients tab
+
+        // Disable order modification buttons
+        ui->btnAddOrd->setEnabled(false);
+        ui->btnUpdOrd->setEnabled(false);
+        ui->btnDelOrd->setEnabled(false);
+
+        // Disable export and statistics buttons
+        ui->btnPdfOrd->setEnabled(false);
+        ui->btnOrderStats->setEnabled(false);
+        ui->btnUpdatePriority->setEnabled(false);
+    }
+}
 
 // ===== Clients
 void MainWindow::addClient() {
