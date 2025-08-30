@@ -21,6 +21,8 @@ public slots:
     void deleteUser();
     void refreshUsers();
     void changePassword();
+    void cancelEdit();
+    void switchToEditMode();
 
 private:
     MainWindow* m_mainWindow;

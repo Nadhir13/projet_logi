@@ -93,9 +93,9 @@ public:
 "    border-radius: 0px;\n"
 "}"));
         verticalLayout = new QVBoxLayout(leftPanel);
-        verticalLayout->setSpacing(20);
+        verticalLayout->setSpacing(15);
         verticalLayout->setObjectName("verticalLayout");
-        verticalLayout->setContentsMargins(40, 40, 40, 40);
+        verticalLayout->setContentsMargins(30, 30, 30, 30);
         logoLabel = new QLabel(leftPanel);
         logoLabel->setObjectName("logoLabel");
         logoLabel->setMinimumSize(QSize(0, 80));
@@ -157,7 +157,7 @@ public:
 
         leUsername = new QLineEdit(loginPage);
         leUsername->setObjectName("leUsername");
-        leUsername->setMinimumSize(QSize(250, 45));
+        leUsername->setMinimumSize(QSize(200, 40));
         leUsername->setStyleSheet(QString::fromUtf8("QLineEdit {\n"
 "    border: 2px solid #e2e8f0;\n"
 "    border-radius: 8px;\n"
@@ -192,7 +192,7 @@ public:
 
         lePassword = new QLineEdit(loginPage);
         lePassword->setObjectName("lePassword");
-        lePassword->setMinimumSize(QSize(250, 45));
+        lePassword->setMinimumSize(QSize(200, 40));
         lePassword->setEchoMode(QLineEdit::Password);
         lePassword->setStyleSheet(QString::fromUtf8("QLineEdit {\n"
 "    border: 2px solid #e2e8f0;\n"
@@ -219,7 +219,7 @@ public:
 
         btnLogin = new QPushButton(loginPage);
         btnLogin->setObjectName("btnLogin");
-        btnLogin->setMinimumSize(QSize(0, 50));
+        btnLogin->setMinimumSize(QSize(0, 45));
         btnLogin->setStyleSheet(QString::fromUtf8("QPushButton {\n"
 "    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,\n"
 "                               stop:0 #667eea, stop:1 #764ba2);\n"
@@ -296,7 +296,7 @@ public:
 
         leRegUsername = new QLineEdit(registerPage);
         leRegUsername->setObjectName("leRegUsername");
-        leRegUsername->setMinimumSize(QSize(250, 45));
+        leRegUsername->setMinimumSize(QSize(200, 40));
         leRegUsername->setStyleSheet(QString::fromUtf8("QLineEdit {\n"
 "    border: 2px solid #e2e8f0;\n"
 "    border-radius: 8px;\n"
@@ -331,7 +331,7 @@ public:
 
         leRegPassword = new QLineEdit(registerPage);
         leRegPassword->setObjectName("leRegPassword");
-        leRegPassword->setMinimumSize(QSize(250, 45));
+        leRegPassword->setMinimumSize(QSize(200, 40));
         leRegPassword->setEchoMode(QLineEdit::Password);
         leRegPassword->setStyleSheet(QString::fromUtf8("QLineEdit {\n"
 "    border: 2px solid #e2e8f0;\n"
@@ -370,7 +370,7 @@ public:
         cbRegRole->addItem(QString());
         cbRegRole->addItem(QString());
         cbRegRole->setObjectName("cbRegRole");
-        cbRegRole->setMinimumSize(QSize(250, 45));
+        cbRegRole->setMinimumSize(QSize(200, 40));
         cbRegRole->setStyleSheet(QString::fromUtf8("QComboBox {\n"
 "    border: 2px solid #e2e8f0;\n"
 "    border-radius: 8px;\n"
@@ -403,7 +403,7 @@ public:
 
         btnRegister = new QPushButton(registerPage);
         btnRegister->setObjectName("btnRegister");
-        btnRegister->setMinimumSize(QSize(0, 50));
+        btnRegister->setMinimumSize(QSize(0, 45));
         btnRegister->setStyleSheet(QString::fromUtf8("QPushButton {\n"
 "    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,\n"
 "                               stop:0 #48bb78, stop:1 #38a169);\n"
@@ -492,7 +492,6 @@ public:
 "    font-size: 28px;\n"
 "    font-weight: bold;\n"
 "    font-family: 'Segoe UI', Arial, sans-serif;\n"
-"    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);\n"
 "}"));
         welcomeLabel->setAlignment(Qt::AlignCenter);
 
@@ -504,7 +503,6 @@ public:
 "    color: rgba(255, 255, 255, 0.9);\n"
 "    font-size: 16px;\n"
 "    font-family: 'Segoe UI', Arial, sans-serif;\n"
-"    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);\n"
 "}"));
         descriptionLabel->setAlignment(Qt::AlignCenter);
 

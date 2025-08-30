@@ -99,20 +99,28 @@ void UserController::setupUi() {
     Ui::MainWindow* ui = m_mainWindow->getUi();
     
     // Connect user-related buttons
-    connect(ui->btnAddUser, &QPushButton::clicked, this, &UserController::addUser);
+    connect(ui->btnAddUser, &QPushButton::clicked, this, &UserController::switchToEditMode);
     connect(ui->btnUpdUser, &QPushButton::clicked, this, &UserController::updateUser);
     connect(ui->btnDelUser, &QPushButton::clicked, this, &UserController::deleteUser);
     connect(ui->btnRefUser, &QPushButton::clicked, this, &UserController::refreshUsers);
     connect(ui->btnChangePassword, &QPushButton::clicked, this, &UserController::changePassword);
+    connect(ui->btnCancelUser, &QPushButton::clicked, this, &UserController::cancelEdit);
     
     // Connect filter signals
     connect(ui->leSearchUser, &QLineEdit::textChanged, this, &UserController::applyFilters);
-    connect(ui->cbUserRoleFilter, &QComboBox::currentTextChanged, this, &UserController::applyFilters);
-    connect(ui->cbUserStatusFilter, &QComboBox::currentTextChanged, this, &UserController::applyFilters);
-    connect(ui->cbUserSort, &QComboBox::currentTextChanged, this, &UserController::applyFilters);
     
     // Set tooltips
     ui->leSearchUser->setToolTip("Recherche par nom d'utilisateur");
+}
+
+void UserController::switchToEditMode() {
+    Ui::MainWindow* ui = m_mainWindow->getUi();
+    ui->stackedUser->setCurrentIndex(1); // Switch to edit mode
+    ui->leUserUsername->clear();
+    ui->leUserPassword->clear();
+    ui->cbUserRole->setCurrentIndex(0);
+    ui->cbUserStatus->setCurrentIndex(0);
+    ui->leUserUsername->setFocus();
 }
 
 void UserController::addUser() {
@@ -129,7 +137,7 @@ void UserController::addUser() {
         ui->leUserUsername->clear();
         ui->leUserPassword->clear();
         ui->cbUserRole->setCurrentIndex(0);
-        ui->stackedUser->setCurrentIndex(0);
+        ui->stackedUser->setCurrentIndex(0); // Switch to view mode
         refreshUsers();
     } else {
         QMessageBox::warning(m_mainWindow, "Utilisateur", "Échec de l'ajout: " + Db::instance().lastError());
@@ -226,6 +234,11 @@ void UserController::changePassword() {
     }
 }
 
+void UserController::cancelEdit() {
+    Ui::MainWindow* ui = m_mainWindow->getUi();
+    ui->stackedUser->setCurrentIndex(0); // Switch back to view mode
+}
+
 void UserController::loadUsersTable() {
     Ui::MainWindow* ui = m_mainWindow->getUi();
     auto users = UserDao::all();
@@ -235,6 +248,9 @@ void UserController::loadUsersTable() {
     QStringList headers = {"ID","Nom d'utilisateur","Rôle","Statut","Date création"};
     ui->tblUsers->setHorizontalHeaderLabels(headers);
     ui->tblUsers->horizontalHeader()->setStretchLastSection(true);
+    ui->tblUsers->setAlternatingRowColors(true);
+    ui->tblUsers->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->tblUsers->setSelectionMode(QAbstractItemView::SingleSelection);
 
     for (int i = 0; i < users.size(); ++i) {
         const auto &u = users[i];
@@ -262,9 +278,6 @@ void UserController::loadUsersTable() {
 void UserController::applyFilters() {
     Ui::MainWindow* ui = m_mainWindow->getUi();
     QString text = ui->leSearchUser->text().trimmed();
-    QString roleFilter = ui->cbUserRoleFilter->currentText();
-    QString statusFilter = ui->cbUserStatusFilter->currentText();
-    QString sortKey = ui->cbUserSort->currentText();
 
     for (int r=0; r<ui->tblUsers->rowCount(); ++r) ui->tblUsers->setRowHidden(r, false);
 
@@ -277,27 +290,11 @@ void UserController::applyFilters() {
             match &= username.contains(text, Qt::CaseInsensitive);
         }
 
-        // Role filter
-        if (roleFilter != "Tous") {
-            match &= ui->tblUsers->item(r,2)->text() == roleFilter;
-        }
-
-        // Status filter
-        if (statusFilter != "Tous") {
-            match &= ui->tblUsers->item(r,3)->text() == statusFilter;
-        }
-
         if (!match) ui->tblUsers->setRowHidden(r, true);
     }
-
-    if (sortKey == "Nom d'utilisateur") ui->tblUsers->sortItems(1);
-    else if (sortKey == "Rôle") ui->tblUsers->sortItems(2);
-    else if (sortKey == "Statut") ui->tblUsers->sortItems(3);
-    else if (sortKey == "Date création") ui->tblUsers->sortItems(4);
 }
 
 void UserController::updateChart() {
-    Ui::MainWindow* ui = m_mainWindow->getUi();
     // Access the chart view through the main window's member variable
     QChartView* userChartView = m_mainWindow->userChartView;
     if (!userChartView) return;
@@ -330,7 +327,7 @@ bool UserController::validateForm() {
         ui->leUserUsername->setFocus();
         return false;
     }
-    if (ui->leUserPassword->text().isEmpty() && ui->stackedUser->currentIndex() == 0) {
+    if (ui->leUserPassword->text().isEmpty()) {
         QMessageBox::warning(m_mainWindow, "Validation", "Le mot de passe est obligatoire");
         ui->leUserPassword->setFocus();
         return false;

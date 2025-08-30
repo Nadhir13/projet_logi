@@ -25,8 +25,29 @@
         <string>Clients</string>
        </attribute>
        <layout class="QVBoxLayout" name="vlc">
+        <property name="spacing">
+         <number>15</number>
+        </property>
+        <property name="leftMargin">
+         <number>15</number>
+        </property>
+        <property name="topMargin">
+         <number>15</number>
+        </property>
+        <property name="rightMargin">
+         <number>15</number>
+        </property>
+        <property name="bottomMargin">
+         <number>15</number>
+        </property>
         <item>
          <layout class="QFormLayout" name="formClient">
+          <property name="horizontalSpacing">
+           <number>15</number>
+          </property>
+          <property name="verticalSpacing">
+           <number>10</number>
+          </property>
           <item row="0" column="0">
            <widget class="QLabel" name="lblNom">
             <property name="text">
@@ -102,6 +123,9 @@
         </item>
         <item>
          <layout class="QHBoxLayout" name="filterRowClient">
+          <property name="spacing">
+           <number>10</number>
+          </property>
           <item>
            <widget class="QLineEdit" name="leSearchClient">
             <property name="placeholderText">
@@ -163,6 +187,9 @@
         </item>
         <item>
          <layout class="QHBoxLayout" name="btnRowClient">
+          <property name="spacing">
+           <number>10</number>
+          </property>
           <item>
            <widget class="QPushButton" name="btnAddClient">
             <property name="text">
@@ -290,8 +317,29 @@
         <string>Commandes</string>
        </attribute>
        <layout class="QVBoxLayout" name="vlo">
+        <property name="spacing">
+         <number>15</number>
+        </property>
+        <property name="leftMargin">
+         <number>15</number>
+        </property>
+        <property name="topMargin">
+         <number>15</number>
+        </property>
+        <property name="rightMargin">
+         <number>15</number>
+        </property>
+        <property name="bottomMargin">
+         <number>15</number>
+        </property>
         <item>
          <layout class="QFormLayout" name="formOrder">
+          <property name="horizontalSpacing">
+           <number>15</number>
+          </property>
+          <property name="verticalSpacing">
+           <number>10</number>
+          </property>
           <item row="0" column="0">
            <widget class="QLabel" name="lblClient">
             <property name="text">
@@ -395,6 +443,9 @@
         </item>
         <item>
          <layout class="QHBoxLayout" name="filterRowOrder">
+          <property name="spacing">
+           <number>10</number>
+          </property>
           <item>
            <widget class="QLineEdit" name="leSearchOrder">
             <property name="placeholderText">
@@ -506,6 +557,9 @@
         </item>
         <item>
          <layout class="QHBoxLayout" name="btnRowOrder">
+          <property name="spacing">
+           <number>10</number>
+          </property>
           <item>
            <widget class="QPushButton" name="btnAddOrd">
             <property name="text">
@@ -628,6 +682,21 @@
         <string>Utilisateurs</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_4">
+        <property name="spacing">
+         <number>15</number>
+        </property>
+        <property name="leftMargin">
+         <number>15</number>
+        </property>
+        <property name="topMargin">
+         <number>15</number>
+        </property>
+        <property name="rightMargin">
+         <number>15</number>
+        </property>
+        <property name="bottomMargin">
+         <number>15</number>
+        </property>
         <item>
          <widget class="QStackedWidget" name="stackedUser">
           <property name="currentIndex">
@@ -637,6 +706,9 @@
            <layout class="QVBoxLayout" name="verticalLayout_5">
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_5">
+              <property name="spacing">
+               <number>10</number>
+              </property>
               <item>
                <widget class="QLineEdit" name="leSearchUser">
                 <property name="placeholderText">
@@ -720,6 +792,9 @@
             </item>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_6">
+              <property name="spacing">
+               <number>10</number>
+              </property>
               <item>
                <widget class="QPushButton" name="btnAddUser">
                 <property name="text">
@@ -803,6 +878,12 @@
            <layout class="QVBoxLayout" name="verticalLayout_6">
             <item>
              <layout class="QFormLayout" name="formLayout_3">
+              <property name="horizontalSpacing">
+               <number>15</number>
+              </property>
+              <property name="verticalSpacing">
+               <number>10</number>
+              </property>
               <item row="0" column="0">
                <widget class="QLabel" name="lblUserUsername">
                 <property name="text">

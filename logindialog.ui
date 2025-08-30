@@ -67,19 +67,19 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <property name="spacing">
-       <number>20</number>
+       <number>15</number>
       </property>
       <property name="leftMargin">
-       <number>40</number>
+       <number>30</number>
       </property>
       <property name="topMargin">
-       <number>40</number>
+       <number>30</number>
       </property>
       <property name="rightMargin">
-       <number>40</number>
+       <number>30</number>
       </property>
       <property name="bottomMargin">
-       <number>40</number>
+       <number>30</number>
       </property>
       <item>
        <widget class="QLabel" name="logoLabel">
@@ -191,8 +191,8 @@
              <widget class="QLineEdit" name="leUsername">
               <property name="minimumSize">
                <size>
-                <width>250</width>
-                <height>45</height>
+                <width>200</width>
+                <height>40</height>
                </size>
               </property>
               <property name="styleSheet">
@@ -241,8 +241,8 @@ QLineEdit::placeholder {
              <widget class="QLineEdit" name="lePassword">
               <property name="minimumSize">
                <size>
-                <width>250</width>
-                <height>45</height>
+                <width>200</width>
+                <height>40</height>
                </size>
               </property>
               <property name="echoMode">
@@ -279,7 +279,7 @@ QLineEdit::placeholder {
             <property name="minimumSize">
              <size>
               <width>0</width>
-              <height>50</height>
+              <height>45</height>
              </size>
             </property>
             <property name="text">
@@ -383,8 +383,8 @@ QPushButton:hover {
              <widget class="QLineEdit" name="leRegUsername">
               <property name="minimumSize">
                <size>
-                <width>250</width>
-                <height>45</height>
+                <width>200</width>
+                <height>40</height>
                </size>
               </property>
               <property name="styleSheet">
@@ -433,8 +433,8 @@ QLineEdit::placeholder {
              <widget class="QLineEdit" name="leRegPassword">
               <property name="minimumSize">
                <size>
-                <width>250</width>
-                <height>45</height>
+                <width>200</width>
+                <height>40</height>
                </size>
               </property>
               <property name="echoMode">
@@ -486,8 +486,8 @@ QLineEdit::placeholder {
              <widget class="QComboBox" name="cbRegRole">
               <property name="minimumSize">
                <size>
-                <width>250</width>
-                <height>45</height>
+                <width>200</width>
+                <height>40</height>
                </size>
               </property>
               <property name="styleSheet">
@@ -540,7 +540,7 @@ QComboBox::down-arrow {
             <property name="minimumSize">
              <size>
               <width>0</width>
-              <height>50</height>
+              <height>45</height>
              </size>
             </property>
             <property name="text">
@@ -674,7 +674,6 @@ QPushButton:hover {
     font-size: 28px;
     font-weight: bold;
     font-family: 'Segoe UI', Arial, sans-serif;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }</string>
         </property>
         <property name="alignment">
@@ -692,7 +691,6 @@ QPushButton:hover {
     color: rgba(255, 255, 255, 0.9);
     font-size: 16px;
     font-family: 'Segoe UI', Arial, sans-serif;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
 }</string>
         </property>
         <property name="alignment">

@@ -94,6 +94,8 @@ void LoginDialog::setupAnimations()
 void LoginDialog::showLoginForm()
 {
     ui->stackedWidget->setCurrentIndex(0);
+    ui->leUsername->clear();
+    ui->lePassword->clear();
     ui->leUsername->setFocus();
     ui->titleLabel->setText("Système de Gestion Logistique");
     ui->subtitleLabel->setText("Connectez-vous à votre compte");
@@ -102,27 +104,15 @@ void LoginDialog::showLoginForm()
 void LoginDialog::showRegisterForm()
 {
     ui->stackedWidget->setCurrentIndex(1);
+    ui->leRegUsername->clear();
+    ui->leRegPassword->clear();
+    ui->cbRegRole->setCurrentIndex(0);
     ui->leRegUsername->setFocus();
     ui->titleLabel->setText("Création de Compte");
     ui->subtitleLabel->setText("Créez votre nouveau compte");
 }
 
-void LoginDialog::animateTransition(bool toRegister)
-{
-    // Create a smooth transition animation
-    QPropertyAnimation *slideAnimation = new QPropertyAnimation(ui->stackedWidget, "pos");
-    slideAnimation->setDuration(300);
-    
-    if (toRegister) {
-        slideAnimation->setStartValue(QPoint(0, 0));
-        slideAnimation->setEndValue(QPoint(-ui->stackedWidget->width(), 0));
-    } else {
-        slideAnimation->setStartValue(QPoint(ui->stackedWidget->width(), 0));
-        slideAnimation->setEndValue(QPoint(0, 0));
-    }
-    
-    slideAnimation->start(QAbstractAnimation::DeleteWhenStopped);
-}
+
 
 void LoginDialog::onLoginClicked()
 {
@@ -204,13 +194,11 @@ void LoginDialog::onRegisterClicked()
 
 void LoginDialog::onSwitchToRegisterClicked()
 {
-    animateTransition(true);
     showRegisterForm();
 }
 
 void LoginDialog::onSwitchToLoginClicked()
 {
-    animateTransition(false);
     showLoginForm();
 }
 

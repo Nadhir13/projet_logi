@@ -145,9 +145,13 @@ public:
         tabClients = new QWidget();
         tabClients->setObjectName("tabClients");
         vlc = new QVBoxLayout(tabClients);
+        vlc->setSpacing(15);
         vlc->setObjectName("vlc");
+        vlc->setContentsMargins(15, 15, 15, 15);
         formClient = new QFormLayout();
         formClient->setObjectName("formClient");
+        formClient->setHorizontalSpacing(15);
+        formClient->setVerticalSpacing(10);
         lblNom = new QLabel(tabClients);
         lblNom->setObjectName("lblNom");
 
@@ -214,6 +218,7 @@ public:
         vlc->addLayout(formClient);
 
         filterRowClient = new QHBoxLayout();
+        filterRowClient->setSpacing(10);
         filterRowClient->setObjectName("filterRowClient");
         leSearchClient = new QLineEdit(tabClients);
         leSearchClient->setObjectName("leSearchClient");
@@ -246,6 +251,7 @@ public:
         vlc->addLayout(filterRowClient);
 
         btnRowClient = new QHBoxLayout();
+        btnRowClient->setSpacing(10);
         btnRowClient->setObjectName("btnRowClient");
         btnAddClient = new QPushButton(tabClients);
         btnAddClient->setObjectName("btnAddClient");
@@ -323,9 +329,13 @@ public:
         tabOrders = new QWidget();
         tabOrders->setObjectName("tabOrders");
         vlo = new QVBoxLayout(tabOrders);
+        vlo->setSpacing(15);
         vlo->setObjectName("vlo");
+        vlo->setContentsMargins(15, 15, 15, 15);
         formOrder = new QFormLayout();
         formOrder->setObjectName("formOrder");
+        formOrder->setHorizontalSpacing(15);
+        formOrder->setVerticalSpacing(10);
         lblClient = new QLabel(tabOrders);
         lblClient->setObjectName("lblClient");
 
@@ -390,6 +400,7 @@ public:
         vlo->addLayout(formOrder);
 
         filterRowOrder = new QHBoxLayout();
+        filterRowOrder->setSpacing(10);
         filterRowOrder->setObjectName("filterRowOrder");
         leSearchOrder = new QLineEdit(tabOrders);
         leSearchOrder->setObjectName("leSearchOrder");
@@ -454,6 +465,7 @@ public:
         vlo->addLayout(filterRowOrder);
 
         btnRowOrder = new QHBoxLayout();
+        btnRowOrder->setSpacing(10);
         btnRowOrder->setObjectName("btnRowOrder");
         btnAddOrd = new QPushButton(tabOrders);
         btnAddOrd->setObjectName("btnAddOrd");
@@ -529,7 +541,9 @@ public:
         tabUsers = new QWidget();
         tabUsers->setObjectName("tabUsers");
         verticalLayout_4 = new QVBoxLayout(tabUsers);
+        verticalLayout_4->setSpacing(15);
         verticalLayout_4->setObjectName("verticalLayout_4");
+        verticalLayout_4->setContentsMargins(15, 15, 15, 15);
         stackedUser = new QStackedWidget(tabUsers);
         stackedUser->setObjectName("stackedUser");
         pageUserView = new QWidget();
@@ -537,6 +551,7 @@ public:
         verticalLayout_5 = new QVBoxLayout(pageUserView);
         verticalLayout_5->setObjectName("verticalLayout_5");
         horizontalLayout_5 = new QHBoxLayout();
+        horizontalLayout_5->setSpacing(10);
         horizontalLayout_5->setObjectName("horizontalLayout_5");
         leSearchUser = new QLineEdit(pageUserView);
         leSearchUser->setObjectName("leSearchUser");
@@ -574,6 +589,7 @@ public:
         verticalLayout_5->addLayout(horizontalLayout_5);
 
         horizontalLayout_6 = new QHBoxLayout();
+        horizontalLayout_6->setSpacing(10);
         horizontalLayout_6->setObjectName("horizontalLayout_6");
         btnAddUser = new QPushButton(pageUserView);
         btnAddUser->setObjectName("btnAddUser");
@@ -628,6 +644,8 @@ public:
         verticalLayout_6->setObjectName("verticalLayout_6");
         formLayout_3 = new QFormLayout();
         formLayout_3->setObjectName("formLayout_3");
+        formLayout_3->setHorizontalSpacing(15);
+        formLayout_3->setVerticalSpacing(10);
         lblUserUsername = new QLabel(pageUserEdit);
         lblUserUsername->setObjectName("lblUserUsername");
 
