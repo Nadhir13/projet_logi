@@ -25,6 +25,8 @@ void ClientController::setupUi() {
     connect(ui->btnUpdClient, &QPushButton::clicked, this, &ClientController::updateClient);
     connect(ui->btnDelClient, &QPushButton::clicked, this, &ClientController::deleteClient);
     connect(ui->btnRefClient, &QPushButton::clicked, this, &ClientController::refreshClients);
+    connect(ui->btnExportExcel, &QPushButton::clicked, this, &ClientController::exportToExcel);
+    connect(ui->btnClientStats, &QPushButton::clicked, this, &ClientController::showStats);
 
     // Connect filter signals
     connect(ui->leSearchClient, &QLineEdit::textChanged, this, &ClientController::applyFilters);

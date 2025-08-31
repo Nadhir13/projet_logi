@@ -38,7 +38,6 @@ FORMS += \
 
 RESOURCES += \
     resources/resources.qrc \
-    styles.qrc \
 
 # Enable high DPI scaling
 CONFIG += highdpi

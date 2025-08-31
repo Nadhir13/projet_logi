@@ -38,10 +38,12 @@ LoginDialog::LoginDialog(QWidget *parent) :
     ui->lePassword->setPlaceholderText("Entrez votre mot de passe");
     ui->leRegUsername->setPlaceholderText("Choisissez un nom d'utilisateur");
     ui->leRegPassword->setPlaceholderText("Choisissez un mot de passe");
+    ui->leRegConfirmPassword->setPlaceholderText("Confirmez votre mot de passe");
 
     // Set password echo mode
     ui->lePassword->setEchoMode(QLineEdit::Password);
     ui->leRegPassword->setEchoMode(QLineEdit::Password);
+    ui->leRegConfirmPassword->setEchoMode(QLineEdit::Password);
 
     // Set focus to username field
     ui->leUsername->setFocus();
@@ -57,6 +59,7 @@ LoginDialog::LoginDialog(QWidget *parent) :
     connect(ui->lePassword, &QLineEdit::returnPressed, this, &LoginDialog::onLoginClicked);
     connect(ui->leRegUsername, &QLineEdit::returnPressed, this, &LoginDialog::onRegisterClicked);
     connect(ui->leRegPassword, &QLineEdit::returnPressed, this, &LoginDialog::onRegisterClicked);
+    connect(ui->leRegConfirmPassword, &QLineEdit::returnPressed, this, &LoginDialog::onRegisterClicked);
 
     // Setup animations
     setupAnimations();
@@ -149,15 +152,24 @@ void LoginDialog::onRegisterClicked()
 {
     QString username = ui->leRegUsername->text().trimmed();
     QString password = ui->leRegPassword->text();
+    QString confirmPassword = ui->leRegConfirmPassword->text();
     QString role = ui->cbRegRole->currentText().toUpper();
 
-    if (username.isEmpty() || password.isEmpty()) {
+    if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
         QMessageBox::warning(this, "Erreur", "Veuillez remplir tous les champs.");
         return;
     }
 
     if (password.length() < 6) {
         QMessageBox::warning(this, "Erreur", "Le mot de passe doit contenir au moins 6 caractères.");
+        ui->leRegPassword->setFocus();
+        return;
+    }
+
+    if (password != confirmPassword) {
+        QMessageBox::warning(this, "Erreur", "Les mots de passe ne correspondent pas.");
+        ui->leRegConfirmPassword->clear();
+        ui->leRegConfirmPassword->setFocus();
         return;
     }
 
@@ -168,6 +180,7 @@ void LoginDialog::onRegisterClicked()
     
     if (checkQuery.exec() && checkQuery.next() && checkQuery.value(0).toInt() > 0) {
         QMessageBox::warning(this, "Erreur", "Ce nom d'utilisateur existe déjà.");
+        ui->leRegUsername->setFocus();
         return;
     }
 
@@ -184,6 +197,7 @@ void LoginDialog::onRegisterClicked()
         // Clear form and switch to login
         ui->leRegUsername->clear();
         ui->leRegPassword->clear();
+        ui->leRegConfirmPassword->clear();
         ui->cbRegRole->setCurrentIndex(0);
         
         onSwitchToLoginClicked();

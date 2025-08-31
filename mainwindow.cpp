@@ -137,6 +137,20 @@ void MainWindow::setupMenuBar()
 
     QAction *exportAction = new QAction("&Exporter", this);
     exportAction->setShortcut(QKeySequence::Save);
+    connect(exportAction, &QAction::triggered, [this]() {
+        int currentTab = ui->tabWidget->currentIndex();
+        switch (currentTab) {
+        case 0: // Clients
+            m_clientController->exportToExcel();
+            break;
+        case 1: // Orders
+            m_orderController->exportToPdf();
+            break;
+        case 2: // Users - we'll add this functionality
+            QMessageBox::information(this, "Export", "Export des utilisateurs non disponible pour le moment.");
+            break;
+        }
+    });
     fileMenu->addAction(exportAction);
 
     fileMenu->addSeparator();
@@ -150,27 +164,6 @@ void MainWindow::setupMenuBar()
     exitAction->setShortcut(QKeySequence::Quit);
     connect(exitAction, &QAction::triggered, this, &QApplication::quit);
     fileMenu->addAction(exitAction);
-
-    // View menu
-    QMenu *viewMenu = menuBar->addMenu("&Affichage");
-
-    QAction *modernStyleAction = new QAction("Style &Moderne", this);
-    connect(modernStyleAction, &QAction::triggered, [this]() {
-        StyleManager::instance().applyModernStyle();
-    });
-    viewMenu->addAction(modernStyleAction);
-
-    QAction *darkStyleAction = new QAction("Style &Sombre", this);
-    connect(darkStyleAction, &QAction::triggered, [this]() {
-        StyleManager::instance().applyDarkStyle();
-    });
-    viewMenu->addAction(darkStyleAction);
-
-    QAction *lightStyleAction = new QAction("Style &Clair", this);
-    connect(lightStyleAction, &QAction::triggered, [this]() {
-        StyleManager::instance().applyLightStyle();
-    });
-    viewMenu->addAction(lightStyleAction);
 
     // Help menu
     QMenu *helpMenu = menuBar->addMenu("&Aide");

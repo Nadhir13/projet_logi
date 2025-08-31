@@ -33,7 +33,18 @@ public:
         return q.exec();
     }
 
-    static bool update(int userId, const QString &username, const QString &role, const QString &status) {
+    static bool update(int userId, const QString &username, const QString &password, const QString &role, const QString &status) {
+        QSqlQuery q(Db::instance().conn());
+        q.prepare("UPDATE USERS SET USERNAME = :user, PASSWORD = :pass, ROLE = :role, STATUS = :status WHERE ID_USER = :id");
+        q.bindValue(":user", username);
+        q.bindValue(":pass", password);
+        q.bindValue(":role", role);
+        q.bindValue(":status", status);
+        q.bindValue(":id", userId);
+        return q.exec();
+    }
+
+    static bool updateWithoutPassword(int userId, const QString &username, const QString &role, const QString &status) {
         QSqlQuery q(Db::instance().conn());
         q.prepare("UPDATE USERS SET USERNAME = :user, ROLE = :role, STATUS = :status WHERE ID_USER = :id");
         q.bindValue(":user", username);
@@ -146,26 +157,73 @@ void UserController::addUser() {
 
 void UserController::updateUser() {
     Ui::MainWindow* ui = m_mainWindow->getUi();
-    auto items = ui->tblUsers->selectedItems();
-    if (items.isEmpty()) {
-        QMessageBox::warning(m_mainWindow, "Utilisateur", "Veuillez sélectionner un utilisateur à modifier");
+    
+    // Check if we're in edit mode (stackedUser index 1)
+    if (ui->stackedUser->currentIndex() == 0) {
+        // We're in view mode, switch to edit mode and load selected user data
+        auto items = ui->tblUsers->selectedItems();
+        if (items.isEmpty()) {
+            QMessageBox::warning(m_mainWindow, "Utilisateur", "Veuillez sélectionner un utilisateur à modifier");
+            return;
+        }
+
+        int row = items.first()->row();
+        int id = ui->tblUsers->item(row, 0)->text().toInt();
+        QString username = ui->tblUsers->item(row, 1)->text();
+        QString role = ui->tblUsers->item(row, 2)->text();
+        QString status = ui->tblUsers->item(row, 3)->text();
+
+        // Load data into form fields
+        ui->leUserUsername->setText(username);
+        ui->leUserPassword->clear(); // Don't show existing password
+        ui->cbUserRole->setCurrentText(role);
+        ui->cbUserStatus->setCurrentText(status);
+        
+        // Store the ID for later update
+        ui->leUserUsername->setProperty("userId", id);
+        
+        // Switch to edit mode
+        ui->stackedUser->setCurrentIndex(1);
+        ui->leUserUsername->setFocus();
         return;
     }
+    
+    // We're in edit mode, perform the update
+    if (!validateForm()) return;
 
-    int row = items.first()->row();
-    int id = ui->tblUsers->item(row, 0)->text().toInt();
-
+    int userId = ui->leUserUsername->property("userId").toInt();
     QString username = ui->leUserUsername->text();
+    QString password = ui->leUserPassword->text();
     QString role = ui->cbUserRole->currentText().toUpper();
-    QString status = ui->cbUserStatus->currentText();
+    QString status = ui->cbUserStatus->currentText().toUpper();
 
-    if (UserDao::update(id, username, role, status)) {
-        QMessageBox::information(m_mainWindow, "Utilisateur", "Utilisateur modifié avec succès");
-        // Switch back to view mode
-        ui->stackedUser->setCurrentIndex(0);
-        refreshUsers();
+    // If password is empty, don't update it
+    if (password.isEmpty()) {
+        if (UserDao::updateWithoutPassword(userId, username, role, status)) {
+            QMessageBox::information(m_mainWindow, "Utilisateur", "Utilisateur modifié avec succès");
+            // Clear form and switch to view mode
+            ui->leUserUsername->clear();
+            ui->leUserPassword->clear();
+            ui->cbUserRole->setCurrentIndex(0);
+            ui->cbUserStatus->setCurrentIndex(0);
+            ui->stackedUser->setCurrentIndex(0);
+            refreshUsers();
+        } else {
+            QMessageBox::warning(m_mainWindow, "Utilisateur", "Échec de la modification: " + Db::instance().lastError());
+        }
     } else {
-        QMessageBox::warning(m_mainWindow, "Utilisateur", "Échec de la modification: " + Db::instance().lastError());
+        if (UserDao::update(userId, username, password, role, status)) {
+            QMessageBox::information(m_mainWindow, "Utilisateur", "Utilisateur modifié avec succès");
+            // Clear form and switch to view mode
+            ui->leUserUsername->clear();
+            ui->leUserPassword->clear();
+            ui->cbUserRole->setCurrentIndex(0);
+            ui->cbUserStatus->setCurrentIndex(0);
+            ui->stackedUser->setCurrentIndex(0);
+            refreshUsers();
+        } else {
+            QMessageBox::warning(m_mainWindow, "Utilisateur", "Échec de la modification: " + Db::instance().lastError());
+        }
     }
 }
 

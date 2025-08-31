@@ -54,6 +54,8 @@ public:
     QLineEdit *leRegUsername;
     QLabel *lblRegPassword;
     QLineEdit *leRegPassword;
+    QLabel *lblRegConfirmPassword;
+    QLineEdit *leRegConfirmPassword;
     QLabel *lblRegRole;
     QComboBox *cbRegRole;
     QPushButton *btnRegister;
@@ -353,6 +355,42 @@ public:
 
         formLayout_2->setWidget(1, QFormLayout::ItemRole::FieldRole, leRegPassword);
 
+        lblRegConfirmPassword = new QLabel(registerPage);
+        lblRegConfirmPassword->setObjectName("lblRegConfirmPassword");
+        lblRegConfirmPassword->setStyleSheet(QString::fromUtf8("QLabel {\n"
+"    color: #4a5568;\n"
+"    font-weight: 600;\n"
+"    font-size: 12px;\n"
+"    font-family: 'Segoe UI', Arial, sans-serif;\n"
+"}"));
+        lblRegConfirmPassword->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+
+        formLayout_2->setWidget(2, QFormLayout::ItemRole::LabelRole, lblRegConfirmPassword);
+
+        leRegConfirmPassword = new QLineEdit(registerPage);
+        leRegConfirmPassword->setObjectName("leRegConfirmPassword");
+        leRegConfirmPassword->setMinimumSize(QSize(200, 40));
+        leRegConfirmPassword->setEchoMode(QLineEdit::Password);
+        leRegConfirmPassword->setStyleSheet(QString::fromUtf8("QLineEdit {\n"
+"    border: 2px solid #e2e8f0;\n"
+"    border-radius: 8px;\n"
+"    padding: 12px 16px;\n"
+"    font-size: 14px;\n"
+"    background: white;\n"
+"    color: #2d3748;\n"
+"}\n"
+"\n"
+"QLineEdit:focus {\n"
+"    border-color: #667eea;\n"
+"    background: #f7fafc;\n"
+"}\n"
+"\n"
+"QLineEdit::placeholder {\n"
+"    color: #a0aec0;\n"
+"}"));
+
+        formLayout_2->setWidget(2, QFormLayout::ItemRole::FieldRole, leRegConfirmPassword);
+
         lblRegRole = new QLabel(registerPage);
         lblRegRole->setObjectName("lblRegRole");
         lblRegRole->setStyleSheet(QString::fromUtf8("QLabel {\n"
@@ -363,7 +401,7 @@ public:
 "}"));
         lblRegRole->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
-        formLayout_2->setWidget(2, QFormLayout::ItemRole::LabelRole, lblRegRole);
+        formLayout_2->setWidget(3, QFormLayout::ItemRole::LabelRole, lblRegRole);
 
         cbRegRole = new QComboBox(registerPage);
         cbRegRole->addItem(QString());
@@ -396,7 +434,7 @@ public:
 "    height: 8px;\n"
 "}"));
 
-        formLayout_2->setWidget(2, QFormLayout::ItemRole::FieldRole, cbRegRole);
+        formLayout_2->setWidget(3, QFormLayout::ItemRole::FieldRole, cbRegRole);
 
 
         verticalLayout_3->addLayout(formLayout_2);
@@ -501,7 +539,7 @@ public:
         descriptionLabel->setObjectName("descriptionLabel");
         descriptionLabel->setStyleSheet(QString::fromUtf8("QLabel {\n"
 "    color: rgba(255, 255, 255, 0.9);\n"
-"    font-size: 16px;\n"
+"    font-size: 14px;\n"
 "    font-family: 'Segoe UI', Arial, sans-serif;\n"
 "}"));
         descriptionLabel->setAlignment(Qt::AlignCenter);
@@ -540,6 +578,8 @@ public:
         leRegUsername->setPlaceholderText(QCoreApplication::translate("LoginDialog", "Choisissez un nom d'utilisateur", nullptr));
         lblRegPassword->setText(QCoreApplication::translate("LoginDialog", "Mot de passe:", nullptr));
         leRegPassword->setPlaceholderText(QCoreApplication::translate("LoginDialog", "Choisissez un mot de passe", nullptr));
+        lblRegConfirmPassword->setText(QCoreApplication::translate("LoginDialog", "Confirmer mot de passe:", nullptr));
+        leRegConfirmPassword->setPlaceholderText(QCoreApplication::translate("LoginDialog", "Confirmez votre mot de passe", nullptr));
         lblRegRole->setText(QCoreApplication::translate("LoginDialog", "R\303\264le:", nullptr));
         cbRegRole->setItemText(0, QCoreApplication::translate("LoginDialog", "Administrateur", nullptr));
         cbRegRole->setItemText(1, QCoreApplication::translate("LoginDialog", "Gestionnaire logistique", nullptr));

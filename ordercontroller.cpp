@@ -28,6 +28,7 @@ void OrderController::setupUi() {
     connect(ui->btnDelOrd, &QPushButton::clicked, this, &OrderController::deleteOrder);
     connect(ui->btnRefOrd, &QPushButton::clicked, this, &OrderController::refreshOrders);
     connect(ui->btnPdfOrd, &QPushButton::clicked, this, &OrderController::exportToPdf);
+    connect(ui->btnOrderStats, &QPushButton::clicked, this, &OrderController::showStats);
 
     // Connect filter signals
     connect(ui->leSearchOrder, &QLineEdit::textChanged, this, &OrderController::applyFilters);
