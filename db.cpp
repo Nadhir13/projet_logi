@@ -1,6 +1,7 @@
 #include "db.h"
 #include <QSqlDatabase>
 #include <QSqlError>
+#include <QMessageBox>
 
 Db& Db::instance() {
     static Db i;
@@ -14,14 +15,17 @@ bool Db::open(const QString& host, int port, const QString& sid,
     } else {
         m_db = QSqlDatabase::database("oracle_conn");
     }
+
     m_db.setHostName(host);
     m_db.setPort(port);
-    m_db.setDatabaseName(sid); // XE
+    m_db.setDatabaseName(sid);
     m_db.setUserName(user);
     m_db.setPassword(pass);
+
     if (!m_db.open()) {
         m_lastErr = m_db.lastError().text();
         return false;
     }
+
     return true;
 }

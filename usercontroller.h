@@ -1,8 +1,10 @@
 #pragma once
 
 #include <QObject>
+#include "user.h"
+#include "userdao.h"
 
-class MainWindow;
+class MainWindow; // Forward declaration
 
 class UserController : public QObject
 {
@@ -10,6 +12,8 @@ class UserController : public QObject
 
 public:
     explicit UserController(MainWindow* mainWindow, QObject* parent = nullptr);
+    ~UserController();
+
     void setupUi();
     void loadUsersTable();
     void applyFilters();
@@ -23,8 +27,14 @@ public slots:
     void changePassword();
     void cancelEdit();
     void switchToEditMode();
+    void onUserTableSelectionChanged();
 
 private:
+    void populateFormWithSelectedUser();
+    bool validateForm(bool isNewUser = false);
+
     MainWindow* m_mainWindow;
-    bool validateForm();
+    UserDao m_dao;
+    int m_selectedUserId = -1;
+    bool m_isEditMode = false;
 };

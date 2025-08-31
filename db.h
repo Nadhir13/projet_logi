@@ -11,6 +11,7 @@ public:
               const QString& user, const QString& pass);
     QSqlDatabase conn() const { return m_db; }
     QString lastError() const { return m_lastErr; }
+    bool isOpen() const { return m_db.isOpen(); }
 
 private:
     Db() = default;

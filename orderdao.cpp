@@ -2,23 +2,35 @@
 #include "db.h"
 #include <QSqlQuery>
 #include <QSqlError>
+#include <QDebug>
+#include <QDate>
+
+OrderDao::OrderDao() {
+    m_db = Db::instance().conn();
+}
 
 bool OrderDao::add(const Order& o) {
-    QSqlQuery q(Db::instance().conn());
+    QSqlQuery q(m_db);
     q.prepare(R"(INSERT INTO COMMANDE (ID_CLIENT, ETAT, MONTANT, ADRESSE_LIVRAISON, PRIORITY, ESTIMATED_DELIVERY)
-                 VALUES (:c,:e,:m,:a,:p,:ed))");
+                 VALUES (:c, :e, :m, :a, :p, :ed))");
     q.bindValue(":c", o.clientId);
     q.bindValue(":e", o.etat);
     q.bindValue(":m", o.montant);
     q.bindValue(":a", o.adrLiv);
     q.bindValue(":p", o.priority);
     q.bindValue(":ed", o.estimatedDelivery);
-    return q.exec();
+
+    bool success = q.exec();
+    if (!success) {
+        qDebug() << "OrderDao::add error:" << q.lastError().text();
+    }
+    return success;
 }
 
-bool OrderDao::upd(const Order& o) {
-    QSqlQuery q(Db::instance().conn());
-    q.prepare(R"(UPDATE COMMANDE SET ID_CLIENT=:c, ETAT=:e, MONTANT=:m, ADRESSE_LIVRAISON=:a, PRIORITY=:p, ESTIMATED_DELIVERY=:ed
+bool OrderDao::update(const Order& o) {
+    QSqlQuery q(m_db);
+    q.prepare(R"(UPDATE COMMANDE SET ID_CLIENT=:c, ETAT=:e, MONTANT=:m,
+                 ADRESSE_LIVRAISON=:a, PRIORITY=:p, ESTIMATED_DELIVERY=:ed
                  WHERE ID_COMMANDE=:id)");
     q.bindValue(":c", o.clientId);
     q.bindValue(":e", o.etat);
@@ -27,61 +39,75 @@ bool OrderDao::upd(const Order& o) {
     q.bindValue(":p", o.priority);
     q.bindValue(":ed", o.estimatedDelivery);
     q.bindValue(":id", o.id);
-    return q.exec();
+
+    bool success = q.exec();
+    if (!success) {
+        qDebug() << "OrderDao::update error:" << q.lastError().text();
+    }
+    return success;
 }
 
-bool OrderDao::del(int id) {
-    QSqlQuery q(Db::instance().conn());
+bool OrderDao::remove(int id) {
+    QSqlQuery q(m_db);
     q.prepare("DELETE FROM COMMANDE WHERE ID_COMMANDE=:id");
     q.bindValue(":id", id);
-    return q.exec();
+
+    bool success = q.exec();
+    if (!success) {
+        qDebug() << "OrderDao::remove error:" << q.lastError().text();
+    }
+    return success;
 }
 
-std::optional<Order> OrderDao::byId(int id) {
-    QSqlQuery q(Db::instance().conn());
-    q.prepare("SELECT ID_COMMANDE,ID_CLIENT,DATE_COMMANDE,ETAT,MONTANT,ADRESSE_LIVRAISON,PRIORITY,ESTIMATED_DELIVERY FROM COMMANDE WHERE ID_COMMANDE=:id");
+std::optional<Order> OrderDao::getById(int id) {
+    QSqlQuery q(m_db);
+    q.prepare("SELECT ID_COMMANDE, ID_CLIENT, DATE_COMMANDE, ETAT, MONTANT, ADRESSE_LIVRAISON, PRIORITY, ESTIMATED_DELIVERY FROM COMMANDE WHERE ID_COMMANDE=:id");
     q.bindValue(":id", id);
+
     if (q.exec() && q.next()) {
         Order o;
-        o.id      = q.value(0).toInt();
-        o.clientId= q.value(1).toInt();
-        o.date    = q.value(2).toDate();
-        o.etat    = q.value(3).toString();
+        o.id = q.value(0).toInt();
+        o.clientId = q.value(1).toInt();
+        o.date = q.value(2).toDate();
+        o.etat = q.value(3).toString();
         o.montant = q.value(4).toDouble();
-        o.adrLiv  = q.value(5).toString();
+        o.adrLiv = q.value(5).toString();
         o.priority = q.value(6).toString();
         o.estimatedDelivery = q.value(7).toDate();
         return o;
     }
+
+    qDebug() << "OrderDao::getById error:" << q.lastError().text();
     return std::nullopt;
 }
 
-QVector<Order> OrderDao::all() {
-    QVector<Order> v;
-    QSqlQuery q("SELECT ID_COMMANDE,ID_CLIENT,DATE_COMMANDE,ETAT,MONTANT,ADRESSE_LIVRAISON,PRIORITY,ESTIMATED_DELIVERY FROM COMMANDE ORDER BY ID_COMMANDE DESC", Db::instance().conn());
+QVector<Order> OrderDao::getAll() {
+    QVector<Order> orders;
+    QSqlQuery q("SELECT ID_COMMANDE, ID_CLIENT, DATE_COMMANDE, ETAT, MONTANT, ADRESSE_LIVRAISON, PRIORITY, ESTIMATED_DELIVERY FROM COMMANDE ORDER BY ID_COMMANDE DESC", m_db);
+
     if (q.exec()) {
         while (q.next()) {
             Order o;
-            o.id      = q.value(0).toInt();
-            o.clientId= q.value(1).toInt();
-            o.date    = q.value(2).toDate();
-            o.etat    = q.value(3).toString();
+            o.id = q.value(0).toInt();
+            o.clientId = q.value(1).toInt();
+            o.date = q.value(2).toDate();
+            o.etat = q.value(3).toString();
             o.montant = q.value(4).toDouble();
-            o.adrLiv  = q.value(5).toString();
+            o.adrLiv = q.value(5).toString();
             o.priority = q.value(6).toString();
             o.estimatedDelivery = q.value(7).toDate();
-            v.push_back(o);
+            orders.append(o);
         }
+    } else {
+        qDebug() << "OrderDao::getAll error:" << q.lastError().text();
     }
-    return v;
+
+    return orders;
 }
 
-QVector<Order> OrderDao::search(int clientId,
-                                const QString& statusFilter,
-                                double minAmount,
-                                double maxAmount) {
-    QVector<Order> v;
-    QString queryStr = "SELECT ID_COMMANDE,ID_CLIENT,DATE_COMMANDE,ETAT,MONTANT,ADRESSE_LIVRAISON,PRIORITY,ESTIMATED_DELIVERY FROM COMMANDE WHERE 1=1";
+QVector<Order> OrderDao::search(int clientId, const QString& statusFilter, double minAmount, double maxAmount) {
+    QVector<Order> orders;
+    QString queryStr = "SELECT ID_COMMANDE, ID_CLIENT, DATE_COMMANDE, ETAT, MONTANT, ADRESSE_LIVRAISON, PRIORITY, ESTIMATED_DELIVERY FROM COMMANDE WHERE 1=1";
 
     if (clientId > 0) {
         queryStr += " AND ID_CLIENT = :clientId";
@@ -98,7 +124,7 @@ QVector<Order> OrderDao::search(int clientId,
 
     queryStr += " ORDER BY ID_COMMANDE DESC";
 
-    QSqlQuery q(Db::instance().conn());
+    QSqlQuery q(m_db);
     q.prepare(queryStr);
 
     if (clientId > 0) {
@@ -117,43 +143,77 @@ QVector<Order> OrderDao::search(int clientId,
     if (q.exec()) {
         while (q.next()) {
             Order o;
-            o.id      = q.value(0).toInt();
-            o.clientId= q.value(1).toInt();
-            o.date    = q.value(2).toDate();
-            o.etat    = q.value(3).toString();
+            o.id = q.value(0).toInt();
+            o.clientId = q.value(1).toInt();
+            o.date = q.value(2).toDate();
+            o.etat = q.value(3).toString();
             o.montant = q.value(4).toDouble();
-            o.adrLiv  = q.value(5).toString();
+            o.adrLiv = q.value(5).toString();
             o.priority = q.value(6).toString();
             o.estimatedDelivery = q.value(7).toDate();
-            v.push_back(o);
+            orders.append(o);
         }
+    } else {
+        qDebug() << "OrderDao::search error:" << q.lastError().text();
     }
-    return v;
+
+    return orders;
 }
 
 double OrderDao::getTotalRevenue() const {
-    QSqlQuery q("SELECT SUM(MONTANT) FROM COMMANDE WHERE ETAT = 'LIVREE'", Db::instance().conn());
+    QSqlQuery q("SELECT SUM(MONTANT) FROM COMMANDE WHERE ETAT = 'LIVREE'", m_db);
     if (q.exec() && q.next()) {
         return q.value(0).toDouble();
     }
+
+    qDebug() << "OrderDao::getTotalRevenue error:" << q.lastError().text();
     return 0.0;
 }
 
 QVector<QPair<QString, int>> OrderDao::getOrdersByStatus() const {
     QVector<QPair<QString, int>> result;
-    QSqlQuery q("SELECT ETAT, COUNT(*) FROM COMMANDE GROUP BY ETAT", Db::instance().conn());
+    QSqlQuery q("SELECT ETAT, COUNT(*) FROM COMMANDE GROUP BY ETAT", m_db);
+
     if (q.exec()) {
         while (q.next()) {
             result.append(qMakePair(q.value(0).toString(), q.value(1).toInt()));
         }
+    } else {
+        qDebug() << "OrderDao::getOrdersByStatus error:" << q.lastError().text();
     }
+
     return result;
 }
 
-bool OrderDao::updateOrderPriority(int orderId, const QString& priority) {
-    QSqlQuery q(Db::instance().conn());
+bool OrderDao::updatePriority(int orderId, const QString& priority) {
+    QSqlQuery q(m_db);
     q.prepare("UPDATE COMMANDE SET PRIORITY = :priority WHERE ID_COMMANDE = :id");
     q.bindValue(":priority", priority);
     q.bindValue(":id", orderId);
-    return q.exec();
+
+    bool success = q.exec();
+    if (!success) {
+        qDebug() << "OrderDao::updatePriority error:" << q.lastError().text();
+    }
+    return success;
+}
+
+bool OrderDao::autoUpdatePriorities() {
+    QSqlQuery q(m_db);
+    q.prepare(R"(
+        UPDATE COMMANDE
+        SET PRIORITY = CASE
+            WHEN MONTANT > 500 THEN 'URGENT'
+            WHEN MONTANT > 200 THEN 'HIGH'
+            WHEN MONTANT > 50 THEN 'NORMAL'
+            ELSE 'LOW'
+        END
+        WHERE ETAT IN ('EN_ATTENTE', 'EN_COURS')
+    )");
+
+    bool success = q.exec();
+    if (!success) {
+        qDebug() << "OrderDao::autoUpdatePriorities error:" << q.lastError().text();
+    }
+    return success;
 }

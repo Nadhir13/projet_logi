@@ -109,13 +109,12 @@ void LoginDialog::showRegisterForm()
     ui->stackedWidget->setCurrentIndex(1);
     ui->leRegUsername->clear();
     ui->leRegPassword->clear();
+    ui->leRegConfirmPassword->clear();
     ui->cbRegRole->setCurrentIndex(0);
     ui->leRegUsername->setFocus();
     ui->titleLabel->setText("Création de Compte");
     ui->subtitleLabel->setText("Créez votre nouveau compte");
 }
-
-
 
 void LoginDialog::onLoginClicked()
 {
@@ -137,7 +136,7 @@ void LoginDialog::onLoginClicked()
         m_userId = query.value(0).toInt();
         m_username = query.value(1).toString();
         m_role = query.value(2).toString();
-        
+
         // Fade out and accept
         connect(m_fadeOutAnimation, &QPropertyAnimation::finished, this, &QDialog::accept);
         m_fadeOutAnimation->start();
@@ -177,7 +176,7 @@ void LoginDialog::onRegisterClicked()
     QSqlQuery checkQuery(Db::instance().conn());
     checkQuery.prepare("SELECT COUNT(*) FROM USERS WHERE USERNAME = :username");
     checkQuery.bindValue(":username", username);
-    
+
     if (checkQuery.exec() && checkQuery.next() && checkQuery.value(0).toInt() > 0) {
         QMessageBox::warning(this, "Erreur", "Ce nom d'utilisateur existe déjà.");
         ui->leRegUsername->setFocus();
@@ -193,13 +192,13 @@ void LoginDialog::onRegisterClicked()
 
     if (insertQuery.exec()) {
         QMessageBox::information(this, "Succès", "Compte créé avec succès! Vous pouvez maintenant vous connecter.");
-        
+
         // Clear form and switch to login
         ui->leRegUsername->clear();
         ui->leRegPassword->clear();
         ui->leRegConfirmPassword->clear();
         ui->cbRegRole->setCurrentIndex(0);
-        
+
         onSwitchToLoginClicked();
     } else {
         QMessageBox::critical(this, "Erreur", "Erreur lors de la création du compte: " + insertQuery.lastError().text());

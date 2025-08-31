@@ -12,6 +12,8 @@ class OrderController : public QObject
 
 public:
     explicit OrderController(MainWindow* mainWindow, QObject* parent = nullptr);
+    ~OrderController();
+
     void setupUi();
     void loadOrdersTable();
     void applyFilters();
@@ -25,9 +27,14 @@ public slots:
     void exportToPdf();
     void showStats();
     void updateOrderPriority();
+    void autoUpdatePriorities();
+    void onOrderTableSelectionChanged();
 
 private:
+    void populateFormWithSelectedOrder();
+    bool validateForm();
+
     MainWindow* m_mainWindow;
     OrderDao m_dao;
-    bool validateForm();
+    int m_selectedOrderId = -1;
 };

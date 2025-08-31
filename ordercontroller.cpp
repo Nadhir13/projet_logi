@@ -19,6 +19,8 @@ OrderController::OrderController(MainWindow* mainWindow, QObject* parent)
     : QObject(parent), m_mainWindow(mainWindow)
 {}
 
+OrderController::~OrderController() {}
+
 void OrderController::setupUi() {
     Ui::MainWindow* ui = m_mainWindow->getUi();
 
@@ -29,6 +31,7 @@ void OrderController::setupUi() {
     connect(ui->btnRefOrd, &QPushButton::clicked, this, &OrderController::refreshOrders);
     connect(ui->btnPdfOrd, &QPushButton::clicked, this, &OrderController::exportToPdf);
     connect(ui->btnOrderStats, &QPushButton::clicked, this, &OrderController::showStats);
+    connect(ui->btnUpdatePriority, &QPushButton::clicked, this, &OrderController::autoUpdatePriorities);
 
     // Connect filter signals
     connect(ui->leSearchOrder, &QLineEdit::textChanged, this, &OrderController::applyFilters);
@@ -38,10 +41,66 @@ void OrderController::setupUi() {
     connect(ui->dsMaxAmount, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &OrderController::applyFilters);
     connect(ui->cbOrderSort, &QComboBox::currentTextChanged, this, &OrderController::applyFilters);
 
+    // Connect table selection changed
+    connect(ui->tblOrders, &QTableWidget::itemSelectionChanged, this, &OrderController::onOrderTableSelectionChanged);
+
     // Set tooltips
     ui->leSearchOrder->setToolTip("Recherche par état et adresse");
     ui->dsMinAmount->setToolTip("Montant minimum");
     ui->dsMaxAmount->setToolTip("Montant maximum");
+}
+
+void OrderController::onOrderTableSelectionChanged() {
+    populateFormWithSelectedOrder();
+}
+
+void OrderController::populateFormWithSelectedOrder() {
+    Ui::MainWindow* ui = m_mainWindow->getUi();
+    auto items = ui->tblOrders->selectedItems();
+
+    if (items.isEmpty()) {
+        // Clear form if no selection
+        ui->cbClient->setCurrentIndex(0);
+        ui->cbEtat->setCurrentIndex(0);
+        ui->dsMontant->setValue(0);
+        ui->leAdrLiv->clear();
+        ui->cbPriority->setCurrentIndex(1); // NORMAL
+        m_selectedOrderId = -1;
+        return;
+    }
+
+    int row = items.first()->row();
+    int id = ui->tblOrders->item(row, 0)->text().toInt();
+    m_selectedOrderId = id;
+
+    auto orderOpt = m_dao.getById(id);
+    if (!orderOpt.has_value()) {
+        QMessageBox::warning(m_mainWindow, "Commande", "Commande non trouvée");
+        return;
+    }
+
+    Order o = orderOpt.value();
+
+    // Set client in combo box
+    int clientIndex = ui->cbClient->findData(o.clientId);
+    if (clientIndex >= 0) {
+        ui->cbClient->setCurrentIndex(clientIndex);
+    }
+
+    // Set status in combo box
+    int statusIndex = ui->cbEtat->findText(o.etat);
+    if (statusIndex >= 0) {
+        ui->cbEtat->setCurrentIndex(statusIndex);
+    }
+
+    ui->dsMontant->setValue(o.montant);
+    ui->leAdrLiv->setText(o.adrLiv);
+
+    // Set priority in combo box
+    int priorityIndex = ui->cbPriority->findText(o.priority);
+    if (priorityIndex >= 0) {
+        ui->cbPriority->setCurrentIndex(priorityIndex);
+    }
 }
 
 void OrderController::addOrder() {
@@ -54,6 +113,7 @@ void OrderController::addOrder() {
     o.montant = ui->dsMontant->value();
     o.adrLiv = ui->leAdrLiv->text();
     o.priority = ui->cbPriority->currentText();
+
     if (!m_dao.add(o)) {
         QMessageBox::warning(m_mainWindow, "Commande", "Échec de l'ajout: " + Db::instance().lastError());
     }
@@ -61,17 +121,15 @@ void OrderController::addOrder() {
 }
 
 void OrderController::updateOrder() {
-    Ui::MainWindow* ui = m_mainWindow->getUi();
-    auto items = ui->tblOrders->selectedItems();
-    if (items.isEmpty()) {
+    if (m_selectedOrderId == -1) {
         QMessageBox::warning(m_mainWindow, "Commande", "Veuillez sélectionner une commande à modifier");
         return;
     }
 
-    int row = items.first()->row();
-    int id = ui->tblOrders->item(row, 0)->text().toInt();
+    Ui::MainWindow* ui = m_mainWindow->getUi();
+    if (!validateForm()) return;
 
-    auto orderOpt = m_dao.byId(id);
+    auto orderOpt = m_dao.getById(m_selectedOrderId);
     if (!orderOpt.has_value()) {
         QMessageBox::warning(m_mainWindow, "Commande", "Commande non trouvée");
         return;
@@ -84,7 +142,7 @@ void OrderController::updateOrder() {
     o.adrLiv = ui->leAdrLiv->text();
     o.priority = ui->cbPriority->currentText();
 
-    if (!m_dao.upd(o)) {
+    if (!m_dao.update(o)) {
         QMessageBox::warning(m_mainWindow, "Commande", "Échec de la modification: " + Db::instance().lastError());
     } else {
         QMessageBox::information(m_mainWindow, "Commande", "Commande modifiée avec succès");
@@ -93,16 +151,22 @@ void OrderController::updateOrder() {
 }
 
 void OrderController::deleteOrder() {
-    Ui::MainWindow* ui = m_mainWindow->getUi();
-    auto items = ui->tblOrders->selectedItems();
-    if (items.isEmpty()) return;
-    int row = items.first()->row();
-    int id = ui->tblOrders->item(row, 0)->text().toInt();
-
-    if (!m_dao.del(id)) {
-        QMessageBox::warning(m_mainWindow, "Commande", "Échec de la suppression: " + Db::instance().lastError());
+    if (m_selectedOrderId == -1) {
+        QMessageBox::warning(m_mainWindow, "Commande", "Veuillez sélectionner une commande à supprimer");
+        return;
     }
-    refreshOrders();
+
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(m_mainWindow, "Confirmation",
+                                  "Êtes-vous sûr de vouloir supprimer cette commande?",
+                                  QMessageBox::Yes | QMessageBox::No);
+
+    if (reply == QMessageBox::Yes) {
+        if (!m_dao.remove(m_selectedOrderId)) {
+            QMessageBox::warning(m_mainWindow, "Commande", "Échec de la suppression: " + Db::instance().lastError());
+        }
+        refreshOrders();
+    }
 }
 
 void OrderController::refreshOrders() {
@@ -111,24 +175,34 @@ void OrderController::refreshOrders() {
 
 void OrderController::loadOrdersTable() {
     Ui::MainWindow* ui = m_mainWindow->getUi();
-    auto v = m_dao.all();
+    auto orders = m_dao.getAll();
+
     ui->tblOrders->clearContents();
-    ui->tblOrders->setRowCount(v.size());
+    ui->tblOrders->setRowCount(orders.size());
     ui->tblOrders->setColumnCount(8);
-    QStringList headers = {"ID","Client ID","Date","État","Montant","Adresse Livraison","Priorité","Livraison Estimée"};
+
+    QStringList headers = {"ID", "Client ID", "Date", "État", "Montant", "Adresse Livraison", "Priorité", "Livraison Estimée"};
     ui->tblOrders->setHorizontalHeaderLabels(headers);
     ui->tblOrders->horizontalHeader()->setStretchLastSection(true);
-    for (int i=0;i<v.size();++i) {
-        const auto &o = v[i];
-        ui->tblOrders->setItem(i,0,new QTableWidgetItem(QString::number(o.id)));
-        ui->tblOrders->setItem(i,1,new QTableWidgetItem(QString::number(o.clientId)));
-        ui->tblOrders->setItem(i,2,new QTableWidgetItem(o.date.toString("yyyy-MM-dd")));
-        ui->tblOrders->setItem(i,3,new QTableWidgetItem(o.etat));
-        ui->tblOrders->setItem(i,4,new QTableWidgetItem(QString::number(o.montant, 'f', 3)));
-        ui->tblOrders->setItem(i,5,new QTableWidgetItem(o.adrLiv));
-        ui->tblOrders->setItem(i,6,new QTableWidgetItem(o.priority));
-        ui->tblOrders->setItem(i,7,new QTableWidgetItem(o.estimatedDelivery.toString("yyyy-MM-dd")));
+
+    for (int i = 0; i < orders.size(); ++i) {
+        const auto &o = orders[i];
+
+        ui->tblOrders->setItem(i, 0, new QTableWidgetItem(QString::number(o.id)));
+        ui->tblOrders->setItem(i, 1, new QTableWidgetItem(QString::number(o.clientId)));
+        ui->tblOrders->setItem(i, 2, new QTableWidgetItem(o.date.toString("yyyy-MM-dd")));
+        ui->tblOrders->setItem(i, 3, new QTableWidgetItem(o.statusText()));
+        ui->tblOrders->setItem(i, 4, new QTableWidgetItem(QString::number(o.montant, 'f', 3)));
+        ui->tblOrders->setItem(i, 5, new QTableWidgetItem(o.adrLiv));
+        ui->tblOrders->setItem(i, 6, new QTableWidgetItem(o.priority));
+
+        QTableWidgetItem* deliveryItem = new QTableWidgetItem();
+        if (o.estimatedDelivery.isValid()) {
+            deliveryItem->setText(o.estimatedDelivery.toString("yyyy-MM-dd"));
+        }
+        ui->tblOrders->setItem(i, 7, deliveryItem);
     }
+
     applyFilters();
     updateChart();
 }
@@ -142,39 +216,47 @@ void OrderController::applyFilters() {
     double maxAmount = ui->dsMaxAmount->value();
     QString sortKey = ui->cbOrderSort->currentText();
 
-    for (int r=0; r<ui->tblOrders->rowCount(); ++r) ui->tblOrders->setRowHidden(r, false);
+    for (int r = 0; r < ui->tblOrders->rowCount(); ++r) {
+        ui->tblOrders->setRowHidden(r, false);
+    }
 
-    for (int r=0; r<ui->tblOrders->rowCount(); ++r) {
+    for (int r = 0; r < ui->tblOrders->rowCount(); ++r) {
         bool match = true;
 
         // Text search (état, adresse)
         if (!text.isEmpty()) {
-            QString rowText = ui->tblOrders->item(r,3)->text() + " " + ui->tblOrders->item(r,5)->text();
+            QString rowText = ui->tblOrders->item(r, 3)->text() + " " + ui->tblOrders->item(r, 5)->text();
             match &= rowText.contains(text, Qt::CaseInsensitive);
         }
 
         // Client filter
         if (clientId > 0) {
-            int rowClientId = ui->tblOrders->item(r,1)->text().toInt();
+            int rowClientId = ui->tblOrders->item(r, 1)->text().toInt();
             match &= (rowClientId == clientId);
         }
 
         // Status filter
         if (etat != "Tous") {
-            match &= ui->tblOrders->item(r,3)->text() == etat;
+            match &= ui->tblOrders->item(r, 3)->text() == etat;
         }
 
         // Amount range filter
-        double amount = ui->tblOrders->item(r,4)->text().toDouble();
+        double amount = ui->tblOrders->item(r, 4)->text().toDouble();
         if (minAmount > 0) match &= (amount >= minAmount);
         if (maxAmount > 0) match &= (amount <= maxAmount);
 
-        if (!match) ui->tblOrders->setRowHidden(r, true);
+        if (!match) {
+            ui->tblOrders->setRowHidden(r, true);
+        }
     }
 
-    if (sortKey == "Date") ui->tblOrders->sortItems(2);
-    else if (sortKey == "Montant") ui->tblOrders->sortItems(4);
-    else if (sortKey == "État") ui->tblOrders->sortItems(3);
+    if (sortKey == "Date") {
+        ui->tblOrders->sortItems(2);
+    } else if (sortKey == "Montant") {
+        ui->tblOrders->sortItems(4);
+    } else if (sortKey == "État") {
+        ui->tblOrders->sortItems(3);
+    }
 }
 
 void OrderController::updateChart() {
@@ -212,20 +294,17 @@ void OrderController::updateChart() {
 }
 
 void OrderController::exportToPdf() {
-    Ui::MainWindow* ui = m_mainWindow->getUi();
-    auto items = ui->tblOrders->selectedItems();
-    if (items.isEmpty()) {
+    if (m_selectedOrderId == -1) {
         QMessageBox::warning(m_mainWindow, "PDF", "Veuillez sélectionner une commande.");
         return;
     }
-    int row = items.first()->row();
-    int id = ui->tblOrders->item(row, 0)->text().toInt();
 
-    auto orderOpt = m_dao.byId(id);
+    auto orderOpt = m_dao.getById(m_selectedOrderId);
     if (!orderOpt.has_value()) {
         QMessageBox::warning(m_mainWindow, "PDF", "Commande introuvable.");
         return;
     }
+
     Order o = orderOpt.value();
 
     QString defaultName = QString("commande_%1.pdf").arg(o.id);
@@ -236,6 +315,7 @@ void OrderController::exportToPdf() {
     writer.setPageSize(QPageSize(QPageSize::A4));
     writer.setResolution(300);
     QPainter painter(&writer);
+
     if (!painter.isActive()) {
         QMessageBox::warning(m_mainWindow, "PDF", "Impossible de créer le PDF.");
         return;
@@ -259,10 +339,11 @@ void OrderController::exportToPdf() {
 
     painter.drawText(x, y, QString("Date: %1").arg(o.date.toString("yyyy-MM-dd"))); y += line;
     painter.drawText(x, y, QString("Client ID: %1").arg(o.clientId)); y += line;
-    painter.drawText(x, y, QString("État: %1").arg(o.etat)); y += line;
+    painter.drawText(x, y, QString("État: %1").arg(o.statusText())); y += line;
     painter.drawText(x, y, QString("Montant: %1 DT").arg(QString::number(o.montant, 'f', 3))); y += line;
     painter.drawText(x, y, QString("Adresse de livraison: %1").arg(o.adrLiv)); y += line;
     painter.drawText(x, y, QString("Priorité: %1").arg(o.priority)); y += line;
+
     if (o.estimatedDelivery.isValid()) {
         painter.drawText(x, y, QString("Livraison estimée: %1").arg(o.estimatedDelivery.toString("yyyy-MM-dd"))); y += line;
     }
@@ -287,15 +368,10 @@ void OrderController::showStats() {
 }
 
 void OrderController::updateOrderPriority() {
-    Ui::MainWindow* ui = m_mainWindow->getUi();
-    auto items = ui->tblOrders->selectedItems();
-    if (items.isEmpty()) {
+    if (m_selectedOrderId == -1) {
         QMessageBox::warning(m_mainWindow, "Priorité", "Veuillez sélectionner une commande");
         return;
     }
-
-    int row = items.first()->row();
-    int id = ui->tblOrders->item(row, 0)->text().toInt();
 
     QStringList priorities = {"LOW", "NORMAL", "HIGH", "URGENT"};
     QString priority = QInputDialog::getItem(m_mainWindow, "Priorité commande",
@@ -303,11 +379,27 @@ void OrderController::updateOrderPriority() {
 
     if (priority.isEmpty()) return;
 
-    if (m_dao.updateOrderPriority(id, priority)) {
+    if (m_dao.updatePriority(m_selectedOrderId, priority)) {
         QMessageBox::information(m_mainWindow, "Priorité", "Priorité mise à jour avec succès");
         refreshOrders();
     } else {
         QMessageBox::warning(m_mainWindow, "Priorité", "Échec de la mise à jour");
+    }
+}
+
+void OrderController::autoUpdatePriorities() {
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(m_mainWindow, "Mise à jour automatique des priorités",
+                                  "Êtes-vous sûr de vouloir mettre à jour automatiquement les priorités de toutes les commandes?",
+                                  QMessageBox::Yes | QMessageBox::No);
+
+    if (reply == QMessageBox::Yes) {
+        if (m_dao.autoUpdatePriorities()) {
+            QMessageBox::information(m_mainWindow, "Priorités", "Priorités mises à jour automatiquement avec succès");
+            refreshOrders();
+        } else {
+            QMessageBox::warning(m_mainWindow, "Priorités", "Échec de la mise à jour automatique");
+        }
     }
 }
 
@@ -325,6 +417,8 @@ bool OrderController::validateForm() {
     }
     if (ui->leAdrLiv->text().isEmpty()) {
         QMessageBox::warning(m_mainWindow, "Validation", "L'adresse de livraison est obligatoire");
+        ui->leAdrLiv->setFocus();
+        return false;
     }
     return true;
 }

@@ -13,4 +13,8 @@ struct Client {
     QDate created = QDate::currentDate();
     QString category = "REGULAR";
     int totalOrders = 0;
+
+    // Helper methods
+    QString fullName() const { return nom + " " + prenom; }
+    bool isValid() const { return !nom.isEmpty() && !prenom.isEmpty(); }
 };

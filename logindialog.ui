@@ -19,10 +19,6 @@
   <property name="windowTitle">
    <string>Système de Gestion Logistique - Connexion</string>
   </property>
-  <property name="windowIcon">
-   <iconset>
-    <normaloff>:/icons/app_icon.png</normaloff>:/icons/app_icon.png</iconset>
-  </property>
   <property name="styleSheet">
    <string notr="true">QDialog {
     background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
@@ -93,21 +89,18 @@
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap>:/icons/logo.png</pixmap>
+         <pixmap resource="resources/resources.qrc">:/icons/logo.png</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
         </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignmentFlag::AlignCenter</set>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QLabel" name="titleLabel">
-        <property name="text">
-         <string>Système de Gestion Logistique</string>
-        </property>
         <property name="styleSheet">
          <string notr="true">QLabel {
     color: #2d3748;
@@ -116,16 +109,16 @@
     font-family: 'Segoe UI', Arial, sans-serif;
 }</string>
         </property>
+        <property name="text">
+         <string>Système de Gestion Logistique</string>
+        </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignmentFlag::AlignCenter</set>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QLabel" name="subtitleLabel">
-        <property name="text">
-         <string>Connectez-vous à votre compte</string>
-        </property>
         <property name="styleSheet">
          <string notr="true">QLabel {
     color: #718096;
@@ -133,15 +126,18 @@
     font-family: 'Segoe UI', Arial, sans-serif;
 }</string>
         </property>
+        <property name="text">
+         <string>Connectez-vous à votre compte</string>
+        </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignmentFlag::AlignCenter</set>
         </property>
        </widget>
       </item>
       <item>
        <spacer name="verticalSpacerTop">
         <property name="orientation">
-         <enum>Qt::Vertical</enum>
+         <enum>Qt::Orientation::Vertical</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -171,9 +167,6 @@
             </property>
             <item row="0" column="0">
              <widget class="QLabel" name="lblUsername">
-              <property name="text">
-               <string>Identifiant:</string>
-              </property>
               <property name="styleSheet">
                <string notr="true">QLabel {
     color: #4a5568;
@@ -182,8 +175,11 @@
     font-family: 'Segoe UI', Arial, sans-serif;
 }</string>
               </property>
+              <property name="text">
+               <string>Identifiant:</string>
+              </property>
               <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
               </property>
              </widget>
             </item>
@@ -221,9 +217,6 @@ QLineEdit::placeholder {
             </item>
             <item row="1" column="0">
              <widget class="QLabel" name="lblPassword">
-              <property name="text">
-               <string>Mot de passe:</string>
-              </property>
               <property name="styleSheet">
                <string notr="true">QLabel {
     color: #4a5568;
@@ -232,8 +225,11 @@ QLineEdit::placeholder {
     font-family: 'Segoe UI', Arial, sans-serif;
 }</string>
               </property>
+              <property name="text">
+               <string>Mot de passe:</string>
+              </property>
               <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
               </property>
              </widget>
             </item>
@@ -244,9 +240,6 @@ QLineEdit::placeholder {
                 <width>200</width>
                 <height>40</height>
                </size>
-              </property>
-              <property name="echoMode">
-               <enum>QLineEdit::Password</enum>
               </property>
               <property name="styleSheet">
                <string notr="true">QLineEdit {
@@ -267,6 +260,9 @@ QLineEdit::placeholder {
     color: #a0aec0;
 }</string>
               </property>
+              <property name="echoMode">
+               <enum>QLineEdit::EchoMode::Password</enum>
+              </property>
               <property name="placeholderText">
                <string>Entrez votre mot de passe</string>
               </property>
@@ -281,9 +277,6 @@ QLineEdit::placeholder {
               <width>0</width>
               <height>45</height>
              </size>
-            </property>
-            <property name="text">
-             <string>Se connecter</string>
             </property>
             <property name="styleSheet">
              <string notr="true">QPushButton {
@@ -313,16 +306,13 @@ QPushButton:disabled {
     color: #e2e8f0;
 }</string>
             </property>
-            <property name="cursor">
-             <enum>Qt::PointingHandCursor</enum>
+            <property name="text">
+             <string>Se connecter</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QPushButton" name="btnSwitchToRegister">
-            <property name="text">
-             <string>Créer un nouveau compte</string>
-            </property>
             <property name="styleSheet">
              <string notr="true">QPushButton {
     background: transparent;
@@ -341,8 +331,8 @@ QPushButton:hover {
     color: #2d3748;
 }</string>
             </property>
-            <property name="cursor">
-             <enum>Qt::PointingHandCursor</enum>
+            <property name="text">
+             <string>Créer un nouveau compte</string>
             </property>
            </widget>
           </item>
@@ -363,9 +353,6 @@ QPushButton:hover {
             </property>
             <item row="0" column="0">
              <widget class="QLabel" name="lblRegUsername">
-              <property name="text">
-               <string>Identifiant:</string>
-              </property>
               <property name="styleSheet">
                <string notr="true">QLabel {
     color: #4a5568;
@@ -374,8 +361,11 @@ QPushButton:hover {
     font-family: 'Segoe UI', Arial, sans-serif;
 }</string>
               </property>
+              <property name="text">
+               <string>Identifiant:</string>
+              </property>
               <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
               </property>
              </widget>
             </item>
@@ -413,9 +403,6 @@ QLineEdit::placeholder {
             </item>
             <item row="1" column="0">
              <widget class="QLabel" name="lblRegPassword">
-              <property name="text">
-               <string>Mot de passe:</string>
-              </property>
               <property name="styleSheet">
                <string notr="true">QLabel {
     color: #4a5568;
@@ -424,8 +411,11 @@ QLineEdit::placeholder {
     font-family: 'Segoe UI', Arial, sans-serif;
 }</string>
               </property>
+              <property name="text">
+               <string>Mot de passe:</string>
+              </property>
               <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
               </property>
              </widget>
             </item>
@@ -437,9 +427,6 @@ QLineEdit::placeholder {
                 <height>40</height>
                </size>
               </property>
-              <property name="echoMode">
-               <enum>QLineEdit::Password</enum>
-              </property>
               <property name="styleSheet">
                <string notr="true">QLineEdit {
     border: 2px solid #e2e8f0;
@@ -459,6 +446,9 @@ QLineEdit::placeholder {
     color: #a0aec0;
 }</string>
               </property>
+              <property name="echoMode">
+               <enum>QLineEdit::EchoMode::Password</enum>
+              </property>
               <property name="placeholderText">
                <string>Choisissez un mot de passe</string>
               </property>
@@ -466,9 +456,6 @@ QLineEdit::placeholder {
             </item>
             <item row="2" column="0">
              <widget class="QLabel" name="lblRegConfirmPassword">
-              <property name="text">
-               <string>Confirmer mot de passe:</string>
-              </property>
               <property name="styleSheet">
                <string notr="true">QLabel {
     color: #4a5568;
@@ -477,8 +464,11 @@ QLineEdit::placeholder {
     font-family: 'Segoe UI', Arial, sans-serif;
 }</string>
               </property>
+              <property name="text">
+               <string>Confirmer mot de passe:</string>
+              </property>
               <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
               </property>
              </widget>
             </item>
@@ -490,9 +480,6 @@ QLineEdit::placeholder {
                 <height>40</height>
                </size>
               </property>
-              <property name="echoMode">
-               <enum>QLineEdit::Password</enum>
-              </property>
               <property name="styleSheet">
                <string notr="true">QLineEdit {
     border: 2px solid #e2e8f0;
@@ -512,6 +499,9 @@ QLineEdit::placeholder {
     color: #a0aec0;
 }</string>
               </property>
+              <property name="echoMode">
+               <enum>QLineEdit::EchoMode::Password</enum>
+              </property>
               <property name="placeholderText">
                <string>Confirmez votre mot de passe</string>
               </property>
@@ -519,9 +509,6 @@ QLineEdit::placeholder {
             </item>
             <item row="3" column="0">
              <widget class="QLabel" name="lblRegRole">
-              <property name="text">
-               <string>Rôle:</string>
-              </property>
               <property name="styleSheet">
                <string notr="true">QLabel {
     color: #4a5568;
@@ -530,8 +517,11 @@ QLineEdit::placeholder {
     font-family: 'Segoe UI', Arial, sans-serif;
 }</string>
               </property>
+              <property name="text">
+               <string>Rôle:</string>
+              </property>
               <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
               </property>
              </widget>
             </item>
@@ -564,7 +554,7 @@ QComboBox::drop-down {
 }
 
 QComboBox::down-arrow {
-    image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iOCIgdmlld0JveD0iMCAwIDEyIDgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0xIDFMNiA2TDExIDEiIHN0cm9rZT0iIzY5NzM3NyIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+);
+    image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iOCIgdmlld0JveD0iMCAwIDEyIDgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0xIDFMNiA2TDExIDEiIHN0cm9rZT0iIzY5NzM3NyIgc3Ryb2tlLXdpZHRoPSIyIiB3dHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+);
     width: 12px;
     height: 8px;
 }</string>
@@ -596,9 +586,6 @@ QComboBox::down-arrow {
               <height>45</height>
              </size>
             </property>
-            <property name="text">
-             <string>Créer le compte</string>
-            </property>
             <property name="styleSheet">
              <string notr="true">QPushButton {
     background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
@@ -622,16 +609,13 @@ QPushButton:pressed {
                                stop:0 #2f855a, stop:1 #276749);
 }</string>
             </property>
-            <property name="cursor">
-             <enum>Qt::PointingHandCursor</enum>
+            <property name="text">
+             <string>Créer le compte</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QPushButton" name="btnSwitchToLogin">
-            <property name="text">
-             <string>Retour à la connexion</string>
-            </property>
             <property name="styleSheet">
              <string notr="true">QPushButton {
     background: transparent;
@@ -650,8 +634,8 @@ QPushButton:hover {
     color: #2d3748;
 }</string>
             </property>
-            <property name="cursor">
-             <enum>Qt::PointingHandCursor</enum>
+            <property name="text">
+             <string>Retour à la connexion</string>
             </property>
            </widget>
           </item>
@@ -662,7 +646,7 @@ QPushButton:hover {
       <item>
        <spacer name="verticalSpacerBottom">
         <property name="orientation">
-         <enum>Qt::Vertical</enum>
+         <enum>Qt::Orientation::Vertical</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -674,9 +658,6 @@ QPushButton:hover {
       </item>
       <item>
        <widget class="QLabel" name="footerLabel">
-        <property name="text">
-         <string>© 2024 Système de Gestion Logistique. Tous droits réservés.</string>
-        </property>
         <property name="styleSheet">
          <string notr="true">QLabel {
     color: #a0aec0;
@@ -684,8 +665,11 @@ QPushButton:hover {
     font-family: 'Segoe UI', Arial, sans-serif;
 }</string>
         </property>
+        <property name="text">
+         <string>© 2024 Système de Gestion Logistique. Tous droits réservés.</string>
+        </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignmentFlag::AlignCenter</set>
         </property>
        </widget>
       </item>
@@ -706,7 +690,7 @@ QPushButton:hover {
       <item>
        <spacer name="verticalSpacer">
         <property name="orientation">
-         <enum>Qt::Vertical</enum>
+         <enum>Qt::Orientation::Vertical</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -718,9 +702,6 @@ QPushButton:hover {
       </item>
       <item>
        <widget class="QLabel" name="welcomeLabel">
-        <property name="text">
-         <string>Bienvenue dans votre système de gestion logistique</string>
-        </property>
         <property name="styleSheet">
          <string notr="true">QLabel {
     color: white;
@@ -729,16 +710,16 @@ QPushButton:hover {
     font-family: 'Segoe UI', Arial, sans-serif;
 }</string>
         </property>
+        <property name="text">
+         <string>Bienvenue dans votre système de gestion logistique</string>
+        </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignmentFlag::AlignCenter</set>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QLabel" name="descriptionLabel">
-        <property name="text">
-         <string>Gérez vos clients, commandes et utilisateurs avec facilité et efficacité</string>
-        </property>
         <property name="styleSheet">
          <string notr="true">QLabel {
     color: rgba(255, 255, 255, 0.9);
@@ -746,15 +727,18 @@ QPushButton:hover {
     font-family: 'Segoe UI', Arial, sans-serif;
 }</string>
         </property>
+        <property name="text">
+         <string>Gérez vos clients, commandes et utilisateurs avec facilité et efficacité</string>
+        </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignmentFlag::AlignCenter</set>
         </property>
        </widget>
       </item>
       <item>
        <spacer name="verticalSpacer_2">
         <property name="orientation">
-         <enum>Qt::Vertical</enum>
+         <enum>Qt::Orientation::Vertical</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -769,6 +753,8 @@ QPushButton:hover {
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources/resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

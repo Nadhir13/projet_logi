@@ -11,4 +11,14 @@ struct Order {
     QString adrLiv;
     QString priority = "NORMAL";
     QDate estimatedDelivery;
+
+    // Helper methods
+    bool isValid() const { return clientId > 0 && montant > 0 && !adrLiv.isEmpty(); }
+    QString statusText() const {
+        if (etat == "EN_ATTENTE") return "En attente";
+        if (etat == "EN_COURS") return "En cours";
+        if (etat == "LIVREE") return "Livrée";
+        if (etat == "ANNULEE") return "Annulée";
+        return etat;
+    }
 };

@@ -4,7 +4,7 @@
 #include <QAbstractItemView>
 #include <QtCharts>
 
-// Add forward declarations for the controllers
+// Forward declarations for the controllers
 class ClientController;
 class OrderController;
 class UserController;
@@ -19,11 +19,20 @@ public:
     explicit MainWindow(int userId, const QString &username, const QString &role, QWidget *parent = nullptr);
     ~MainWindow();
 
-    // Make the UI accessible to the controllers (e.g., via friend class or getters)
+    // Make the UI accessible to the controllers
     Ui::MainWindow* getUi() const { return ui; }
 
+    // Getters for user information
+    int getUserId() const { return m_userId; }
+    QString getUsername() const { return m_username; }
+    QString getRole() const { return m_role; }
+
+    // Chart views accessible to controllers
+    QChartView* clientChartView = nullptr;
+    QChartView* orderChartView = nullptr;
+    QChartView* userChartView = nullptr;
+
 private slots:
-    // Only general app slots remain here
     void logout();
     void onTabChanged(int index);
 
@@ -32,21 +41,15 @@ private:
     void setupMenuBar();
     void initializeChartViews();
     void setupStatusBar();
-    void applyButtonStyling();
+    void applyAppStyle();
 
     Ui::MainWindow *ui;
     int m_userId;
     QString m_username;
     QString m_role;
 
-    // Add pointers to the controllers
+    // Pointers to the controllers
     ClientController* m_clientController = nullptr;
     OrderController* m_orderController = nullptr;
     UserController* m_userController = nullptr;
-
-public:
-    // Make chart views accessible to controllers
-    QChartView* clientChartView = nullptr;
-    QChartView* orderChartView = nullptr;
-    QChartView* userChartView = nullptr;
 };

@@ -1,21 +1,28 @@
 #pragma once
 #include <QVector>
 #include <optional>
+#include <QSqlDatabase>
 #include "client.h"
 
 class ClientDao {
 public:
+    ClientDao();
+
     bool add(const Client& c);
-    bool upd(const Client& c);
-    bool del(int id);
-    std::optional<Client> byId(int id);
-    QVector<Client> all();
+    bool update(const Client& c);
+    bool remove(int id);
+    std::optional<Client> getById(int id);
+    QVector<Client> getAll();
 
     // Search and business functions
     QVector<Client> search(const QString& nameFilter = "",
                            const QString& statusFilter = "",
                            const QString& emailFilter = "");
-    bool updateClientCategory(int clientId, const QString& category);
+    bool updateCategory(int clientId, const QString& category);
     QVector<Client> getTopClients(int limit = 5);
-    bool autoCategorizeClients();
+    bool autoCategorize();
+    int getOrderCount(int clientId) const;
+
+private:
+    QSqlDatabase m_db;
 };

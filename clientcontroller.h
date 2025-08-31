@@ -12,7 +12,9 @@ class ClientController : public QObject
 
 public:
     explicit ClientController(MainWindow* mainWindow, QObject* parent = nullptr);
-    void setupUi(); // Connects signals/slots and initializes UI state for the client tab
+    ~ClientController();
+
+    void setupUi();
     void loadClientsTable();
     void loadClientsCombo();
     void loadClientFilterCombo();
@@ -28,9 +30,13 @@ public slots:
     void exportToExcel();
     void updateClientCategory();
     void autoCategorizeClients();
+    void onClientTableSelectionChanged();
 
 private:
-    MainWindow* m_mainWindow; // Pointer to the main window for UI access
-    ClientDao m_dao;
+    void populateFormWithSelectedClient();
     bool validateForm();
+
+    MainWindow* m_mainWindow;
+    ClientDao m_dao;
+    int m_selectedClientId = -1;
 };

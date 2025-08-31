@@ -1,6 +1,7 @@
 #include "usercontroller.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "db.h"
 #include <QMessageBox>
 #include <QTableWidget>
 #include <QTableWidgetItem>
@@ -9,106 +10,16 @@
 #include <QInputDialog>
 #include <QColor>
 #include <QtCharts>
-#include <QSqlQuery>
-#include "db.h"
-
-// User structure (copied from mainwindow.cpp)
-struct User {
-    int id = 0;
-    QString username;
-    QString role;
-    QString status;
-    QDate created;
-};
-
-// User DAO class (copied from mainwindow.cpp)
-class UserDao {
-public:
-    static bool add(const QString &username, const QString &password, const QString &role) {
-        QSqlQuery q(Db::instance().conn());
-        q.prepare("INSERT INTO USERS (USERNAME, PASSWORD, ROLE, STATUS) VALUES (:user, :pass, :role, 'ACTIVE')");
-        q.bindValue(":user", username);
-        q.bindValue(":pass", password);
-        q.bindValue(":role", role);
-        return q.exec();
-    }
-
-    static bool update(int userId, const QString &username, const QString &password, const QString &role, const QString &status) {
-        QSqlQuery q(Db::instance().conn());
-        q.prepare("UPDATE USERS SET USERNAME = :user, PASSWORD = :pass, ROLE = :role, STATUS = :status WHERE ID_USER = :id");
-        q.bindValue(":user", username);
-        q.bindValue(":pass", password);
-        q.bindValue(":role", role);
-        q.bindValue(":status", status);
-        q.bindValue(":id", userId);
-        return q.exec();
-    }
-
-    static bool updateWithoutPassword(int userId, const QString &username, const QString &role, const QString &status) {
-        QSqlQuery q(Db::instance().conn());
-        q.prepare("UPDATE USERS SET USERNAME = :user, ROLE = :role, STATUS = :status WHERE ID_USER = :id");
-        q.bindValue(":user", username);
-        q.bindValue(":role", role);
-        q.bindValue(":status", status);
-        q.bindValue(":id", userId);
-        return q.exec();
-    }
-
-    static bool updatePassword(int userId, const QString &password) {
-        QSqlQuery q(Db::instance().conn());
-        q.prepare("UPDATE USERS SET PASSWORD = :pass WHERE ID_USER = :id");
-        q.bindValue(":pass", password);
-        q.bindValue(":id", userId);
-        return q.exec();
-    }
-
-    static bool remove(int userId) {
-        QSqlQuery q(Db::instance().conn());
-        q.prepare("DELETE FROM USERS WHERE ID_USER = :id");
-        q.bindValue(":id", userId);
-        return q.exec();
-    }
-
-    static QVector<User> all() {
-        QVector<User> users;
-        QSqlQuery q("SELECT ID_USER, USERNAME, ROLE, STATUS, DATE_CREATION FROM USERS ORDER BY ID_USER", Db::instance().conn());
-        if (q.exec()) {
-            while (q.next()) {
-                User u;
-                u.id = q.value(0).toInt();
-                u.username = q.value(1).toString();
-                u.role = q.value(2).toString();
-                u.status = q.value(3).toString();
-                u.created = q.value(4).toDate();
-                users.append(u);
-            }
-        }
-        return users;
-    }
-
-    static User getById(int userId) {
-        User u;
-        QSqlQuery q(Db::instance().conn());
-        q.prepare("SELECT ID_USER, USERNAME, ROLE, STATUS, DATE_CREATION FROM USERS WHERE ID_USER = :id");
-        q.bindValue(":id", userId);
-        if (q.exec() && q.next()) {
-            u.id = q.value(0).toInt();
-            u.username = q.value(1).toString();
-            u.role = q.value(2).toString();
-            u.status = q.value(3).toString();
-            u.created = q.value(4).toDate();
-        }
-        return u;
-    }
-};
 
 UserController::UserController(MainWindow* mainWindow, QObject* parent)
     : QObject(parent), m_mainWindow(mainWindow)
 {}
 
+UserController::~UserController() {}
+
 void UserController::setupUi() {
     Ui::MainWindow* ui = m_mainWindow->getUi();
-    
+
     // Connect user-related buttons
     connect(ui->btnAddUser, &QPushButton::clicked, this, &UserController::switchToEditMode);
     connect(ui->btnUpdUser, &QPushButton::clicked, this, &UserController::updateUser);
@@ -116,38 +27,84 @@ void UserController::setupUi() {
     connect(ui->btnRefUser, &QPushButton::clicked, this, &UserController::refreshUsers);
     connect(ui->btnChangePassword, &QPushButton::clicked, this, &UserController::changePassword);
     connect(ui->btnCancelUser, &QPushButton::clicked, this, &UserController::cancelEdit);
-    
+
     // Connect filter signals
     connect(ui->leSearchUser, &QLineEdit::textChanged, this, &UserController::applyFilters);
-    
+    connect(ui->cbUserRoleFilter, &QComboBox::currentTextChanged, this, &UserController::applyFilters);
+    connect(ui->cbUserStatusFilter, &QComboBox::currentTextChanged, this, &UserController::applyFilters);
+    connect(ui->cbUserSort, &QComboBox::currentTextChanged, this, &UserController::applyFilters);
+
+    // Connect table selection changed
+    connect(ui->tblUsers, &QTableWidget::itemSelectionChanged, this, &UserController::onUserTableSelectionChanged);
+
     // Set tooltips
     ui->leSearchUser->setToolTip("Recherche par nom d'utilisateur");
+}
+
+void UserController::onUserTableSelectionChanged() {
+    if (!m_isEditMode) {
+        populateFormWithSelectedUser();
+    }
+}
+
+void UserController::populateFormWithSelectedUser() {
+    Ui::MainWindow* ui = m_mainWindow->getUi();
+    auto items = ui->tblUsers->selectedItems();
+
+    if (items.isEmpty()) {
+        m_selectedUserId = -1;
+        return;
+    }
+
+    int row = items.first()->row();
+    int id = ui->tblUsers->item(row, 0)->text().toInt();
+    m_selectedUserId = id;
 }
 
 void UserController::switchToEditMode() {
     Ui::MainWindow* ui = m_mainWindow->getUi();
     ui->stackedUser->setCurrentIndex(1); // Switch to edit mode
-    ui->leUserUsername->clear();
-    ui->leUserPassword->clear();
-    ui->cbUserRole->setCurrentIndex(0);
-    ui->cbUserStatus->setCurrentIndex(0);
+
+    if (m_selectedUserId == -1) {
+        // New user mode
+        ui->leUserUsername->clear();
+        ui->leUserPassword->clear();
+        ui->cbUserRole->setCurrentIndex(0);
+        ui->cbUserStatus->setCurrentIndex(0);
+        m_isEditMode = false;
+    } else {
+        // Edit existing user mode
+        auto userOpt = m_dao.getById(m_selectedUserId);
+        if (userOpt.has_value()) {
+            User u = userOpt.value();
+            ui->leUserUsername->setText(u.username);
+            ui->leUserPassword->clear(); // Don't show password
+            ui->cbUserRole->setCurrentText(u.role);
+            ui->cbUserStatus->setCurrentText(u.status);
+        }
+        m_isEditMode = true;
+    }
+
     ui->leUserUsername->setFocus();
 }
 
 void UserController::addUser() {
     Ui::MainWindow* ui = m_mainWindow->getUi();
-    if (!validateForm()) return;
+    if (!validateForm(true)) return;
 
-    QString username = ui->leUserUsername->text();
-    QString password = ui->leUserPassword->text();
-    QString role = ui->cbUserRole->currentText().toUpper();
+    User u;
+    u.username = ui->leUserUsername->text();
+    u.password = ui->leUserPassword->text();
+    u.role = ui->cbUserRole->currentText();
+    u.status = ui->cbUserStatus->currentText();
 
-    if (UserDao::add(username, password, role)) {
+    if (m_dao.add(u)) {
         QMessageBox::information(m_mainWindow, "Utilisateur", "Utilisateur ajouté avec succès");
         // Clear form and switch to view mode
         ui->leUserUsername->clear();
         ui->leUserPassword->clear();
         ui->cbUserRole->setCurrentIndex(0);
+        ui->cbUserStatus->setCurrentIndex(0);
         ui->stackedUser->setCurrentIndex(0); // Switch to view mode
         refreshUsers();
     } else {
@@ -156,103 +113,74 @@ void UserController::addUser() {
 }
 
 void UserController::updateUser() {
-    Ui::MainWindow* ui = m_mainWindow->getUi();
-    
-    // Check if we're in edit mode (stackedUser index 1)
-    if (ui->stackedUser->currentIndex() == 0) {
-        // We're in view mode, switch to edit mode and load selected user data
-        auto items = ui->tblUsers->selectedItems();
-        if (items.isEmpty()) {
-            QMessageBox::warning(m_mainWindow, "Utilisateur", "Veuillez sélectionner un utilisateur à modifier");
-            return;
-        }
-
-        int row = items.first()->row();
-        int id = ui->tblUsers->item(row, 0)->text().toInt();
-        QString username = ui->tblUsers->item(row, 1)->text();
-        QString role = ui->tblUsers->item(row, 2)->text();
-        QString status = ui->tblUsers->item(row, 3)->text();
-
-        // Load data into form fields
-        ui->leUserUsername->setText(username);
-        ui->leUserPassword->clear(); // Don't show existing password
-        ui->cbUserRole->setCurrentText(role);
-        ui->cbUserStatus->setCurrentText(status);
-        
-        // Store the ID for later update
-        ui->leUserUsername->setProperty("userId", id);
-        
-        // Switch to edit mode
-        ui->stackedUser->setCurrentIndex(1);
-        ui->leUserUsername->setFocus();
+    if (m_selectedUserId == -1) {
+        QMessageBox::warning(m_mainWindow, "Utilisateur", "Veuillez sélectionner un utilisateur à modifier");
         return;
     }
-    
-    // We're in edit mode, perform the update
-    if (!validateForm()) return;
 
-    int userId = ui->leUserUsername->property("userId").toInt();
+    Ui::MainWindow* ui = m_mainWindow->getUi();
+    if (!validateForm(false)) return;
+
     QString username = ui->leUserUsername->text();
     QString password = ui->leUserPassword->text();
-    QString role = ui->cbUserRole->currentText().toUpper();
-    QString status = ui->cbUserStatus->currentText().toUpper();
+    QString role = ui->cbUserRole->currentText();
+    QString status = ui->cbUserStatus->currentText();
 
     // If password is empty, don't update it
+    bool success;
     if (password.isEmpty()) {
-        if (UserDao::updateWithoutPassword(userId, username, role, status)) {
-            QMessageBox::information(m_mainWindow, "Utilisateur", "Utilisateur modifié avec succès");
-            // Clear form and switch to view mode
-            ui->leUserUsername->clear();
-            ui->leUserPassword->clear();
-            ui->cbUserRole->setCurrentIndex(0);
-            ui->cbUserStatus->setCurrentIndex(0);
-            ui->stackedUser->setCurrentIndex(0);
-            refreshUsers();
-        } else {
-            QMessageBox::warning(m_mainWindow, "Utilisateur", "Échec de la modification: " + Db::instance().lastError());
-        }
+        success = m_dao.updateWithoutPassword(m_selectedUserId, username, role, status);
     } else {
-        if (UserDao::update(userId, username, password, role, status)) {
-            QMessageBox::information(m_mainWindow, "Utilisateur", "Utilisateur modifié avec succès");
-            // Clear form and switch to view mode
-            ui->leUserUsername->clear();
-            ui->leUserPassword->clear();
-            ui->cbUserRole->setCurrentIndex(0);
-            ui->cbUserStatus->setCurrentIndex(0);
-            ui->stackedUser->setCurrentIndex(0);
-            refreshUsers();
-        } else {
-            QMessageBox::warning(m_mainWindow, "Utilisateur", "Échec de la modification: " + Db::instance().lastError());
-        }
+        User u;
+        u.id = m_selectedUserId;
+        u.username = username;
+        u.password = password;
+        u.role = role;
+        u.status = status;
+        success = m_dao.update(u);
+    }
+
+    if (success) {
+        QMessageBox::information(m_mainWindow, "Utilisateur", "Utilisateur modifié avec succès");
+        // Clear form and switch to view mode
+        ui->leUserUsername->clear();
+        ui->leUserPassword->clear();
+        ui->cbUserRole->setCurrentIndex(0);
+        ui->cbUserStatus->setCurrentIndex(0);
+        ui->stackedUser->setCurrentIndex(0);
+        refreshUsers();
+    } else {
+        QMessageBox::warning(m_mainWindow, "Utilisateur", "Échec de la modification: " + Db::instance().lastError());
     }
 }
 
 void UserController::deleteUser() {
-    Ui::MainWindow* ui = m_mainWindow->getUi();
-    auto items = ui->tblUsers->selectedItems();
-    if (items.isEmpty()) {
+    if (m_selectedUserId == -1) {
         QMessageBox::warning(m_mainWindow, "Utilisateur", "Veuillez sélectionner un utilisateur à supprimer");
         return;
     }
 
-    int row = items.first()->row();
-    int id = ui->tblUsers->item(row, 0)->text().toInt();
-    QString username = ui->tblUsers->item(row, 1)->text();
+    auto userOpt = m_dao.getById(m_selectedUserId);
+    if (!userOpt.has_value()) {
+        QMessageBox::warning(m_mainWindow, "Utilisateur", "Utilisateur non trouvé");
+        return;
+    }
 
-    // Prevent self-deletion - we need to access the user ID from the main window
-    // This is a temporary fix - ideally we should pass the user ID to the controller
-    if (id == 1) { // Assuming current user ID is 1 for now
+    User u = userOpt.value();
+
+    // Prevent self-deletion
+    if (u.id == m_mainWindow->getUserId()) {
         QMessageBox::warning(m_mainWindow, "Utilisateur", "Vous ne pouvez pas supprimer votre propre compte");
         return;
     }
 
     QMessageBox::StandardButton reply;
     reply = QMessageBox::question(m_mainWindow, "Confirmation",
-                                  QString("Êtes-vous sûr de vouloir supprimer l'utilisateur %1?").arg(username),
+                                  QString("Êtes-vous sûr de vouloir supprimer l'utilisateur %1?").arg(u.username),
                                   QMessageBox::Yes | QMessageBox::No);
 
     if (reply == QMessageBox::Yes) {
-        if (UserDao::remove(id)) {
+        if (m_dao.remove(m_selectedUserId)) {
             QMessageBox::information(m_mainWindow, "Utilisateur", "Utilisateur supprimé avec succès");
             refreshUsers();
         } else {
@@ -266,26 +194,33 @@ void UserController::refreshUsers() {
 }
 
 void UserController::changePassword() {
-    Ui::MainWindow* ui = m_mainWindow->getUi();
-    auto items = ui->tblUsers->selectedItems();
-    if (items.isEmpty()) {
+    if (m_selectedUserId == -1) {
         QMessageBox::warning(m_mainWindow, "Utilisateur", "Veuillez sélectionner un utilisateur");
         return;
     }
 
-    int row = items.first()->row();
-    int id = ui->tblUsers->item(row, 0)->text().toInt();
-    QString username = ui->tblUsers->item(row, 1)->text();
+    auto userOpt = m_dao.getById(m_selectedUserId);
+    if (!userOpt.has_value()) {
+        QMessageBox::warning(m_mainWindow, "Utilisateur", "Utilisateur non trouvé");
+        return;
+    }
+
+    User u = userOpt.value();
 
     QString password = QInputDialog::getText(m_mainWindow, "Changer le mot de passe",
-                                             QString("Nouveau mot de passe pour %1:").arg(username),
+                                             QString("Nouveau mot de passe pour %1:").arg(u.username),
                                              QLineEdit::Password);
 
     if (password.isEmpty()) {
         return;
     }
 
-    if (UserDao::updatePassword(id, password)) {
+    if (password.length() < 6) {
+        QMessageBox::warning(m_mainWindow, "Validation", "Le mot de passe doit contenir au moins 6 caractères");
+        return;
+    }
+
+    if (m_dao.updatePassword(m_selectedUserId, password)) {
         QMessageBox::information(m_mainWindow, "Utilisateur", "Mot de passe changé avec succès");
     } else {
         QMessageBox::warning(m_mainWindow, "Utilisateur", "Échec du changement de mot de passe: " + Db::instance().lastError());
@@ -295,15 +230,18 @@ void UserController::changePassword() {
 void UserController::cancelEdit() {
     Ui::MainWindow* ui = m_mainWindow->getUi();
     ui->stackedUser->setCurrentIndex(0); // Switch back to view mode
+    m_isEditMode = false;
 }
 
 void UserController::loadUsersTable() {
     Ui::MainWindow* ui = m_mainWindow->getUi();
-    auto users = UserDao::all();
+    auto users = m_dao.getAll();
+
     ui->tblUsers->clearContents();
     ui->tblUsers->setRowCount(users.size());
     ui->tblUsers->setColumnCount(5);
-    QStringList headers = {"ID","Nom d'utilisateur","Rôle","Statut","Date création"};
+
+    QStringList headers = {"ID", "Nom d'utilisateur", "Rôle", "Statut", "Date création"};
     ui->tblUsers->setHorizontalHeaderLabels(headers);
     ui->tblUsers->horizontalHeader()->setStretchLastSection(true);
     ui->tblUsers->setAlternatingRowColors(true);
@@ -312,14 +250,15 @@ void UserController::loadUsersTable() {
 
     for (int i = 0; i < users.size(); ++i) {
         const auto &u = users[i];
+
         ui->tblUsers->setItem(i, 0, new QTableWidgetItem(QString::number(u.id)));
         ui->tblUsers->setItem(i, 1, new QTableWidgetItem(u.username));
-        ui->tblUsers->setItem(i, 2, new QTableWidgetItem(u.role));
-        ui->tblUsers->setItem(i, 3, new QTableWidgetItem(u.status));
+        ui->tblUsers->setItem(i, 2, new QTableWidgetItem(u.roleText()));
+        ui->tblUsers->setItem(i, 3, new QTableWidgetItem(u.statusText()));
         ui->tblUsers->setItem(i, 4, new QTableWidgetItem(u.created.toString("yyyy-MM-dd")));
 
         // Color code based on status
-        QTableWidgetItem *statusItem = new QTableWidgetItem(u.status);
+        QTableWidgetItem *statusItem = ui->tblUsers->item(i, 3);
         if (u.status == "ACTIVE") {
             statusItem->setBackground(QColor("#d4edda")); // Light green
             statusItem->setForeground(QColor("#155724")); // Dark green
@@ -327,8 +266,18 @@ void UserController::loadUsersTable() {
             statusItem->setBackground(QColor("#f8d7da")); // Light red
             statusItem->setForeground(QColor("#721c24")); // Dark red
         }
-        ui->tblUsers->setItem(i, 3, statusItem);
+
+        // Color code based on role
+        QTableWidgetItem *roleItem = ui->tblUsers->item(i, 2);
+        if (u.role == "ADMIN") {
+            roleItem->setBackground(QColor("#d1ecf1")); // Light blue
+            roleItem->setForeground(QColor("#0c5460")); // Dark blue
+        } else if (u.role == "MANAGER") {
+            roleItem->setBackground(QColor("#fff3cd")); // Light yellow
+            roleItem->setForeground(QColor("#856404")); // Dark yellow
+        }
     }
+
     applyFilters();
     updateChart();
 }
@@ -336,37 +285,66 @@ void UserController::loadUsersTable() {
 void UserController::applyFilters() {
     Ui::MainWindow* ui = m_mainWindow->getUi();
     QString text = ui->leSearchUser->text().trimmed();
+    QString roleFilter = ui->cbUserRoleFilter->currentText();
+    QString statusFilter = ui->cbUserStatusFilter->currentText();
+    QString sortKey = ui->cbUserSort->currentText();
 
-    for (int r=0; r<ui->tblUsers->rowCount(); ++r) ui->tblUsers->setRowHidden(r, false);
+    for (int r = 0; r < ui->tblUsers->rowCount(); ++r) {
+        ui->tblUsers->setRowHidden(r, false);
+    }
 
-    for (int r=0; r<ui->tblUsers->rowCount(); ++r) {
+    for (int r = 0; r < ui->tblUsers->rowCount(); ++r) {
         bool match = true;
 
         // Username search
         if (!text.isEmpty()) {
-            QString username = ui->tblUsers->item(r,1)->text();
+            QString username = ui->tblUsers->item(r, 1)->text();
             match &= username.contains(text, Qt::CaseInsensitive);
         }
 
-        if (!match) ui->tblUsers->setRowHidden(r, true);
+        // Role filter
+        if (roleFilter != "Tous les rôles") {
+            QString role = ui->tblUsers->item(r, 2)->text();
+            match &= (role == roleFilter);
+        }
+
+        // Status filter
+        if (statusFilter != "Tous les statuts") {
+            QString status = ui->tblUsers->item(r, 3)->text();
+            match &= (status == statusFilter);
+        }
+
+        if (!match) {
+            ui->tblUsers->setRowHidden(r, true);
+        }
+    }
+
+    if (sortKey == "Nom d'utilisateur") {
+        ui->tblUsers->sortItems(1);
+    } else if (sortKey == "Rôle") {
+        ui->tblUsers->sortItems(2);
+    } else if (sortKey == "Statut") {
+        ui->tblUsers->sortItems(3);
+    } else if (sortKey == "Date création") {
+        ui->tblUsers->sortItems(4);
     }
 }
 
 void UserController::updateChart() {
-    // Access the chart view through the main window's member variable
     QChartView* userChartView = m_mainWindow->userChartView;
     if (!userChartView) return;
 
-    auto users = UserDao::all();
-
-    QMap<QString, int> roleCounts;
-    for (const auto &user : users) {
-        roleCounts[user.role]++;
-    }
+    auto roleCounts = m_dao.getUsersByRole();
 
     QPieSeries *series = new QPieSeries();
-    for (auto it = roleCounts.begin(); it != roleCounts.end(); ++it) {
-        series->append(it.key(), it.value());
+    for (const auto &pair : roleCounts) {
+        QString roleName;
+        if (pair.first == "ADMIN") roleName = "Administrateurs";
+        else if (pair.first == "MANAGER") roleName = "Gestionnaires";
+        else if (pair.first == "DELIVERY") roleName = "Livreurs";
+        else roleName = pair.first;
+
+        series->append(roleName, pair.second);
     }
 
     QChart *chart = new QChart();
@@ -378,17 +356,33 @@ void UserController::updateChart() {
     userChartView->setChart(chart);
 }
 
-bool UserController::validateForm() {
+bool UserController::validateForm(bool isNewUser) {
     Ui::MainWindow* ui = m_mainWindow->getUi();
+
     if (ui->leUserUsername->text().isEmpty()) {
         QMessageBox::warning(m_mainWindow, "Validation", "Le nom d'utilisateur est obligatoire");
         ui->leUserUsername->setFocus();
         return false;
     }
-    if (ui->leUserPassword->text().isEmpty()) {
+
+    if (isNewUser && ui->leUserPassword->text().isEmpty()) {
         QMessageBox::warning(m_mainWindow, "Validation", "Le mot de passe est obligatoire");
         ui->leUserPassword->setFocus();
         return false;
     }
+
+    if (isNewUser && ui->leUserPassword->text().length() < 6) {
+        QMessageBox::warning(m_mainWindow, "Validation", "Le mot de passe doit contenir au moins 6 caractères");
+        ui->leUserPassword->setFocus();
+        return false;
+    }
+
+    // Check if username already exists (for new users)
+    if (isNewUser && m_dao.usernameExists(ui->leUserUsername->text())) {
+        QMessageBox::warning(m_mainWindow, "Validation", "Ce nom d'utilisateur existe déjà");
+        ui->leUserUsername->setFocus();
+        return false;
+    }
+
     return true;
 }

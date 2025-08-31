@@ -37,14 +37,13 @@ private:
     void setupAnimations();
     void showLoginForm();
     void showRegisterForm();
-    void animateTransition(bool toRegister);
 
     Ui::LoginDialog *ui;
     int m_userId;
     QString m_username;
     QString m_role;
     QPoint m_dragPosition;
-    
+
     QPropertyAnimation *m_fadeInAnimation;
     QPropertyAnimation *m_fadeOutAnimation;
 };

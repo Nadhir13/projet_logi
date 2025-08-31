@@ -10,7 +10,6 @@
 #define UI_LOGINDIALOG_H
 
 #include <QtCore/QVariant>
-#include <QtGui/QIcon>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QDialog>
@@ -75,9 +74,6 @@ public:
             LoginDialog->setObjectName("LoginDialog");
         LoginDialog->resize(1000, 700);
         LoginDialog->setMinimumSize(QSize(900, 600));
-        QIcon icon;
-        icon.addFile(QString::fromUtf8(":/icons/app_icon.png"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
-        LoginDialog->setWindowIcon(icon);
         LoginDialog->setStyleSheet(QString::fromUtf8("QDialog {\n"
 "    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,\n"
 "                               stop:0 #667eea, stop:1 #764ba2);\n"
@@ -103,7 +99,7 @@ public:
         logoLabel->setMinimumSize(QSize(0, 80));
         logoLabel->setPixmap(QPixmap(QString::fromUtf8(":/icons/logo.png")));
         logoLabel->setScaledContents(true);
-        logoLabel->setAlignment(Qt::AlignCenter);
+        logoLabel->setAlignment(Qt::AlignmentFlag::AlignCenter);
 
         verticalLayout->addWidget(logoLabel);
 
@@ -115,7 +111,7 @@ public:
 "    font-weight: bold;\n"
 "    font-family: 'Segoe UI', Arial, sans-serif;\n"
 "}"));
-        titleLabel->setAlignment(Qt::AlignCenter);
+        titleLabel->setAlignment(Qt::AlignmentFlag::AlignCenter);
 
         verticalLayout->addWidget(titleLabel);
 
@@ -126,7 +122,7 @@ public:
 "    font-size: 14px;\n"
 "    font-family: 'Segoe UI', Arial, sans-serif;\n"
 "}"));
-        subtitleLabel->setAlignment(Qt::AlignCenter);
+        subtitleLabel->setAlignment(Qt::AlignmentFlag::AlignCenter);
 
         verticalLayout->addWidget(subtitleLabel);
 
@@ -153,7 +149,7 @@ public:
 "    font-size: 12px;\n"
 "    font-family: 'Segoe UI', Arial, sans-serif;\n"
 "}"));
-        lblUsername->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+        lblUsername->setAlignment(Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter);
 
         formLayout->setWidget(0, QFormLayout::ItemRole::LabelRole, lblUsername);
 
@@ -188,14 +184,13 @@ public:
 "    font-size: 12px;\n"
 "    font-family: 'Segoe UI', Arial, sans-serif;\n"
 "}"));
-        lblPassword->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+        lblPassword->setAlignment(Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter);
 
         formLayout->setWidget(1, QFormLayout::ItemRole::LabelRole, lblPassword);
 
         lePassword = new QLineEdit(loginPage);
         lePassword->setObjectName("lePassword");
         lePassword->setMinimumSize(QSize(200, 40));
-        lePassword->setEchoMode(QLineEdit::Password);
         lePassword->setStyleSheet(QString::fromUtf8("QLineEdit {\n"
 "    border: 2px solid #e2e8f0;\n"
 "    border-radius: 8px;\n"
@@ -213,6 +208,7 @@ public:
 "QLineEdit::placeholder {\n"
 "    color: #a0aec0;\n"
 "}"));
+        lePassword->setEchoMode(QLineEdit::EchoMode::Password);
 
         formLayout->setWidget(1, QFormLayout::ItemRole::FieldRole, lePassword);
 
@@ -248,7 +244,6 @@ public:
 "    background: #a0aec0;\n"
 "    color: #e2e8f0;\n"
 "}"));
-        btnLogin->setCursor(Qt::PointingHandCursor);
 
         verticalLayout_2->addWidget(btnLogin);
 
@@ -270,7 +265,6 @@ public:
 "    border-color: #cbd5e0;\n"
 "    color: #2d3748;\n"
 "}"));
-        btnSwitchToRegister->setCursor(Qt::PointingHandCursor);
 
         verticalLayout_2->addWidget(btnSwitchToRegister);
 
@@ -292,7 +286,7 @@ public:
 "    font-size: 12px;\n"
 "    font-family: 'Segoe UI', Arial, sans-serif;\n"
 "}"));
-        lblRegUsername->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+        lblRegUsername->setAlignment(Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter);
 
         formLayout_2->setWidget(0, QFormLayout::ItemRole::LabelRole, lblRegUsername);
 
@@ -327,14 +321,13 @@ public:
 "    font-size: 12px;\n"
 "    font-family: 'Segoe UI', Arial, sans-serif;\n"
 "}"));
-        lblRegPassword->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+        lblRegPassword->setAlignment(Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter);
 
         formLayout_2->setWidget(1, QFormLayout::ItemRole::LabelRole, lblRegPassword);
 
         leRegPassword = new QLineEdit(registerPage);
         leRegPassword->setObjectName("leRegPassword");
         leRegPassword->setMinimumSize(QSize(200, 40));
-        leRegPassword->setEchoMode(QLineEdit::Password);
         leRegPassword->setStyleSheet(QString::fromUtf8("QLineEdit {\n"
 "    border: 2px solid #e2e8f0;\n"
 "    border-radius: 8px;\n"
@@ -352,6 +345,7 @@ public:
 "QLineEdit::placeholder {\n"
 "    color: #a0aec0;\n"
 "}"));
+        leRegPassword->setEchoMode(QLineEdit::EchoMode::Password);
 
         formLayout_2->setWidget(1, QFormLayout::ItemRole::FieldRole, leRegPassword);
 
@@ -363,14 +357,13 @@ public:
 "    font-size: 12px;\n"
 "    font-family: 'Segoe UI', Arial, sans-serif;\n"
 "}"));
-        lblRegConfirmPassword->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+        lblRegConfirmPassword->setAlignment(Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter);
 
         formLayout_2->setWidget(2, QFormLayout::ItemRole::LabelRole, lblRegConfirmPassword);
 
         leRegConfirmPassword = new QLineEdit(registerPage);
         leRegConfirmPassword->setObjectName("leRegConfirmPassword");
         leRegConfirmPassword->setMinimumSize(QSize(200, 40));
-        leRegConfirmPassword->setEchoMode(QLineEdit::Password);
         leRegConfirmPassword->setStyleSheet(QString::fromUtf8("QLineEdit {\n"
 "    border: 2px solid #e2e8f0;\n"
 "    border-radius: 8px;\n"
@@ -388,6 +381,7 @@ public:
 "QLineEdit::placeholder {\n"
 "    color: #a0aec0;\n"
 "}"));
+        leRegConfirmPassword->setEchoMode(QLineEdit::EchoMode::Password);
 
         formLayout_2->setWidget(2, QFormLayout::ItemRole::FieldRole, leRegConfirmPassword);
 
@@ -399,7 +393,7 @@ public:
 "    font-size: 12px;\n"
 "    font-family: 'Segoe UI', Arial, sans-serif;\n"
 "}"));
-        lblRegRole->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+        lblRegRole->setAlignment(Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter);
 
         formLayout_2->setWidget(3, QFormLayout::ItemRole::LabelRole, lblRegRole);
 
@@ -429,7 +423,7 @@ public:
 "}\n"
 "\n"
 "QComboBox::down-arrow {\n"
-"    image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iOCIgdmlld0JveD0iMCAwIDEyIDgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0xIDFMNiA2TDExIDEiIHN0cm9rZT0iIzY5NzM3NyIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+);\n"
+"    image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iOCIgdmlld0JveD0iMCAwIDEyIDgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0xIDFMNiA2TDExIDEiIHN0cm9rZT0iIzY5NzM3NyIgc3Ryb2tlLXdpZHRoPSIyIiB3dHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+);\n"
 "    width: 12px;\n"
 "    height: 8px;\n"
 "}"));
@@ -463,7 +457,6 @@ public:
 "    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,\n"
 "                               stop:0 #2f855a, stop:1 #276749);\n"
 "}"));
-        btnRegister->setCursor(Qt::PointingHandCursor);
 
         verticalLayout_3->addWidget(btnRegister);
 
@@ -485,7 +478,6 @@ public:
 "    border-color: #cbd5e0;\n"
 "    color: #2d3748;\n"
 "}"));
-        btnSwitchToLogin->setCursor(Qt::PointingHandCursor);
 
         verticalLayout_3->addWidget(btnSwitchToLogin);
 
@@ -504,7 +496,7 @@ public:
 "    font-size: 11px;\n"
 "    font-family: 'Segoe UI', Arial, sans-serif;\n"
 "}"));
-        footerLabel->setAlignment(Qt::AlignCenter);
+        footerLabel->setAlignment(Qt::AlignmentFlag::AlignCenter);
 
         verticalLayout->addWidget(footerLabel);
 
@@ -531,7 +523,7 @@ public:
 "    font-weight: bold;\n"
 "    font-family: 'Segoe UI', Arial, sans-serif;\n"
 "}"));
-        welcomeLabel->setAlignment(Qt::AlignCenter);
+        welcomeLabel->setAlignment(Qt::AlignmentFlag::AlignCenter);
 
         verticalLayout_4->addWidget(welcomeLabel);
 
@@ -542,7 +534,7 @@ public:
 "    font-size: 14px;\n"
 "    font-family: 'Segoe UI', Arial, sans-serif;\n"
 "}"));
-        descriptionLabel->setAlignment(Qt::AlignCenter);
+        descriptionLabel->setAlignment(Qt::AlignmentFlag::AlignCenter);
 
         verticalLayout_4->addWidget(descriptionLabel);
 

@@ -17,6 +17,8 @@ ClientController::ClientController(MainWindow* mainWindow, QObject* parent)
     : QObject(parent), m_mainWindow(mainWindow)
 {}
 
+ClientController::~ClientController() {}
+
 void ClientController::setupUi() {
     Ui::MainWindow* ui = m_mainWindow->getUi();
 
@@ -27,6 +29,7 @@ void ClientController::setupUi() {
     connect(ui->btnRefClient, &QPushButton::clicked, this, &ClientController::refreshClients);
     connect(ui->btnExportExcel, &QPushButton::clicked, this, &ClientController::exportToExcel);
     connect(ui->btnClientStats, &QPushButton::clicked, this, &ClientController::showStats);
+    connect(ui->btnUpdateCategory, &QPushButton::clicked, this, &ClientController::autoCategorizeClients);
 
     // Connect filter signals
     connect(ui->leSearchClient, &QLineEdit::textChanged, this, &ClientController::applyFilters);
@@ -34,9 +37,56 @@ void ClientController::setupUi() {
     connect(ui->cbStatutFilter, &QComboBox::currentTextChanged, this, &ClientController::applyFilters);
     connect(ui->cbClientSort, &QComboBox::currentTextChanged, this, &ClientController::applyFilters);
 
+    // Connect table selection changed
+    connect(ui->tblClients, &QTableWidget::itemSelectionChanged, this, &ClientController::onClientTableSelectionChanged);
+
     // Set tooltips
     ui->leSearchClient->setToolTip("Recherche par nom et prénom");
     ui->leEmailFilter->setToolTip("Filtrer par email spécifique");
+}
+
+void ClientController::onClientTableSelectionChanged() {
+    populateFormWithSelectedClient();
+}
+
+void ClientController::populateFormWithSelectedClient() {
+    Ui::MainWindow* ui = m_mainWindow->getUi();
+    auto items = ui->tblClients->selectedItems();
+
+    if (items.isEmpty()) {
+        // Clear form if no selection
+        ui->leNom->clear();
+        ui->lePrenom->clear();
+        ui->leTel->clear();
+        ui->leEmail->clear();
+        ui->leAdr->clear();
+        ui->cbStatut->setCurrentIndex(0);
+        m_selectedClientId = -1;
+        return;
+    }
+
+    int row = items.first()->row();
+    int id = ui->tblClients->item(row, 0)->text().toInt();
+    m_selectedClientId = id;
+
+    auto clientOpt = m_dao.getById(id);
+    if (!clientOpt.has_value()) {
+        QMessageBox::warning(m_mainWindow, "Client", "Client non trouvé");
+        return;
+    }
+
+    Client c = clientOpt.value();
+    ui->leNom->setText(c.nom);
+    ui->lePrenom->setText(c.prenom);
+    ui->leTel->setText(c.tel);
+    ui->leEmail->setText(c.email);
+    ui->leAdr->setText(c.adr);
+
+    // Set status in combo box
+    int statusIndex = ui->cbStatut->findText(c.statut);
+    if (statusIndex >= 0) {
+        ui->cbStatut->setCurrentIndex(statusIndex);
+    }
 }
 
 void ClientController::addClient() {
@@ -51,6 +101,7 @@ void ClientController::addClient() {
     c.adr = ui->leAdr->text();
     c.statut = ui->cbStatut->currentText();
     c.category = "REGULAR";
+
     if (!m_dao.add(c)) {
         QMessageBox::warning(m_mainWindow, "Client", "Échec de l'ajout: " + Db::instance().lastError());
     }
@@ -58,17 +109,15 @@ void ClientController::addClient() {
 }
 
 void ClientController::updateClient() {
-    Ui::MainWindow* ui = m_mainWindow->getUi();
-    auto items = ui->tblClients->selectedItems();
-    if (items.isEmpty()) {
+    if (m_selectedClientId == -1) {
         QMessageBox::warning(m_mainWindow, "Client", "Veuillez sélectionner un client à modifier");
         return;
     }
 
-    int row = items.first()->row();
-    int id = ui->tblClients->item(row, 0)->text().toInt();
+    Ui::MainWindow* ui = m_mainWindow->getUi();
+    if (!validateForm()) return;
 
-    auto clientOpt = m_dao.byId(id);
+    auto clientOpt = m_dao.getById(m_selectedClientId);
     if (!clientOpt.has_value()) {
         QMessageBox::warning(m_mainWindow, "Client", "Client non trouvé");
         return;
@@ -82,7 +131,7 @@ void ClientController::updateClient() {
     c.adr = ui->leAdr->text();
     c.statut = ui->cbStatut->currentText();
 
-    if (!m_dao.upd(c)) {
+    if (!m_dao.update(c)) {
         QMessageBox::warning(m_mainWindow, "Client", "Échec de la modification: " + Db::instance().lastError());
     } else {
         QMessageBox::information(m_mainWindow, "Client", "Client modifié avec succès");
@@ -91,16 +140,22 @@ void ClientController::updateClient() {
 }
 
 void ClientController::deleteClient() {
-    Ui::MainWindow* ui = m_mainWindow->getUi();
-    auto items = ui->tblClients->selectedItems();
-    if (items.isEmpty()) return;
-    int row = items.first()->row();
-    int id = ui->tblClients->item(row, 0)->text().toInt();
-
-    if (!m_dao.del(id)) {
-        QMessageBox::warning(m_mainWindow, "Client", "Échec de la suppression: " + Db::instance().lastError());
+    if (m_selectedClientId == -1) {
+        QMessageBox::warning(m_mainWindow, "Client", "Veuillez sélectionner un client à supprimer");
+        return;
     }
-    refreshClients();
+
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(m_mainWindow, "Confirmation",
+                                  "Êtes-vous sûr de vouloir supprimer ce client?",
+                                  QMessageBox::Yes | QMessageBox::No);
+
+    if (reply == QMessageBox::Yes) {
+        if (!m_dao.remove(m_selectedClientId)) {
+            QMessageBox::warning(m_mainWindow, "Client", "Échec de la suppression: " + Db::instance().lastError());
+        }
+        refreshClients();
+    }
 }
 
 void ClientController::refreshClients() {
@@ -111,23 +166,27 @@ void ClientController::refreshClients() {
 
 void ClientController::loadClientsTable() {
     Ui::MainWindow* ui = m_mainWindow->getUi();
-    auto v = m_dao.all();
+    auto clients = m_dao.getAll();
+
     ui->tblClients->clearContents();
-    ui->tblClients->setRowCount(v.size());
+    ui->tblClients->setRowCount(clients.size());
     ui->tblClients->setColumnCount(9);
-    QStringList headers = {"ID","Nom","Prénom","Tel","Email","Adresse","Statut","Créé","Catégorie"};
+
+    QStringList headers = {"ID", "Nom", "Prénom", "Tel", "Email", "Adresse", "Statut", "Créé", "Catégorie"};
     ui->tblClients->setHorizontalHeaderLabels(headers);
     ui->tblClients->horizontalHeader()->setStretchLastSection(true);
-    for (int i=0;i<v.size();++i) {
-        const auto &c = v[i];
-        ui->tblClients->setItem(i,0,new QTableWidgetItem(QString::number(c.id)));
-        ui->tblClients->setItem(i,1,new QTableWidgetItem(c.nom));
-        ui->tblClients->setItem(i,2,new QTableWidgetItem(c.prenom));
-        ui->tblClients->setItem(i,3,new QTableWidgetItem(c.tel));
-        ui->tblClients->setItem(i,4,new QTableWidgetItem(c.email));
-        ui->tblClients->setItem(i,5,new QTableWidgetItem(c.adr));
-        ui->tblClients->setItem(i,6,new QTableWidgetItem(c.statut));
-        ui->tblClients->setItem(i,7,new QTableWidgetItem(c.created.toString("yyyy-MM-dd")));
+
+    for (int i = 0; i < clients.size(); ++i) {
+        const auto &c = clients[i];
+
+        ui->tblClients->setItem(i, 0, new QTableWidgetItem(QString::number(c.id)));
+        ui->tblClients->setItem(i, 1, new QTableWidgetItem(c.nom));
+        ui->tblClients->setItem(i, 2, new QTableWidgetItem(c.prenom));
+        ui->tblClients->setItem(i, 3, new QTableWidgetItem(c.tel));
+        ui->tblClients->setItem(i, 4, new QTableWidgetItem(c.email));
+        ui->tblClients->setItem(i, 5, new QTableWidgetItem(c.adr));
+        ui->tblClients->setItem(i, 6, new QTableWidgetItem(c.statut));
+        ui->tblClients->setItem(i, 7, new QTableWidgetItem(c.created.toString("yyyy-MM-dd")));
 
         // Color code based on category
         QTableWidgetItem *categoryItem = new QTableWidgetItem(c.category);
@@ -137,29 +196,34 @@ void ClientController::loadClientsTable() {
             categoryItem->setBackground(QColor("#FFD700")); // Gold color
         } else if (c.category == "SILVER") {
             categoryItem->setBackground(QColor("#C0C0C0")); // Silver color
+        } else {
+            categoryItem->setBackground(QColor("#FFFFFF")); // Regular color
         }
-        ui->tblClients->setItem(i,8,categoryItem);
+        ui->tblClients->setItem(i, 8, categoryItem);
     }
+
     applyFilters();
     updateChart();
 }
 
 void ClientController::loadClientsCombo() {
     Ui::MainWindow* ui = m_mainWindow->getUi();
-    auto v = m_dao.all();
+    auto clients = m_dao.getAll();
+
     ui->cbClient->clear();
-    for (const auto& c: v) {
-        ui->cbClient->addItem(QString("%1 %2").arg(c.nom, c.prenom), c.id);
+    for (const auto& c: clients) {
+        ui->cbClient->addItem(c.fullName(), c.id);
     }
 }
 
 void ClientController::loadClientFilterCombo() {
     Ui::MainWindow* ui = m_mainWindow->getUi();
-    auto v = m_dao.all();
+    auto clients = m_dao.getAll();
+
     ui->cbClientFilter->clear();
     ui->cbClientFilter->addItem("Tous les clients", -1);
-    for (const auto& c: v) {
-        ui->cbClientFilter->addItem(QString("%1 %2").arg(c.nom, c.prenom), c.id);
+    for (const auto& c: clients) {
+        ui->cbClientFilter->addItem(c.fullName(), c.id);
     }
 }
 
@@ -170,41 +234,49 @@ void ClientController::applyFilters() {
     QString statut = ui->cbStatutFilter->currentText();
     QString sortKey = ui->cbClientSort->currentText();
 
-    for (int r=0; r<ui->tblClients->rowCount(); ++r) ui->tblClients->setRowHidden(r, false);
+    for (int r = 0; r < ui->tblClients->rowCount(); ++r) {
+        ui->tblClients->setRowHidden(r, false);
+    }
 
-    for (int r=0; r<ui->tblClients->rowCount(); ++r) {
+    for (int r = 0; r < ui->tblClients->rowCount(); ++r) {
         bool match = true;
 
         // Name search (nom, prénom)
         if (!text.isEmpty()) {
-            QString rowText = ui->tblClients->item(r,1)->text() + " " + ui->tblClients->item(r,2)->text();
+            QString rowText = ui->tblClients->item(r, 1)->text() + " " + ui->tblClients->item(r, 2)->text();
             match &= rowText.contains(text, Qt::CaseInsensitive);
         }
 
         // Email filter
         if (!emailFilter.isEmpty()) {
-            QString email = ui->tblClients->item(r,4)->text();
+            QString email = ui->tblClients->item(r, 4)->text();
             match &= email.contains(emailFilter, Qt::CaseInsensitive);
         }
 
         // Status filter
         if (statut != "Tous") {
-            match &= ui->tblClients->item(r,6)->text() == statut;
+            match &= ui->tblClients->item(r, 6)->text() == statut;
         }
 
-        if (!match) ui->tblClients->setRowHidden(r, true);
+        if (!match) {
+            ui->tblClients->setRowHidden(r, true);
+        }
     }
 
-    if (sortKey == "Nom") ui->tblClients->sortItems(1);
-    else if (sortKey == "Prénom") ui->tblClients->sortItems(2);
-    else if (sortKey == "Créé") ui->tblClients->sortItems(7);
+    if (sortKey == "Nom") {
+        ui->tblClients->sortItems(1);
+    } else if (sortKey == "Prénom") {
+        ui->tblClients->sortItems(2);
+    } else if (sortKey == "Créé") {
+        ui->tblClients->sortItems(7);
+    }
 }
 
 void ClientController::updateChart() {
     QChartView* clientChartView = m_mainWindow->clientChartView;
     if (!clientChartView) return;
 
-    auto clients = m_dao.all();
+    auto clients = m_dao.getAll();
 
     QMap<QString, int> counts;
     counts["ACTIVE"] = 0;
@@ -263,7 +335,7 @@ void ClientController::exportToExcel() {
     QTextStream stream(&file);
     stream << "ID,Nom,Prénom,Téléphone,Email,Adresse,Statut,Date création,Catégorie\n";
 
-    auto clients = m_dao.all();
+    auto clients = m_dao.getAll();
 
     for (const auto &client : clients) {
         stream << client.id << ","
@@ -282,15 +354,10 @@ void ClientController::exportToExcel() {
 }
 
 void ClientController::updateClientCategory() {
-    Ui::MainWindow* ui = m_mainWindow->getUi();
-    auto items = ui->tblClients->selectedItems();
-    if (items.isEmpty()) {
+    if (m_selectedClientId == -1) {
         QMessageBox::warning(m_mainWindow, "Catégorie", "Veuillez sélectionner un client");
         return;
     }
-
-    int row = items.first()->row();
-    int id = ui->tblClients->item(row, 0)->text().toInt();
 
     QStringList categories = {"REGULAR", "SILVER", "GOLD", "PLATINUM"};
     QString category = QInputDialog::getItem(m_mainWindow, "Catégorie client",
@@ -298,7 +365,7 @@ void ClientController::updateClientCategory() {
 
     if (category.isEmpty()) return;
 
-    if (m_dao.updateClientCategory(id, category)) {
+    if (m_dao.updateCategory(m_selectedClientId, category)) {
         QMessageBox::information(m_mainWindow, "Catégorie", "Catégorie mise à jour avec succès");
         refreshClients();
     } else {
@@ -307,11 +374,18 @@ void ClientController::updateClientCategory() {
 }
 
 void ClientController::autoCategorizeClients() {
-    if (m_dao.autoCategorizeClients()) {
-        QMessageBox::information(m_mainWindow, "Catégorisation", "Clients catégorisés automatiquement avec succès");
-        refreshClients();
-    } else {
-        QMessageBox::warning(m_mainWindow, "Catégorisation", "Échec de la catégorisation automatique");
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(m_mainWindow, "Catégorisation automatique",
+                                  "Êtes-vous sûr de vouloir catégoriser automatiquement tous les clients?",
+                                  QMessageBox::Yes | QMessageBox::No);
+
+    if (reply == QMessageBox::Yes) {
+        if (m_dao.autoCategorize()) {
+            QMessageBox::information(m_mainWindow, "Catégorisation", "Clients catégorisés automatiquement avec succès");
+            refreshClients();
+        } else {
+            QMessageBox::warning(m_mainWindow, "Catégorisation", "Échec de la catégorisation automatique");
+        }
     }
 }
 

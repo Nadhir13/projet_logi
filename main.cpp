@@ -2,6 +2,7 @@
 #include "mainwindow.h"
 #include "db.h"
 #include "logindialog.h"
+#include <QMessageBox>
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
@@ -11,7 +12,8 @@ int main(int argc, char *argv[]) {
 
     // Connect to database
     if (!Db::instance().open("localhost", 1521, "XE", "system", "admin")) {
-        qFatal("DB open failed: %s", qPrintable(Db::instance().lastError()));
+        QMessageBox::critical(nullptr, "Erreur de base de données",
+                              "Impossible de se connecter à la base de données:\n" + Db::instance().lastError());
         return 1;
     }
 
